@@ -60,7 +60,7 @@ include("input.jl")
     # Operator{:Locking_ratio_mix}(:E=>Ē,:ν=>ν̄),
     ]
     kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
-    kᵤₚ = zeros(3*nᵤ,2*nₚ)
+    kᵤₚ = zeros(2*nᵤ,nₚ)
     kₚₚ = zeros(nₚ,nₚ)
     f = zeros(2*nᵤ)
 

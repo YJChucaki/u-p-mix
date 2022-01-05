@@ -360,6 +360,13 @@ function import_quad(filename1::String,filename2::String)
     nodes = [Node{(:𝐼,),1}((i,),data) for i in 1:nₚ]
     data_p = Dict([:x=>(1,xᵖ),:y=>(1,yᵖ),:z=>(1,zᵖ)])
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
+    s, var𝐴 = cal_area_support(elms_p["Ω"])
+    # s = 1.7*s*ones(nᵖ)
+
+    # f = open("./xlsx/var.txt", "a")
+    # writedlm(f, [nᵖ var𝐴])
+    
+    # push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
     sp = ApproxOperator.RegularGrid(xᵖ,yᵖ,zᵖ,n=1,γ=2)
     parameters = (:Linear2D,:□,:CubicSpline)
