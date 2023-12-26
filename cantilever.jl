@@ -2,8 +2,8 @@ using  ApproxOperator, LinearAlgebra, Printf, TimerOutputs, XLSX
 include("input.jl")
 
 # for i in 40:50
-    ndiv= 20
-    ndiv_p= 20
+    ndiv= 10
+    ndiv_p= 10
     # elements,nodes,nodes_p = import_fem_tri3("./msh/square_"*string(ndiv)*".msh","./msh/square_"*string(ndiv_p)*".msh")
     # elements,nodes,nodes_p = import_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
     # elements,nodes,nodes_p= import_quad("./msh/square_quad_"*string(ndiv)*".msh","./msh/square_quad_"*string(ndiv_p)*".msh")
@@ -66,6 +66,7 @@ include("input.jl")
     h1,l2 = ops[5](elements["Ω"])
     L2 = log10(l2)
     H1 = log10(h1)
+    println(L2)
     # h = log10(10.0/ndiv)
 
 #     index = 40:50

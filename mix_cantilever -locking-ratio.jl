@@ -3,18 +3,19 @@ using  ApproxOperator, LinearAlgebra, Printf, XLSX
 
 include("input.jl")
 
-# for i in 10:30
-    ndiv= 40
-    ndiv_p= 20
-     #elements,nodes,nodes_p = import_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
-     #elements,nodes,nodes_p = import_fem_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble.msh")
-    elements,nodes,nodes_p = import_fem_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
+# for i in 1637:1650
+    i=100
+    ndiv= 4
+    # ndiv_p= 4
+    # elements,nodes,nodes_p = import_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
+    elements,nodes,nodes_p = import_fem_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
 
-    s = 2.5*12/ndiv_p*ones(nₚ)
-    push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
+    # s = 1.5*12/ndiv_p*ones(nₚ)
+
+    # push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
     set𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ω"])
@@ -26,8 +27,9 @@ include("input.jl")
 
     P = 1000
     Ē = 3e6
-    # ν̄ = 0.49999999999999
-    ν̄ = 0.3
+    ν̄ = 0.49999999999999
+  
+    # ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
     L = 48
@@ -50,8 +52,7 @@ include("input.jl")
     Operator{:∫∫qpdxdy}(:E=>Ē,:ν=>ν̄),
     Operator{:∫vᵢtᵢds}(),
     Operator{:∫vᵢgᵢds}(:α=>1e9*E),
-    Operator{:Hₑ_Incompressible}(:E=>E,:ν=>ν),
-    Operator{:Hₑ_PlaneStress}(:E=>E,:ν=>ν),
+    Operator{:Locking_ratio_mix}(:E=>Ē,:ν=>ν̄),
     ]
     kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
     kᵤₚ = zeros(2*nᵤ,nₚ)
@@ -70,7 +71,10 @@ include("input.jl")
     d = k\f
     d₁ = d[1:2:2*nᵤ]
     d₂ = d[2:2:2*nᵤ]
+    q  = d[2*nᵤ+1:end]
     push!(nodes,:d₁=>d₁,:d₂=>d₂)
+    push!(nodes_p,:q=>q)
+
 
     ApproxOperator.prescribe!(elements["Ω"],:u=>(x,y,z)->-P*y/6/EI*((6*L-3x)*x + (2+ν)*(y^2-D^2/4)))
     ApproxOperator.prescribe!(elements["Ω"],:v=>(x,y,z)->P/6/EI*(3*ν*y^2*(L-x) + (4+5*ν)*D^2*x/4 + (3*L-x)*x^2))
@@ -79,16 +83,13 @@ include("input.jl")
     ApproxOperator.prescribe!(elements["Ω"],:∂v∂x=>(x,y,z)->P/6/EI*((6*L-3*x)*x - 3*ν*y^2 + (4+5*ν)*D^2/4))
     ApproxOperator.prescribe!(elements["Ω"],:∂v∂y=>(x,y,z)->P/EI*(L-x)*y*ν)
 
-    h1,l2 = ops[8](elements["Ω"])
-    L2 = log10(l2)
-    H1 = log10(h1)
-    h = nᵤ/nₚ
-     println(h)
-     println(L2)
-#     index = 10:30
+     R=ops[8](elements["Ω"],elements["Ωᵖ"])
+    
+    println(R)
+#     index = 1637:1650
 #     XLSX.openxlsx("./xlsx/mix.xlsx", mode="rw") do xf
-#         Sheet = xf[5]
-#         ind = findfirst(n->n==ndiv_p,index)+1
+#         Sheet = xf[6]
+#         ind = findfirst(n->n==i,index)+1
 #         Sheet["B"*string(ind)] = h
 #         Sheet["C"*string(ind)] = L2
 #         Sheet["D"*string(ind)] = H1
