@@ -1,6 +1,12 @@
 
 using BubbleMsh
+# path = "./msh/plate_with_hole.msh"
+# path = "./msh/cantilever.msh"
+path = "./msh/cook_membrane.msh"
 
-path = "./msh/cantilever.msh"
+#cantilever
+# bubblemsh(path,[24.0,0.0,0.0],[23.0,5.0,0.0],43,2.0,0.1)
 
-bubblemsh(path,[24.0,0.0,0.0],[23.0,5.0,0.0],1660,0.4,0.1)
+#cook_membrane
+bubblemsh(path,[24.0,37.0,0.0],[23.0,7.0,0.0],20,1.0,0.1)
+#plate_with_hole

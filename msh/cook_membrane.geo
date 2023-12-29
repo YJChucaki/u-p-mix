@@ -2,7 +2,7 @@
 a = 48.0;
 b = 44.0;
 c = 16.0;
-n =8;
+n =5;
 
 
 Point(1) = {0.0, 0.0, 0.0};
@@ -24,11 +24,12 @@ Transfinite Curve{2,4} = n+1;
 
 Physical Curve("Γᵗ") = {2};
 Physical Curve("Γᵍ") = {4};
-Physical Surface("Ω") = {1};
+Physical Curve("Γ") = {1,3};
+//Physical Surface("Ω") = {1};
 
-Transfinite Surface{1};
+//Transfinite Surface{1};
 
-Mesh.Algorithm = 8;
+Mesh.Algorithm = 1;
 Mesh.MshFileVersion = 2;
 Mesh 2;
 //RecombineMesh;
