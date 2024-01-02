@@ -76,12 +76,14 @@ L2 = log10(l2)
 H1 = log10(h1)
 h = log10(12.0/ndiv)
 
-index = [8,16,32,60]
-XLSX.openxlsx("./xlsx/eigem.xlsx", mode="rw") do xf
-    Sheet = xf[3]
-    ind = findfirst(n->n==ndiv,index)+1
-    Sheet["B"*string(ind)] = h
-    Sheet["C"*string(ind)] = L2
-    Sheet["D"*string(ind)] = H1
- end
+println(L2,H1,h)
+
+# index = [8,16,32,60]
+# XLSX.openxlsx("./xlsx/eigem.xlsx", mode="rw") do xf
+#     Sheet = xf[3]
+#     ind = findfirst(n->n==ndiv,index)+1
+#     Sheet["B"*string(ind)] = h
+#     Sheet["C"*string(ind)] = L2
+#     Sheet["D"*string(ind)] = H1
+#  end
 

@@ -2,8 +2,8 @@ using  ApproxOperator, LinearAlgebra, Printf, TimerOutputs, XLSX
 include("input.jl")
 
 # for i in 40:50
-    ndiv= 10
-    ndiv_p= 10
+    ndiv= 4
+    ndiv_p= 4
     # elements,nodes,nodes_p = import_fem_tri3("./msh/square_"*string(ndiv)*".msh","./msh/square_"*string(ndiv_p)*".msh")
     # elements,nodes,nodes_p = import_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
     # elements,nodes,nodes_p= import_quad("./msh/square_quad_"*string(ndiv)*".msh","./msh/square_quad_"*string(ndiv_p)*".msh")
@@ -18,7 +18,7 @@ include("input.jl")
 
     P = 1000
     Ē = 3e6
-    # ν̄ = 0.49999999999999
+    # ν̄ = 0.4999999
     ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
@@ -48,6 +48,7 @@ include("input.jl")
         Operator{:∫vᵢgᵢds}(:α=>1e9*E),
         Operator{:Hₑ_PlaneStress}(:E=>E,:ν=>ν),
         Operator{:Hₑ_Incompressible}(:E=>E,:ν=>ν),
+        
     ]
 
     k = zeros(2*nᵤ,2*nᵤ)
@@ -63,10 +64,11 @@ include("input.jl")
 
     push!(nodes,:d₁=>d₁,:d₂=>d₂)
 
-    h1,l2 = ops[5](elements["Ω"])
+    h1,l2 = ops[6](elements["Ω"])
     L2 = log10(l2)
     H1 = log10(h1)
-    println(L2)
+    h = log10(12.0/ndiv)
+    println(L2,H1,h)
     # h = log10(10.0/ndiv)
 
 #     index = 40:50

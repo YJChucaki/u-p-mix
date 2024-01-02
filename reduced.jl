@@ -1,11 +1,11 @@
-using Revise, ApproxOperator, LinearAlgebra, Printf, TimerOutputs, XLSX
+using  ApproxOperator, LinearAlgebra, Printf, TimerOutputs, XLSX
 include("input.jl")
 
-ndiv= 50
-ndiv_p= 50
+ndiv= 4
+ndiv_p= 4
 # elements,nodes,nodes_p= import_quad_GI1("./msh/square_quad_"*string(ndiv)*".msh","./msh/square_quad_"*string(ndiv_p)*".msh")
-# elements,nodes,nodes_p= import_quad_GI1("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
-elements,nodes,nodes_p= import_fem_tri3_GI1("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
+elements,nodes,nodes_p= import_quad_GI1("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
+# elements,nodes,nodes_p= import_fem_tri3_GI1("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
 nᵤ = length(nodes)
 nₚ = length(nodes_p)
 
@@ -18,7 +18,7 @@ set𝝭!(elements["Γᵗ"])
 
 P = 1000
 Ē = 3e6
-ν̄ = 0.49999999999999
+ν̄ = 0.4999999
 # ν̄ = 0.3
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
@@ -77,6 +77,7 @@ ops = [
     Operator{:∫vᵢtᵢds}(),
     Operator{:∫vᵢgᵢds}(:α=>1e9*E),
     Operator{:Hₑ_PlaneStress}(:E=>E,:ν=>ν),
+    Operator{:Hₑ_Incompressible}(:E=>E,:ν=>ν),
 
 ]
 opsᵛ = [
@@ -103,6 +104,7 @@ d₂ = d[2:2:2*nᵤ]
 
 push!(nodes,:d₁=>d₁,:d₂=>d₂)
 
-h1,l2 = ops[5](elements["Ω"])
+h1,l2 = ops[6](elements["Ω"])
 L2 = log10(l2)
 H1 = log10(h1)
+println(L2,H1)

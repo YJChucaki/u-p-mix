@@ -1,15 +1,15 @@
-using Revise, ApproxOperator, LinearAlgebra, Printf
+using ApproxOperator, LinearAlgebra, Printf
 include("input.jl")
 
-# elements,nodes,nodes_p = import_mf_tri3("./msh/square_8.msh","./msh/square_8.msh")
-elements,nodes,nodes_p = import_fem_tri3("./msh/square_8.msh","./msh/square_8.msh")
+elements,nodes,nodes_p = import_mf_tri3("./msh/square_8.msh","./msh/square_8.msh")
+# elements,nodes,nodes_p = import_fem_tri3("./msh/square_8.msh","./msh/square_8.msh")
 
 nᵤ = length(nodes)
 nₚ = length(nodes_p)
 
 s = 1.5*10/2*ones(nₚ)
 push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
-# push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
+push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 
 set𝝭!(elements["Ω"])
 set∇𝝭!(elements["Ω"])

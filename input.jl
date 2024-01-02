@@ -17,6 +17,14 @@ function import_mf_tri3(filename1::String,filename2::String)
     nodes = [Node{(:𝐼,),1}((i,),data) for i in 1:nₚ]
     data_p = Dict([:x=>(1,xᵖ),:y=>(1,yᵖ),:z=>(1,zᵖ)])
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
+    s, var𝐴 = cal_area_support(elms["Ω"])
+    sₚ, var𝐴 = cal_area_support(elms_p["Ω"])
+    sₚ= 1.5*sₚ*ones(nᵖ)
+    s= 1.5*s*ones(nₚ)
+    
+    
+    push!(nodes_p,:s₁=>sₚ,:s₂=>sₚ,:s₃=>sₚ)
+    push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 
     sp = ApproxOperator.RegularGrid(x,y,z,n=1,γ=2)
     sp_p = ApproxOperator.RegularGrid(xᵖ,yᵖ,zᵖ,n=1,γ=2)
