@@ -4,11 +4,11 @@ using  ApproxOperator, LinearAlgebra, Printf, XLSX
 include("input.jl")
 
 # for i in 1637:1650
-    # i=60
+    i=375
     ndiv= 6
     ndiv_p= 6
     # elements,nodes,nodes_p = import_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
-    elements,nodes,nodes_p =import_fem_tri3_plate_with_hole("./msh/plate_with_hole_"*string(ndiv)*".msh","./msh/plate_with_hole_"*string(ndiv_p)*".msh")
+    elements,nodes,nodes_p =import_fem_tri3_plate_with_hole("./msh/plate_with_hole_"*string(ndiv)*".msh","./msh/plate_with_hole_new_bubble_"*string(i)*".msh")
 
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
@@ -30,8 +30,8 @@ include("input.jl")
 
   
     Ē = 3e6
-    # ν̄ = 0.49999999999999
-    ν̄ = 0.3
+    ν̄ = 0.4999999
+    # ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
    

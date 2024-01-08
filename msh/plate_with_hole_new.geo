@@ -1,7 +1,7 @@
 
 a = 1.0;
 b = 5.0;
-n = 6;
+n = 8;
 
 Point(1) = {0.0, 0.0, 0.0};
 Point(2) = {  a, 0.0, 0.0};
@@ -26,17 +26,17 @@ Line(7) = {9,5};
 Line(8) = {5,10};
 Line(9) = {10,6};
 Circle(10) = {6,1,12};
-Circle(11) = {10,1,11};
-Circle(12) = {11,1,7};
-Line(13) = {8,11};
-Line(14) = {9,11};
-Line(15) = {11,12};
+//Circle(11) = {10,1,11};
+//Circle(12) = {11,1,7};
+//Line(13) = {8,11};
+//Line(14) = {9,11};
+//Line(15) = {11,12};
 
-Curve Loop(16) = {15,1,2,-12};
-Curve Loop(17) = {12,3,4,13};
-Curve Loop(18) = {5,6,14,-13};
-Curve Loop(19) = {8,11,-14,7};
-Curve Loop(20) = {10,-15,-11,9};
+//Curve Loop(16) = {15,1,2,-12};
+//Curve Loop(17) = {12,3,4,13};
+//Curve Loop(18) = {5,6,14,-13};
+//Curve Loop(19) = {8,11,-14,7};
+//Curve Loop(20) = {10,-15,-11,9};
 Curve Loop(21) = {1,2,3,4,5};
 
 Plane Surface(1) = {16};
@@ -46,8 +46,8 @@ Plane Surface(4) = {19};
 Plane Surface(5) = {20};
 
 Plane Surface(1) = {21};
-Transfinite Curve{1,2,4,7,9,10,11,12,15} = n+1;
-Transfinite Curve{3,5,6,8,13,14} = 2*n+1;
+Transfinite Curve{1,2,4,7,9,10} = n+1;
+Transfinite Curve{3,5,6,8} = 2*n+1;
 
 
 
@@ -56,7 +56,7 @@ Physical Curve("Γᵗ₂") = {6,7};
 Physical Curve("Γᵗ₃") = {1,10};
 Physical Curve("Γᵍ₁") = {2,3};
 Physical Curve("Γᵍ₂") = {8,9};
-Physical Curve("Γ") = {11,12,13,14,15};
+
 //Physical Surface("Ω") = {1,2,3,4,5};
 
 //Transfinite Surface{1};

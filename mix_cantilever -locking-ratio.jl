@@ -4,16 +4,16 @@ using  ApproxOperator, LinearAlgebra, Printf, XLSX
 include("input.jl")
 
 # for i in 1637:1650
-    i=72
-    ndiv= 4
-    ndiv_p= 4
+    i=3600
+    ndiv= 32
+    ndiv_p= 32
     elements,nodes,nodes_p = import_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
     # elements,nodes,nodes_p = import_fem_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
 
-    s = 1.25*12/ndiv_p*ones(nₚ)
+    s =1.5*12/ndiv_p*ones(nₚ)
 # 
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
@@ -54,6 +54,7 @@ include("input.jl")
     Operator{:∫vᵢgᵢds}(:α=>1e9*E),
     Operator{:Locking_ratio_mix}(:E=>Ē,:ν=>ν̄),
     Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄),
+    Operator{:Hₑ_Incompressible}(:E=>E,:ν=>ν),
     ]
     kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
     kᵤₚ = zeros(2*nᵤ,nₚ)
@@ -86,6 +87,7 @@ include("input.jl")
 
     #  R=ops[8](elements["Ω"],elements["Ωᵖ"])
      h1,l2 = ops[9](elements["Ω"],elements["Ωᵖ"])
+    #  h1,l2 = ops[10](elements["Ω"])
      L2 = log10(l2)
      H1 = log10(h1)
     # println(R)
