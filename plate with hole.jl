@@ -4,18 +4,18 @@ using  ApproxOperator, LinearAlgebra, Printf, XLSX
 include("input.jl")
 
 # for i in 1637:1650
-    i=375
-    ndiv= 6
-    ndiv_p= 6
-    # elements,nodes,nodes_p = import_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
-    elements,nodes,nodes_p =import_fem_tri3_plate_with_hole("./msh/plate_with_hole_"*string(ndiv)*".msh","./msh/plate_with_hole_new_bubble_"*string(i)*".msh")
+    i=4558
+    ndiv= 24
+    ndiv_p= 24
+    elements,nodes,nodes_p = import_fem_quad_plate_with_hole("./msh/plate_with_hole_quad_"*string(ndiv)*".msh","./msh/plate_with_hole_new_bubble_"*string(i)*".msh")
+    # elements,nodes,nodes_p =import_fem_tri3_plate_with_hole("./msh/plate_with_hole_"*string(ndiv)*".msh","./msh/plate_with_hole_new_bubble_"*string(i)*".msh")
 
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
 
-    # s = 1.5*12/ndiv_p*ones(nₚ)
+    s = 1.6*5/ndiv_p*ones(nₚ)
 
-    # push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
+    push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
     set𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ω"])
@@ -113,7 +113,8 @@ ApproxOperator.prescribe!(elements["Γᵍ₂"],:g₂=>(x,y,z)->0.0)
     H1 = log10(h1)
     h = 2nᵤ/nₚ
     println(L2,H1)
-
+    h = log10(5.0/3*ndiv)
+    println(h)
 #     index = 1637:1650
 #     XLSX.openxlsx("./xlsx/mix.xlsx", mode="rw") do xf
 #         Sheet = xf[6]

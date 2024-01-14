@@ -1,7 +1,7 @@
 
 a = 1.0;
 b = 5.0;
-n = 8;
+n = 30;
 
 Point(1) = {0.0, 0.0, 0.0};
 Point(2) = {  a, 0.0, 0.0};
@@ -47,7 +47,7 @@ Plane Surface(5) = {20};
 
 Plane Surface(1) = {21};
 Transfinite Curve{1,2,4,7,9,10} = n+1;
-Transfinite Curve{3,5,6,8} = 2*n+1;
+Transfinite Curve{3,5,6,8} = n+1;
 
 
 

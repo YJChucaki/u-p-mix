@@ -1,11 +1,12 @@
 using  ApproxOperator, LinearAlgebra, Printf, TimerOutputs, XLSX
 include("input.jl")
 
-ndiv= 8
-ndiv_p= 8
+ndiv= 32
+ndiv_p= 32
 # elements,nodes,nodes_p= import_quad_GI1("./msh/square_quad_"*string(ndiv)*".msh","./msh/square_quad_"*string(ndiv_p)*".msh")
 elements,nodes,nodes_p= import_quad_GI1("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
 # elements,nodes,nodes_p= import_fem_tri3_GI1("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
+
 nᵤ = length(nodes)
 nₚ = length(nodes_p)
 
@@ -18,8 +19,8 @@ set𝝭!(elements["Γᵗ"])
 
 P = 1000
 Ē = 3e6
-ν̄ = 0.4999999
-# ν̄ = 0.3
+# ν̄ = 0.4999999
+ν̄ = 0.3
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
 L = 48
@@ -77,7 +78,7 @@ ops = [
     Operator{:∫vᵢtᵢds}(),
     Operator{:∫vᵢgᵢds}(:α=>1e9*E),
     Operator{:Hₑ_PlaneStress}(:E=>E,:ν=>ν),
-    Operator{:Hₑ_Incompressible}(:E=>E,:ν=>ν),
+    Operator{:Hₑ_Incompressible}(:E=>Ē,:ν=>ν̄ ),
 
 ]
 opsᵛ = [
