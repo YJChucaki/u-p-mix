@@ -1,9 +1,9 @@
 
 using ApproxOperator, LinearAlgebra, Printf ,XLSX
 include("input.jl")
-# for i in 10:30
-ndiv= 20
-ndiv_p=30
+# for i in 2:10
+ndiv= 30
+ndiv_p=9
 # elements, nodes, nodes_𝑝,elms = import_rkgsi_mix_quadratic(fid_𝑢,fid_𝑝)
 elements,nodes,nodes_p = import_fem_tri3("./msh/cook_membrane_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(ndiv_p)*".msh")
 
@@ -22,7 +22,7 @@ push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 # ν = (3*κ-2*μ)/2/(3*κ+μ)
 E = 70.0
 # ν = 0.3333
-ν =0.499999
+ν =0.4999999
 
 
 set𝝭!(elements["Ω"])
@@ -139,6 +139,7 @@ for (i,x) in enumerate(a.𝓒)
     global u₂ += 𝝭[i]*x.d₂
 end
 h = nᵤ/nₚ
+
 println(u₂)
 # println(nₚ)
 # index = 10:30

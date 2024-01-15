@@ -17,10 +17,11 @@ function import_mf_tri3(filename1::String,filename2::String)
     nodes = [Node{(:𝐼,),1}((i,),data) for i in 1:nₚ]
     data_p = Dict([:x=>(1,xᵖ),:y=>(1,yᵖ),:z=>(1,zᵖ)])
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
-    s, var𝐴 = cal_area_support(elms["Ω"])
+    # s, var𝐴 = cal_area_support(elms["Ω"])
     sₚ, var𝐴 = cal_area_support(elms_p["Ω"])
     sₚ= 1.5*sₚ*ones(nᵖ)
-    s= 1.5*s*ones(nₚ)
+    s = 1.5*12/ndiv*ones(nₚ)
+    # s= 1.5*s*ones(nₚ)
     
     
     push!(nodes_p,:s₁=>sₚ,:s₂=>sₚ,:s₃=>sₚ)
@@ -41,7 +42,7 @@ function import_mf_tri3(filename1::String,filename2::String)
     f_Γᵍ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(ReproducingKernel{parameters...,:Seg2},:SegGI5,data)
 
     elements["Ω"] = f_Ω(elms["Ω"],sp)
-    elements["Ωᵖ"] = f_Ωᵖ(elms_p["Ω"],sp_p)
+    elements["Ωᵖ"] = f_Ωᵖ(elms["Ω"],sp_p)
     elements["Γᵍ"] = f_Γᵍ(elms["Γᵍ"],sp)
     push!(f_Ω,
         :𝝭=>:𝑠,
@@ -105,13 +106,13 @@ function import_fem_tri3(filename1::String,filename2::String)
     data_p = Dict([:x=>(1,xᵖ),:y=>(1,yᵖ),:z=>(1,zᵖ)])
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
 
-    s, var𝐴 = cal_area_support(elms_p["Ω"])
-    s = 1.25*s*ones(nᵖ)
+    # s, var𝐴 = cal_area_support(elms_p["Ω"])
+    # s = 1.25*s*ones(nᵖ)
 
-    f = open("./xlsx/var.txt", "a")
-    writedlm(f, [nᵖ var𝐴])
+    # f = open("./xlsx/var.txt", "a")
+    # writedlm(f, [nᵖ var𝐴])
     
-    push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
+    # push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
     sp = ApproxOperator.RegularGrid(xᵖ,yᵖ,zᵖ,n=1,γ=2)
     parameters = (:Linear2D,:□,:CubicSpline)

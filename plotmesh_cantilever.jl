@@ -1,9 +1,9 @@
 using ApproxOperator,CairoMakie
 
-lwb = 2.0;lwm = 0.5;mso = 7;msx = 7;ppu = 2.5;α = 0.7;
-filename1 = "./msh/cantilever_20.msh"
-# filename2 = "./msh/cantilever_bubble_1600.msh"
-savename = "./png/1.png"
+lwb = 1;lwm =1;mso =7;msx =7;ppu = 2.5;α = 0.7;
+filename1 = "./msh/cantilever_16.msh"
+filename2 = "./msh/cantilever_bubble_1058.msh"
+savename = "./png/3.png"
 elms,~= ApproxOperator.importmsh(filename1)
 elms_p,~ = ApproxOperator.importmsh(filename2)
 
@@ -34,10 +34,10 @@ for elm in elms["Ω"]
 end
 scatter!(x,y,marker = :circle, markersize = mso, color = :black)
 
-# for elm in elms_p["Ω"]
-#     id = [i for i in elm.i]
-#     lines!(xᵖ[id[[1,2,3,1]]],yᵖ[id[[1,2,3,1]]], linewidth = lwm, color = :blue)
-# end
-# scatter!(xᵖ,yᵖ,marker = :xcross, markersize = msx, color = (:blue, α))
+for elm in elms_p["Ω"]
+    id = [i for i in elm.i]
+    # lines!(xᵖ[id[[1,2,3,1]]],yᵖ[id[[1,2,3,1]]], linewidth = lwm, color = :blue)
+end
+scatter!(xᵖ,yᵖ,marker = :xcross, markersize = msx, color = (:blue, α))
 save(savename,f,px_per_unit = ppu)
 f

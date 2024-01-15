@@ -4,12 +4,12 @@ using  ApproxOperator, LinearAlgebra, Printf, XLSX
 include("input.jl")
 
 # for i in 1637:1650
-    i=72
-    ndiv= 8
-    # ndiv_p= 4
+    # i=3600
+    ndiv= 32
+    ndiv_p=16
     # elements,nodes,nodes_p = import_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
-    # elements,nodes,nodes_p = import_fem_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
-    elements,nodes,nodes_p = import_mf_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+    elements,nodes,nodes_p = import_mf_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
+    # elements,nodes,nodes_p = import_mf_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
 
@@ -52,7 +52,7 @@ include("input.jl")
     Operator{:∫∫p∇vdxdy}(),
     Operator{:∫∫qpdxdy}(:E=>Ē,:ν=>ν̄),
     Operator{:∫vᵢtᵢds}(),
-    Operator{:∫vᵢgᵢds}(:α=>1e9*E),
+    Operator{:∫vᵢgᵢds}(:α=>1e3*E),
     Operator{:Hₑ_Incompressible}(:E=>E,:ν=>ν),
     Operator{:Hₑ_PlaneStress}(:E=>E,:ν=>ν),
     Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄),
@@ -69,7 +69,7 @@ include("input.jl")
     ops[5](elements["Ωᵖ"],kₚₚ)
     ops[7](elements["Γᵍ"],kᵤᵤ,f)
     ops[6](elements["Γᵗ"],f)
-    ops[11](elements["Ω"],f)
+    # ops[11](elements["Ω"],f)
 
     k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
     f = [f;zeros(nₚ)]
