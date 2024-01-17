@@ -3,7 +3,7 @@ using  ApproxOperator, LinearAlgebra, Printf, XLSX
 
 include("input.jl")
 
-ndiv= 60
+ndiv= 16
 elements,nodes= import_quad_PP("./msh/cantilever_quad_"*string(ndiv)*".msh")
 nᵤ = length(nodes)
 nₚ = length(elements["Ωᵖ"])

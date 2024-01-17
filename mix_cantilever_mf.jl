@@ -5,10 +5,11 @@ include("input.jl")
 
 # for i in 1637:1650
     # i=3600
-    ndiv= 32
-    ndiv_p=16
+    ndiv= 2
+    ndiv_p=1
     # elements,nodes,nodes_p = import_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
-    elements,nodes,nodes_p = import_mf_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
+    elements,nodes,nodes_p = import_mf_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
+    # elements,nodes,nodes_p = import_mf_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
     # elements,nodes,nodes_p = import_mf_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
     nᵤ = length(nodes)
     nₚ = length(nodes_p)

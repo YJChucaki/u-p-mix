@@ -4,20 +4,20 @@ using  ApproxOperator, LinearAlgebra, Printf, XLSX
 include("input.jl")
 
 # for i in 2:10
-    # i=72
-    ndiv= 16
-    ndiv_p= 8
+    i=1800
+    ndiv= 30
+    # ndiv_p= 4
     # elements,nodes,nodes_p = import_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
-    # elements,nodes,nodes_p = import_fem_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+    elements,nodes,nodes_p = import_fem_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
     # elements,nodes,nodes_p = import_mf_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
-    elements,nodes,nodes_p = import_fem_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
+    # elements,nodes,nodes_p = import_fem_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
     # elements,nodes,nodes_p = import_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
 
-    s =1.5*12/ndiv_p*ones(nₚ)
+    # s =1.5*12/ndiv_p*ones(nₚ)
 # 
-    push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
+    # push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
     set𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ω"])

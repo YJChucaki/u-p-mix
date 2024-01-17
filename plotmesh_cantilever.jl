@@ -1,9 +1,9 @@
 using ApproxOperator,CairoMakie
 
-lwb = 1;lwm =1;mso =7;msx =7;ppu = 2.5;α = 0.7;
-filename1 = "./msh/cantilever_16.msh"
-filename2 = "./msh/cantilever_bubble_1058.msh"
-savename = "./png/3.png"
+lwb = 2.5;lwm =2.5;mso =15;msx =15;ppu = 2.5;α = 0.7;
+filename1 = "./msh/cantilever_4.msh"
+filename2 = "./msh/cantilever_bubble_72.msh"
+savename = "./png/5.png"
 elms,~= ApproxOperator.importmsh(filename1)
 elms_p,~ = ApproxOperator.importmsh(filename2)
 

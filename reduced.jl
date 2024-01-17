@@ -1,12 +1,12 @@
 using  ApproxOperator, LinearAlgebra, Printf, TimerOutputs, XLSX
 include("input.jl")
 
-ndiv= 32
-ndiv_p= 32
+ndiv= 2
+ndiv_p=2
 # elements,nodes,nodes_p= import_quad_GI1("./msh/square_quad_"*string(ndiv)*".msh","./msh/square_quad_"*string(ndiv_p)*".msh")
-elements,nodes,nodes_p= import_quad_GI1("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
+# elements,nodes,nodes_p= import_quad_GI1("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
 # elements,nodes,nodes_p= import_fem_tri3_GI1("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
-
+elements,nodes,nodes_p= import_mf_quad_reduce("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
 nᵤ = length(nodes)
 nₚ = length(nodes_p)
 
