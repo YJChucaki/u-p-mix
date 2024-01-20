@@ -308,7 +308,7 @@ function import_fem_tri3(filename1::String,filename2::String)
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
 
     s, var𝐴 = cal_area_support(elms_p["Ω"])
-    s = 1.9*s*ones(nᵖ)
+    s = 1.1*s*ones(nᵖ)
 
     # f = open("./xlsx/var.txt", "a")
     # writedlm(f, [nᵖ var𝐴])

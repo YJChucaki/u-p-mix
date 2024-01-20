@@ -4,9 +4,9 @@ using  ApproxOperator, LinearAlgebra, Printf, XLSX
 include("input.jl")
 
 # for i in 2:10
-    i=1800
-    ndiv= 30
-    # ndiv_p= 4
+    i=280
+    ndiv= 8
+    # ndiv_p= 8
     # elements,nodes,nodes_p = import_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
     elements,nodes,nodes_p = import_fem_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
     # elements,nodes,nodes_p = import_mf_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
