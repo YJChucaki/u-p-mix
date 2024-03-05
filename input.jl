@@ -308,7 +308,7 @@ function import_fem_tri3(filename1::String,filename2::String)
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
 
     s, var𝐴 = cal_area_support(elms_p["Ω"])
-    s = 1.5*s*ones(nᵖ)
+    s = 4.7*s*ones(nᵖ)
 
     # f = open("./xlsx/var.txt", "a")
     # writedlm(f, [nᵖ var𝐴])
@@ -563,7 +563,7 @@ function import_quad(filename1::String,filename2::String)
     data_p = Dict([:x=>(1,xᵖ),:y=>(1,yᵖ),:z=>(1,zᵖ)])
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
     s, var𝐴 = cal_area_support(elms_p["Ω"])
-    s = 5.5*s*ones(nᵖ)
+    s = 2.2*s*ones(nᵖ)
 
     f = open("./xlsx/var.txt", "a")
     writedlm(f, [nᵖ var𝐴])
