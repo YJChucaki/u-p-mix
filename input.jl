@@ -369,7 +369,7 @@ function import_fem_tri3(filename1::String,filename2::String)
             ap.n₂ = (x₁-x₂)/𝐿
         end
     end
-    return elements, nodes, nodes_p
+    return elements, nodes, nodes_p,sp,xᵖ,yᵖ,zᵖ
 end
 
 function import_fem_tri3_GI1(filename1::String,filename2::String)

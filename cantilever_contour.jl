@@ -1,110 +1,112 @@
-using ApproxOperator, GLMakie, CairoMakie, XLSX, YAML
-
+using ApproxOperator, GLMakie, CairoMakie, TimerOutputs
+import Gmsh: gmsh
 include("input.jl")
-elements, nodes = import_gauss_quadratic("./msh/cook_membrance_25.msh",:TriGI3)
+i=72
 
-nκ = 400942
-μ = 80.1938
-E = 9*κ*μ/(3*κ+μ)
-ν = (3*κ-2*μ)/2/(3*κ+μ)
-# E = 70.0
-# ν = 0.3333
+ndiv=4
+# ndiv_p=8
+# elements,nodes,nodes_p = import_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+elements,nodes,nodes_p,sp,xᵖ,yᵖ,zᵖ = import_fem_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements,nodes,nodes_p = import_mf_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements,nodes,nodes_p = import_fem_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
+# elements,nodes,nodes_p = import_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
+nᵤ = length(nodes)
+nₚ = length(nodes_p)
 
-nₚ = length(nodes)
-nₑ = length(elements["Ω"])
-s = 2.5*44/25*ones(nₚ)
-push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
+# s =1.5*12/ndiv_p*ones(nₚ)
+# 
+# push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
+set𝝭!(elements["Ω"])
+    set∇𝝭!(elements["Ω"])
+    # set𝝭!(elements["Ωᵍ"])
+    # set∇𝝭!(elements["Ωᵍ"])
+    set𝝭!(elements["Ωᵖ"])
+    set𝝭!(elements["Γᵍ"])
+    set𝝭!(elements["Γᵗ"])
 
-data = getfield(nodes[1],:data)
-sp = ApproxOperator.RegularGrid(data[:x][2],data[:y][2],data[:z][2],n=3,γ=5)
+    P = 1000
+    Ē = 3e6
+    ν̄ = 0.4999999
+  
+    # ν̄ = 0.3
+    E = Ē/(1.0-ν̄^2)
+    ν = ν̄/(1.0-ν̄)
+    L = 48
+    D = 12
+    I = D^3/12
+    EI = E*I
+    ApproxOperator.prescribe!(elements["Γᵗ"],:t₁=>(x,y,z)->0.0)
+    ApproxOperator.prescribe!(elements["Γᵗ"],:t₂=>(x,y,z)->P/2/I*(D^2/4-y^2))
+    ApproxOperator.prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->-P*y/6/EI*((6*L-3x)*x + (2+ν)*(y^2-D^2/4)))
+    ApproxOperator.prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->P/6/EI*(3*ν*y^2*(L-x) + (4+5*ν)*D^2*x/4 + (3*L-x)*x^2))
+    ApproxOperator.prescribe!(elements["Γᵍ"],:n₁₁=>(x,y,z)->1.0)
+    ApproxOperator.prescribe!(elements["Γᵍ"],:n₁₂=>(x,y,z)->0.0)
+    ApproxOperator.prescribe!(elements["Γᵍ"],:n₂₂=>(x,y,z)->1.0)
 
-sheet = XLSX.readtable("./xlsx/triangular_contour.xlsx", "Sheet1")
+    ops = [
+    Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>E,:ν=>ν),
+    Operator{:∫∫εᵛᵢⱼσᵛᵢⱼdxdy}(:E=>Ē,:ν=>ν̄ ),
+    Operator{:∫∫εᵈᵢⱼσᵈᵢⱼdxdy}(:E=>Ē,:ν=>ν̄ ),
+    Operator{:∫∫p∇vdxdy}(),
+    Operator{:∫∫qpdxdy}(:E=>Ē,:ν=>ν̄),
+    Operator{:∫vᵢtᵢds}(),
+    Operator{:∫vᵢgᵢds}(:α=>1e9*E),
+    Operator{:Locking_ratio_mix}(:E=>Ē,:ν=>ν̄),
+    Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄),
+    Operator{:Hₑ_Incompressible}(:E=>E,:ν=>ν),
+    ]
+    kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
+    kᵤₚ = zeros(2*nᵤ,nₚ)
+    kₚₚ = zeros(nₚ,nₚ)
+    f = zeros(2*nᵤ)
 
-inte = 300
-x = [-10/3+10/inte*i for i in 0:inte]
-y = [-10/3^0.5+20/3^0.5/inte*i for i in 0:inte]
+    ops[3](elements["Ω"],kᵤᵤ)
+    ops[4](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
+    ops[5](elements["Ωᵖ"],kₚₚ)
+    ops[7](elements["Γᵍ"],kᵤᵤ,f)
+    ops[6](elements["Γᵗ"],f)
 
+    k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
+    f = [f;zeros(nₚ)]
 
-D = 1.0
-ν = 0.3
-# w₁₁(x,y) = -1/4320*(10+3*x)*(800-420*x+45*x^2-27*y^2)
-# w₂₂(x,y) = -1/4320*(10+3*x)*(800-60*x-9*x^2-81*y^2)
-# w₁₂(x,y) = -1/4320*18*y*(200-60*x-9*x^2-9*y^2)
+    d = k\f
+    d₁ = d[1:2:2*nᵤ]
+    d₂ = d[2:2:2*nᵤ]
+    q  = d[2*nᵤ+1:end]
+    push!(nodes,:d₁=>d₁,:d₂=>d₂)
+    push!(nodes_p,:q=>q)
 
-w₁₁(x,y) = 1/640*(6*x-20)*(4/9*100-x^2-y^2)+1/640*(3*x^2-3*y^2-20*x)*(-2*x)*2-2/640*(x^3-3*y^2*x-10(x^2+y^2)+4/27*1000)
-w₂₂(x,y) = 1/640*(-6*x-20)*(4/9*100-x^2-y^2)+1/640*(0-6*y*x-20*y)*(-2*y)*2-2/640*(x^3-3*y^2*x-10(x^2+y^2)+4/27*1000)
-w₁₂(x,y) = 1/640*(-6*y)*(4/9*100-x^2-y^2)+1/640*(3*x^2-3*y^2-20*x)*(-2*y)+1/640*(0-6*y*x-20*y)*(-2*x)
-M₁₁(x,y) = - D*(w₁₁(x,y)+ν*w₂₂(x,y))
-M₂₂(x,y) = - D*(ν*w₁₁(x,y)+w₂₂(x,y))
-M₁₂(x,y) = - D*(1-ν)*w₁₂(x,y)
-
-Mᵣᵣ = Array{Union{Missing,Float64}}(missing,inte+1,inte+1)
-for j in 1:inte+1
-    for i in 1:inte+1
-        xᵢ = x[i]
-        yᵢ = y[j]
-        if yᵢ<=-3^0.5/3*xᵢ+20*3^0.5/9 && yᵢ>=3^0.5/3*xᵢ-20*3^0.5/9
-        # if yᵢ<=-3^0.5/3*xᵢ+20*3^0.5/9
-            # Mᵣᵣ[i,j] = M₁₁(xᵢ,yᵢ)
-            Mᵣᵣ[i,j] = M₁₂(xᵢ,yᵢ)
-            # Mᵣᵣ[i,j] = M₂₂(xᵢ,yᵢ)
-        end
+𝗠 = zeros(21)
+ind = 10
+xs = zeros(ind)
+ys = zeros(ind)
+zs = zeros(ind)
+color = zeros(ind,ind)
+for (I,ξ¹) in enumerate(LinRange(0.0, L/2, ind))
+    for (J,ξ²) in enumerate(LinRange(0.0, D/2, ind))
+        indices = sp(ξ¹,ξ²,0.0)
+        Nᵖ = zeros(length(indices))
+        data = Dict([:xᵖ=>(2,[ξ¹]),:yᵖ=>(2,[ξ²]),:zᵖ=>(2,[0.0]),:𝝭=>(4,Nᵖ),:𝗠=>(0,𝗠)])
+        𝓒 = [nodes_p[k] for k in indices]
+        𝓖 = [𝑿ₛ((𝑔=1,𝐺=1,𝐶=1,𝑠=0),data)]
+        ap = type(𝓒,𝓖)
+        set𝝭!(ap)
+         p= 0.0
+         for (i,xᵢ) in enumerate(𝓒)
+            p  += Nᵖ[i]*xᵢ.q
+        end 
+        
+        color[I,J] = p
     end
 end
+fig = Figure()
 
-f = Figure(fontsize=24,fonts = (; regular = "Times New Roman"))
-ax = Axis(f[1, 1])
-ax.aspect = 1
+ax = Axis3(fig[1, 1])
+
 hidespines!(ax)
 hidedecorations!(ax)
-surface!(x,y,Mᵣᵣ,
-    # colormap = :balance,
-    # colormap = :bluesreds,
-    colormap = :haline,
-    shading = false,
-    colorrange=(-1.,1.)
-    )
-contour!(x,y,Mᵣᵣ,color=:whitesmoke,levels=-0.9:0.2:1.1)
-# contour!(x,y,Mᵣᵣ,color=:whitesmoke)
-lines!([-10/3.,20/3,-10/3,-10/3],[-10/3^0.5,0.0,10/3^0.5,-10/3^0.5],color=:black)
-Colorbar(f[1,2], colormap=:haline,limits = (-1, 1),ticks = -1.0:0.5:1.0, size=50)
-f
-# save("./figure/triangular_exact.png",f)
-
-# Mᵣᵣ = Array{Union{Missing,Float64}}(missing,inte+1,inte+1)
-# n = 5
-# d = sheet[1][n]
-# for j in 1:inte+1
-#     for i in 1:inte+1
-#         xᵢ = x[i]
-#         yᵢ = y[j]
-#         if yᵢ<=-3^0.5/3*xᵢ+20*3^0.5/9 && yᵢ>=3^0.5/3*xᵢ-20*3^0.5/9
-#             Mᵣᵣ[i,j] = 0.0
-#             indices = sp(xᵢ,yᵢ,0.0)
-#             ξ = ApproxOperator.SNode((1,1,0),Dict([:x=>(2,[xᵢ]),:y=>(2,[yᵢ]),:z=>(2,[0.])]))
-#             ap = ApproxOperator.ReproducingKernel{:Cubic2D,:□,:QuinticSpline,:Tri3}([nodes[ind] for ind in indices],[ξ],Dict{Symbol,ApproxOperator.SymMat}())
-#             set_memory_𝗠!(ap,:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²)
-#             set_memory_𝝭!([ap],:𝝭,:∂𝝭∂x,:∂𝝭∂y,:∂²𝝭∂x²,:∂²𝝭∂x∂y,:∂²𝝭∂y²)
-#             set∇²₂𝝭!(ap,ξ)
-#             B₁₁ = ξ[:∂²𝝭∂x²]
-#             B₁₂ = ξ[:∂²𝝭∂x∂y]
-#             B₂₂ = ξ[:∂²𝝭∂y²]
-#             for (ind,I) in enumerate(indices)
-#                 M₁₁ = -D*(B₁₁[ind]+ν*B₂₂[ind])*d[I]
-#                 M₂₂ = -D*(ν*B₁₁[ind]+B₂₂[ind])*d[I]
-#                 M₁₂ = -D*(1-ν)*B₁₂[ind]*d[I]
-#                 Mᵣᵣ[i,j] += M₁₂
-#             end
-#         end
-#     end
-# end
-# f = Figure()
-# ax = Axis(f[1, 1])
-# ax.aspect = 1
-# hidespines!(ax)
-# hidedecorations!(ax)
-# surface!(x,y,Mᵣᵣ,colormap = :haline, shading = false, colorrange=(-1.,1.))
-# contour!(x,y,Mᵣᵣ,color=:whitesmoke,levels=-0.9:0.2:1.1)
-# lines!([-10/3.,20/3,-10/3,-10/3],[-10/3^0.5,0.0,10/3^0.5,-10/3^0.5],color=:black)
-# save("./figure/triangular_"*string(n)*".png",f)
+lines!([Point(0.0, -6.0, 0.0), Point(48.0,-6.0,0.0), Point(48.0, 6.0, 0.0), Point(0, 6.0, 0.0)],color=:black)
+s = surface!(ax,x,y, color=color, colormap=:coolwarm)
+Colorbar(fig[2, 1], s, vertical = false)
+fig
