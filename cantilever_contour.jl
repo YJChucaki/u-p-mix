@@ -87,7 +87,7 @@ for (I,ξ¹) in enumerate(LinRange(0.0, L/2, ind))
     for (J,ξ²) in enumerate(LinRange(0.0, D/2, ind))
         indices = sp(ξ¹,ξ²,0.0)
         Nᵖ = zeros(length(indices))
-        data = Dict([:xᵖ=>(2,[ξ¹]),:yᵖ=>(2,[ξ²]),:zᵖ=>(2,[0.0]),:𝝭=>(4,Nᵖ),:𝗠=>(0,𝗠)])
+        data = Dict([:xᵖ=>(1,[ξ¹]),:yᵖ=>(1,[ξ²]),:zᵖ=>(1,[0.0]),:𝝭=>(4,Nᵖ),:𝗠=>(0,𝗠)])
         𝓒 = [nodes_p[k] for k in indices]
         𝓖 = [𝑿ₛ((𝑔=1,𝐺=1,𝐶=1,𝑠=0),data)]
         ap = type(𝓒,𝓖)
@@ -96,7 +96,6 @@ for (I,ξ¹) in enumerate(LinRange(0.0, L/2, ind))
          for (i,xᵢ) in enumerate(𝓒)
             p  += Nᵖ[i]*xᵢ.q
         end 
-        
         color[I,J] = p
     end
 end
