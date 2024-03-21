@@ -10,7 +10,7 @@ path = "./msh/cantilever.msh"
 # 500:0.65
 # 93:0.9
 
-bubblemsh(path,[24.0,0.0,0.0],[23.0,5.0,0.0],33,2.0,0.1)
+bubblemsh(path,[24.0,0.0,0.0],[23.0,5.0,0.0],10,3.0,0.1)
 
 
 #cook_membrane

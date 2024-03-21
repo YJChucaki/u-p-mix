@@ -1,7 +1,7 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie
- ndiv= 32
- ndiv_p= 3
-i=40
+ ndiv= 8
+ ndiv_p= 7
+i=200
 include("import_prescrible_ops.jl")
 include("import_cantilever.jl")
 # elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
@@ -82,7 +82,7 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3(".
 #         Sheet["H"*string(ind)] = H1
 
 # @save compress=true "jld/cantilever_mix_tri3_"*string(ndiv)*".jld" q
-# @save compress=true "jld/cantilever_mix_tri3_bubble_G3_"*string(i)*".jld" q
+@save compress=true "jld/cantilever_mix_tri3_bubble_G30_"*string(i)*".jld" q
 # @save compress=true "jld/cantilever_mix_quad4_bubble_G3_"*string(i)*".jld" q
 # @save compress=true "jld/cantilever_mix_quad4_"*string(ndiv)*".jld" q
 #     end
@@ -128,7 +128,7 @@ lwb = 2.5;lwm =2.5;mso =5;msx =15;ppu = 2.5;α = 0.7;
 for elm in elements["Ω"]
     x = [x.x for x in elm.𝓒[[1,2,3,1]]]
     y = [x.y for x in elm.𝓒[[1,2,3,1]]]
-    lines!(x,y, linewidth = 0.03, color = :black)
+    lines!(x,y, linewidth = 0.3, color = :black)
 end
 # scatter!(x,y,marker = :circle, markersize = mso, color = :black)
 lines!([0.0,L,L,0.0,0.0],[-D/2,-D/2,D/2,D/2,-D/2], linewidth = lwb, color = :black)
