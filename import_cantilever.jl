@@ -11,7 +11,7 @@ function import_cantilever_mix_tri3(filename1::String,filename2::String)
     x = nodes.x
     y = nodes.y
     z = nodes.z
-    integrationOrder = 30
+    integrationOrder = 1
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
     elements["Ω"] = getElements(nodes, entities["Ω"],   integrationOrder, normal = true)
     elements["Γᵍ"] = getElements(nodes, entities["Γᵍ"],   integrationOrder, normal = true)
@@ -27,7 +27,7 @@ function import_cantilever_mix_tri3(filename1::String,filename2::String)
     zᵖ = nodes_p.z
 
     type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
-    sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 1,γ = 2)
+    sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)
     gmsh.open(filename1)
  
     entities = getPhysicalGroups()

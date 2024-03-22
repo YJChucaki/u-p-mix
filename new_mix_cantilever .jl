@@ -1,7 +1,7 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie
  ndiv= 8
- ndiv_p= 7
-i=200
+ ndiv_p= 8
+i=230
 include("import_prescrible_ops.jl")
 include("import_cantilever.jl")
 # elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
@@ -82,7 +82,7 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3(".
 #         Sheet["H"*string(ind)] = H1
 
 # @save compress=true "jld/cantilever_mix_tri3_"*string(ndiv)*".jld" q
-@save compress=true "jld/cantilever_mix_tri3_bubble_G30_"*string(i)*".jld" q
+# @save compress=true "jld/cantilever_mix_tri3_bubble_G30_"*string(i)*".jld" q
 # @save compress=true "jld/cantilever_mix_quad4_bubble_G3_"*string(i)*".jld" q
 # @save compress=true "jld/cantilever_mix_quad4_"*string(ndiv)*".jld" q
 #     end
@@ -134,5 +134,5 @@ end
 lines!([0.0,L,L,0.0,0.0],[-D/2,-D/2,D/2,D/2,-D/2], linewidth = lwb, color = :black)
 # save("./png/cantilever_"*string(i)*".png",fig)
 # save("./png/cantilever_nomesh_"*string(i)*".png",fig)
-save("./png/cantilever_tri3_G30_"*string(i)*".png",fig)
+# save("./png/cantilever_tri3_G30_"*string(i)*".png",fig)
 fig
