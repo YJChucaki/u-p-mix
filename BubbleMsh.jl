@@ -1,8 +1,9 @@
 
 using BubbleMsh
 # path = "./msh/plate_with_hole_new.msh"
-path = "./msh/cantilever.msh"
+# path = "./msh/cantilever.msh"
 # path = "./msh/cook_membrane.msh"
+path = "./msh/square.msh"
 
 #cantilever
 # 4165:3845,0.225,0.1
@@ -10,10 +11,13 @@ path = "./msh/cantilever.msh"
 # 500:0.65
 # 93:0.9
 
-bubblemsh(path,[24.0,0.0,0.0],[23.0,5.0,0.0],10,3.0,0.1)
+bubblemsh(path,[24.0,0.0,0.0],[23.0,5.0,0.0],217,0.92,0.1)
 
 
 #cook_membrane
 # bubblemsh(path,[24.0,37.0,0.0],[23.0,10.0,0.0],70,2.2,0.1)
 #plate_with_hole
 # bubblemsh(path,[2.5,2.5,0.0],[1.8,1.8,0.0],1274,0.11,0.07)
+#square
+# 127:10,80,0.6
+bubblemsh(path,[5.0,5.0,0.0],[4.7,4.7,0.0],112,0.50,0.1)

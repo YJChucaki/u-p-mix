@@ -1,13 +1,13 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie
- ndiv= 8
- ndiv_p= 8
-i=230
+ ndiv= 297
+ ndiv_p= 3
+i=11
 include("import_prescrible_ops.jl")
 include("import_cantilever.jl")
 # elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
 # elements, nodes ,nodes_p = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
 elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
-# elements, nodes ,nodes_p = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
     nₘ=21
@@ -22,16 +22,19 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3(".
     D = 12
     I = D^3/12
     EI = E*I
+    K=Ē/3/(1-2ν̄ )
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
     eval(prescribeForGauss)
     eval(prescribeForPenalty)
 
     set𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ω"])
+    set∇𝝭!(elements["Ωᵍ"])
     set𝝭!(elements["Ωᵖ"])
+    set𝝭!(elements["Ωᵍᵖ"])
     set𝝭!(elements["Γᵍ"])
     set𝝭!(elements["Γᵗ"])
-
+    set𝝭!(elements["Γᵍᵖ"])
    
 
     
@@ -41,6 +44,7 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3(".
     kᵤₚ = zeros(2*nᵤ,nₚ)
     kₚₚ = zeros(nₚ,nₚ)
     f = zeros(2*nᵤ)
+    fp= zeros(nₚ)
     opsup[3](elements["Ω"],kᵤᵤ)
     opsup[4](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
     opsup[5](elements["Ωᵖ"],kₚₚ)
@@ -49,11 +53,12 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3(".
 
     eval(opsPenalty)
     opsα[1](elements["Γᵍ"],kᵤᵤ,f)
+    opsα[2](elements["Γᵍ"],elements["Γᵍᵖ"],kᵤₚ,fp)
 
     
 
     k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
-    f = [f;zeros(nₚ)]
+    f = [f;fp]
 
     d = k\f
     d₁ = d[1:2:2*nᵤ]
@@ -62,7 +67,7 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3(".
     push!(nodes,:d₁=>d₁,:d₂=>d₂)
     push!(nodes_p,:q=>q)
 
-    h1,l2,h1_dil,h1_dev = opsup[8](elements["Ω"],elements["Ωᵖ"])
+    h1,l2,h1_dil,h1_dev = opsup[8](elements["Ωᵍ"],elements["Ωᵍᵖ"])
     # h1,l2 = opsup[8](elements["Ω"],elements["Ωᵖ"])
     L2 = log10(l2)
     H1 = log10(h1)
@@ -106,12 +111,17 @@ for (I,ξ¹) in enumerate(LinRange(0.0, L, ind))
          p= 0.0       
         for (i,xᵢ) in enumerate(𝓒)
             p  += Nᵖ[i]*xᵢ.q
+           
         end 
         xs[I] = ξ¹
         ys[J] = ξ² 
         color[I,J] = p
+        
     end
 end
+
+
+
 fig = Figure()
 
 ax = Axis(fig[1, 1], aspect = 4)
@@ -120,19 +130,40 @@ hidespines!(ax)
 hidedecorations!(ax)
 
 # s=surface!(xs,ys, color, colormap=:coolwarm)
-s = contourf!(xs,ys, color, colormap=:coolwarm)
+s = contourf!(xs,ys, color, colormap=:coolwarm,levels=-1000:200:1000)
 Colorbar(fig[1, 2], s)
 
-# elements
+# # elements
 lwb = 2.5;lwm =2.5;mso =5;msx =15;ppu = 2.5;α = 0.7;
 for elm in elements["Ω"]
+    # xs=zeros(1,1)
+    # ys=zeros(1,1)
+    # color=zeros(1,1)
+    # p=0.0
+    # ε₁₁ = 0.0
+    # ε₂₂ = 0.0
+    # ε₁₂ = 0.0
+    # for (i,ξ) in enumerate(elm.𝓖)
+    #     B₁ = ξ[:∂𝝭∂x]
+    #     B₂ = ξ[:∂𝝭∂y]
+    #     for (j,xⱼ) in enumerate(elm.𝓒)
+    #         ε₁₁ += B₁[j]*xⱼ.d₁
+    #         ε₂₂ += B₂[j]*xⱼ.d₂
+    #         ε₁₂ += B₁[j]*xⱼ.d₂ + B₂[j]*xⱼ.d₁
+    #     end
+    # end
+    # p   = K*(ε₁₁+ε₂₂)
+    # color[1,1]=p
     x = [x.x for x in elm.𝓒[[1,2,3,1]]]
     y = [x.y for x in elm.𝓒[[1,2,3,1]]]
+    # xs[1,1]=(x[1]+x[2]+x[3])/3
+    # ys[1,1]=(y[1]+y[2]+y[3])/3
     lines!(x,y, linewidth = 0.3, color = :black)
+#     s = contourf!(xs,ys, color, colormap=:coolwarm,levels=-1000:200:1000)
 end
 # scatter!(x,y,marker = :circle, markersize = mso, color = :black)
 lines!([0.0,L,L,0.0,0.0],[-D/2,-D/2,D/2,D/2,-D/2], linewidth = lwb, color = :black)
 # save("./png/cantilever_"*string(i)*".png",fig)
 # save("./png/cantilever_nomesh_"*string(i)*".png",fig)
-# save("./png/cantilever_tri3_G30_"*string(i)*".png",fig)
+save("./png/cantilever_tri3_G3_nonunoform_level_"*string(i)*".png",fig)
 fig

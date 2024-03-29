@@ -78,7 +78,7 @@ end
 opsPenalty = quote
     opsα = [
         Operator{:∫vᵢgᵢds}(:α=>αᵥ*E),
-      
+        Operator{:∫pnᵢgᵢds}(:α=>αᵥ*E),
     ]
 end
 

@@ -1,7 +1,7 @@
 
 a = 10.0;
 b = 10.0;
-n = 20;
+n = 12;
 
 Point(1) = {0.0, 0.0, 0.0};
 Point(2) = {  a, 0.0, 0.0};
@@ -22,9 +22,9 @@ Transfinite Curve{1,2,3,4} = n+1;
 
 Physical Curve("Γᵗ") = {2,3,4};
 Physical Curve("Γᵍ") = {1};
-Physical Surface("Ω") = {1};
+//Physical Surface("Ω") = {1};
 
-Transfinite Surface{1};
+//Transfinite Surface{1};
 
 Mesh.Algorithm = 8;
 Mesh.MshFileVersion = 2;
