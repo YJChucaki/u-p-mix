@@ -1,7 +1,12 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie
- ndiv= 297
- ndiv_p= 3
-i=11
+ ndiv= 8
+ ndiv_p= 9
+i=340
+# 40,60-3
+# 80-4
+# 100,120-5
+# 160,200-7
+
 include("import_prescrible_ops.jl")
 include("import_cantilever.jl")
 # elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
@@ -164,6 +169,6 @@ end
 # scatter!(x,y,marker = :circle, markersize = mso, color = :black)
 lines!([0.0,L,L,0.0,0.0],[-D/2,-D/2,D/2,D/2,-D/2], linewidth = lwb, color = :black)
 # save("./png/cantilever_"*string(i)*".png",fig)
-# save("./png/cantilever_nomesh_"*string(i)*".png",fig)
-save("./png/cantilever_tri3_G3_nonunoform_level_"*string(i)*".png",fig)
+save("./png/cantilever_tri3_G3_level_"*string(i)*".png",fig)
+# save("./png/cantilever_tri3_G3_nonunoform_level_"*string(i)*".png",fig)
 fig
