@@ -11,7 +11,7 @@ function import_cantilever_mix_tri3(filename1::String,filename2::String)
     x = nodes.x
     y = nodes.y
     z = nodes.z
-    integrationOrder_Ω = 3
+    integrationOrder_Ω = 2
     integrationOrder_Γ = 2
     integrationOrder_Ωᵍ =10
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()

@@ -1,7 +1,7 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie
  ndiv= 8
- ndiv_p= 9
-i=340
+ ndiv_p= 7
+i=160
 # 40,60-3
 # 80-4
 # 100,120-5
@@ -33,7 +33,7 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3(".
     eval(prescribeForPenalty)
 
     set𝝭!(elements["Ω"])
-    set∇𝝭!(elements["Ω"])
+    set∇𝝭!(elements["Ω"][1])
     set∇𝝭!(elements["Ωᵍ"])
     set𝝭!(elements["Ωᵖ"])
     set𝝭!(elements["Ωᵍᵖ"])
@@ -169,6 +169,6 @@ end
 # scatter!(x,y,marker = :circle, markersize = mso, color = :black)
 lines!([0.0,L,L,0.0,0.0],[-D/2,-D/2,D/2,D/2,-D/2], linewidth = lwb, color = :black)
 # save("./png/cantilever_"*string(i)*".png",fig)
-save("./png/cantilever_tri3_G3_level_"*string(i)*".png",fig)
+# save("./png/cantilever_tri3_G3_level_"*string(i)*".png",fig)
 # save("./png/cantilever_tri3_G3_nonunoform_level_"*string(i)*".png",fig)
 fig
