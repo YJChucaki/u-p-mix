@@ -3,10 +3,11 @@ $MeshFormat
 $EndMeshFormat
 $PhysicalNames
 5
-1 1 "Γ₁"
-1 2 "Γ₂"
-1 3 "Γ₃"
-1 4 "Γ₄"
+
+1 1 "Γ¹"
+1 2 "Γ²"
+1 3 "Γ³"
+1 4 "Γ⁴"
 2 5 "Ω"
 $EndPhysicalNames
 $Nodes

@@ -1,7 +1,7 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie
  ndiv= 8
  ndiv_p= 7
-i=160
+ i=260
 # 40,60-3
 # 80-4
 # 100,120-5
@@ -16,7 +16,7 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3(".
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
     nₘ=21
-    s =1.5*12/ndiv_p*ones(nₚ)
+    s =1.1*12/ndiv_p*ones(nₚ)
     P = 1000
     Ē = 3e6
     ν̄ = 0.4999999
@@ -32,8 +32,8 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3(".
     eval(prescribeForGauss)
     eval(prescribeForPenalty)
 
-    set𝝭!(elements["Ω"])
-    set∇𝝭!(elements["Ω"][1])
+    # set𝝭!(elements["Ω"])
+    set∇𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ωᵍ"])
     set𝝭!(elements["Ωᵖ"])
     set𝝭!(elements["Ωᵍᵖ"])
