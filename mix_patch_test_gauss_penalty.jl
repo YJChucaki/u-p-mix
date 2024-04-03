@@ -1,7 +1,7 @@
 
 using ApproxOperator, Tensors, JLD
 
-ndiv= 11
+# ndiv= 11
  ndiv_p= 11
  i=80
 # 40,60-3
@@ -13,12 +13,12 @@ include("import_prescrible_ops.jl")
 include("import_patch_test.jl")
 # elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
 # elements, nodes ,nodes_p = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
-elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
+elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3("./msh/patchtest.msh","./msh/patchtest_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
     nₘ=21
-    s =1.1*12/ndiv_p*ones(nₚ)
+    s =1.5*12/ndiv_p*ones(nₚ)
     P = 1000
     Ē = 3e6
     ν̄ = 0.4999999
