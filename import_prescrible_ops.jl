@@ -59,7 +59,13 @@ const trilobatto13 = ([1.0000000000000000,0.0000000000000000,0.0,
 opsGauss = quote
     op = Operator{:∫εᵢⱼNᵢⱼκᵢⱼMᵢⱼdΩ}(:E=>E,:ν=>ν,:h=>h)
 end
-
+opsFEM = quote
+    opsFEM =[
+        Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>Ē,:ν=>ν̄ ),
+        Operator{:Hₑ_PlaneStress}(:E=>Ē,:ν=>ν̄ )
+       
+    ]
+end
 opsupmix = quote
     opsup = [
         Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>E,:ν=>ν),

@@ -13,7 +13,7 @@ include("import_prescrible_ops.jl")
 include("import_patch_test.jl")
 # elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
 # elements, nodes ,nodes_p = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
-elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3("./msh/patchtest.msh","./msh/patchtest_bubble_"*string(i)*".msh")
+elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_patchtest_up_mix("./msh/patchtest.msh","./msh/patchtest_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
@@ -32,14 +32,14 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3(".
     K=Ē/3/(1-2ν̄ )
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
-    u(x,y) = x+y
+    u(x,y) = x-y
     ∂u∂x(x,y) = 1.0
-    ∂u∂y(x,y) = 1.0
-    v(x,y) = x+y
+    ∂u∂y(x,y) = -1.0
+    v(x,y) = x-y
     ∂v∂x(x,y) = 1.0
-    ∂v∂y(x,y) = 1.0
+    ∂v∂y(x,y) = -1.0
 
-   eval(prescribeForGauss)
+   eval(prescribeForGauss_mix)
    eval(prescribeForPenalty)
 #    eval(prescribeVariables)
 #    eval(opsGauss)
@@ -85,12 +85,12 @@ push!(nodes_p,:q=>q)
 # @save compress=true "jld/patchtest_gauss_penalty.jld" d₁ d₂ d₃
 
 set∇𝝭!(elements["Ωᵍ"])
-h1,l2,h1_dil,h1_dev = opsup[8](elements["Ωᵍ"],elements["Ωᵍᵖ"])
+h1,l2= opsup[8](elements["Ωᵍ"],elements["Ωᵍᵖ"])
 # h1,l2,h1_dil,h1_dev = opsup[8](elements["Ω"],elements["Ωᵖ"])
 L2 = log10(l2)
 H1 = log10(h1)
-H1_dil = log10(h1_dil)
-H1_dev = log10(h1_dev)
+# H1_dil = log10(h1_dil)
+# H1_dev = log10(h1_dev)
 # h = log10(12.0/ndiv)
+           
 println(L2,H1)
-println(H1_dil,H1_dev)
