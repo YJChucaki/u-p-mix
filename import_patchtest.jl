@@ -41,11 +41,13 @@ function import_patchtest_mix(filename1::String, filename2::String)
     type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
     sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)
     elements["Ωᵖ"] = getElements(nodes_p, entities["Ω"], type, integrationOrder_Ω, sp)
+    elements["Ωᵍᵖ"] = getElements(nodes_p, entities["Ω"], type,  integrationOrder_Ωᵍ, sp)
     nₘ = 6
     𝗠 = (0,zeros(nₘ))
     push!(elements["Ωᵖ"], :𝝭=>:𝑠)
     push!(elements["Ωᵖ"], :𝗠=>𝗠)
-
+    push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠)
+    push!(elements["Ωᵍᵖ"], :𝗠=>𝗠)
     gmsh.finalize()
     return elements, nodes, nodes_p 
 end
@@ -89,6 +91,7 @@ function import_patchtest_quad(filename::String)
 
     return elements, nodes, f
 end
+
 
 function import_patchtest_stripe(filename::String)
     gmsh.initialize()

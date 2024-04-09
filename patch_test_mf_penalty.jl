@@ -40,8 +40,8 @@ eval(prescribeForGauss)
 eval(prescribeForPenalty)
 
 
-set𝝭!(elements["Ω"])
-set∇𝝭!(elements["Ω"])
+
+set∇𝝭!(elements["Ωᵘ"])
 set∇𝝭!(elements["Ωᵍ"])
 set𝝭!(elements["Γ¹"])
 set𝝭!(elements["Γ²"])
