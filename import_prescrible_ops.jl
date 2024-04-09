@@ -62,6 +62,7 @@ end
 opsFEM = quote
     opsFEM =[
         Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>Ē,:ν=>ν̄ ),
+        Operator{:∫∫vᵢbᵢdxdy}(),
         Operator{:Hₑ_PlaneStress}(:E=>Ē,:ν=>ν̄ )
        
     ]
