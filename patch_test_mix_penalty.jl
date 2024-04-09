@@ -58,8 +58,8 @@ opsα[1](elements["Γ⁴"],kᵤᵤ,f)
 
 kᵈ = kᵤᵤ
 kᵛ = kᵤₚ*(kₚₚ\kᵤₚ')
-k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
-f = [f;fp]
+# k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
+# f = [f;fp]
 d = (kᵛ+kᵈ)\f
 
 # d = k\f
