@@ -56,13 +56,13 @@ opsα[1](elements["Γ²"],kᵤᵤ,f)
 opsα[1](elements["Γ³"],kᵤᵤ,f)
 opsα[1](elements["Γ⁴"],kᵤᵤ,f)
 
-kᵈ = kᵤᵤ
-kᵛ = kᵤₚ*(kₚₚ\kᵤₚ')
-# k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
-# f = [f;fp]
-d = (kᵛ+kᵈ)\f
+# kᵈ = kᵤᵤ
+# kᵛ = kᵤₚ*(kₚₚ\kᵤₚ')
+k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
+f = [f;fp]
+# d = (kᵛ+kᵈ)\f
 
-# d = k\f
+d = k\f
 d₁ = d[1:2:2*nᵤ]
 d₂ = d[2:2:2*nᵤ]
 q  = d[2*nᵤ+1:end]

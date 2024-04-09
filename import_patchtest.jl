@@ -24,9 +24,9 @@ function import_patchtest_mix(filename1::String, filename2::String)
     gmsh.open(filename1)
     entities = getPhysicalGroups()
     nodes = get𝑿ᵢ()
-    elements["Ωᵘ"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
+    elements["Ω"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
     elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
-    push!(elements["Ωᵘ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     elements["Γ¹"] = getElements(nodes, entities["Γ¹"], integrationOrder_Γ)
     elements["Γ²"] = getElements(nodes, entities["Γ²"], integrationOrder_Γ)
@@ -42,6 +42,8 @@ function import_patchtest_mix(filename1::String, filename2::String)
     sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)
     elements["Ωᵖ"] = getElements(nodes_p, entities["Ω"], type, integrationOrder_Ω, sp)
     elements["Ωᵍᵖ"] = getElements(nodes_p, entities["Ω"], type,  integrationOrder_Ωᵍ, sp)
+
+
     nₘ = 6
     𝗠 = (0,zeros(nₘ))
     push!(elements["Ωᵖ"], :𝝭=>:𝑠)
@@ -347,6 +349,9 @@ end
 
 prescribe = quote
     
+    prescribe!(elements["Ω"],:b₁=>(x,y,z)->b₁(x,y))
+    prescribe!(elements["Ω"],:b₂=>(x,y,z)->b₂(x,y))
+
     prescribe!(elements["Γ¹"],:g₁=>(x,y,z)->u(x,y))
     prescribe!(elements["Γ¹"],:g₂=>(x,y,z)->v(x,y))
     prescribe!(elements["Γ¹"],:n₁₁=>(x,y,z)->1.0)
@@ -380,4 +385,11 @@ prescribe = quote
     prescribe!(elements["Ωᵍ"],:∂u∂y=>(x,y,z)->∂u∂y(x,y))
     prescribe!(elements["Ωᵍ"],:∂v∂x=>(x,y,z)->∂v∂x(x,y))
     prescribe!(elements["Ωᵍ"],:∂v∂y=>(x,y,z)->∂v∂y(x,y))
+
+    prescribe!(elements["Ωᵍᵖ"],:u=>(x,y,z)->u(x,y))
+    prescribe!(elements["Ωᵍᵖ"],:v=>(x,y,z)->v(x,y))
+    prescribe!(elements["Ωᵍᵖ"],:∂u∂x=>(x,y,z)->∂u∂x(x,y))
+    prescribe!(elements["Ωᵍᵖ"],:∂u∂y=>(x,y,z)->∂u∂y(x,y))
+    prescribe!(elements["Ωᵍᵖ"],:∂v∂x=>(x,y,z)->∂v∂x(x,y))
+    prescribe!(elements["Ωᵍᵖ"],:∂v∂y=>(x,y,z)->∂v∂y(x,y))
 end
