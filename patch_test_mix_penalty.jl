@@ -1,10 +1,8 @@
 
-using ApproxOperator, Tensors, JLD
+using ApproxOperator, Tensors,  LinearAlgebra
 
 ndiv= 11
- i=105
 
-include("import_prescrible_ops.jl")
 include("import_patchtest.jl")
 nₚ = 50
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_"*string(ndiv)*".msh")
@@ -12,73 +10,93 @@ elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".
 nᵤ = length(nodes)
 nₚ = length(nodes_p)
  
+set∇𝝭!(elements["Ω"])
+set𝝭!(elements["Ωᵖ"])
+set𝝭!(elements["Ωᵍᵖ"])
+set𝝭!(elements["Γ"])
 Ē = 3e6
 ν̄ = 0.4999999999999
 # ν̄ = 0.3
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
-    
-n = 3
+n = 1
 u(x,y) = (x+y)^n
 v(x,y) = -(x+y)^n
 ∂u∂x(x,y) = n*(x+y)^abs(n-1)
 ∂u∂y(x,y) = n*(x+y)^abs(n-1)
 ∂v∂x(x,y) = -n*(x+y)^abs(n-1)
 ∂v∂y(x,y) = -n*(x+y)^abs(n-1)
+∂²u∂x²(x,y) = n*(n-1)*(x+y)^abs(n-2)
+∂²u∂x∂y(x,y) = n*(n-1)*(x+y)^abs(n-2)
+∂²u∂y²(x,y) = n*(n-1)*(x+y)^abs(n-2)
+∂²v∂x²(x,y) = -n*(n-1)*(x+y)^abs(n-2)
+∂²v∂x∂y(x,y) = -n*(n-1)*(x+y)^abs(n-2)
+∂²v∂y²(x,y) = -n*(n-1)*(x+y)^abs(n-2)
+∂ε₁₁∂x(x,y) = ∂²u∂x²(x,y)
+∂ε₁₁∂y(x,y) = ∂²u∂x∂y(x,y)
+∂ε₂₂∂x(x,y) = ∂²v∂x∂y(x,y)
+∂ε₂₂∂y(x,y) = ∂²v∂y²(x,y)
+∂ε₁₂∂x(x,y) = 0.5*(∂²u∂x∂y(x,y) + ∂²v∂x²(x,y))
+∂ε₁₂∂y(x,y) = 0.5*(∂²u∂y²(x,y) + ∂²v∂x∂y(x,y))
+∂σ₁₁∂x(x,y) = E/(1-ν^2)*(∂ε₁₁∂x(x,y) + ν*∂ε₂₂∂x(x,y))
+∂σ₁₁∂y(x,y) = E/(1-ν^2)*(∂ε₁₁∂y(x,y) + ν*∂ε₂₂∂y(x,y))
+∂σ₂₂∂x(x,y) = E/(1-ν^2)*(ν*∂ε₁₁∂x(x,y) + ∂ε₂₂∂x(x,y))
+∂σ₂₂∂y(x,y) = E/(1-ν^2)*(ν*∂ε₁₁∂y(x,y) + ∂ε₂₂∂y(x,y))
+∂σ₁₂∂x(x,y) = E/(1+ν)*∂ε₁₂∂x(x,y)
+∂σ₁₂∂y(x,y) = E/(1+ν)*∂ε₁₂∂y(x,y)
+b₁(x,y) = -∂σ₁₁∂x(x,y) - ∂σ₁₂∂y(x,y)
+b₂(x,y) = -∂σ₁₂∂x(x,y) - ∂σ₂₂∂y(x,y)
 
 eval(prescribe)
 
+ops = [
+       Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>E,:ν=>ν),
+       Operator{:∫vᵢtᵢds}(),
+       Operator{:∫vᵢgᵢds}(:α=>1e9*E),
+       Operator{:∫∫vᵢbᵢdxdy}(),
+       Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄)
+]
+opsᵛ = [
+    Operator{:∫∫p∇vdxdy}(),
+    Operator{:∫∫qpdxdy}(:E=>Ē,:ν=>ν̄),
+]
+opsᵈ = [
+    Operator{:∫∫εᵈᵢⱼσᵈᵢⱼdxdy}(:E=>Ē,:ν=>ν̄ )
+]
 
-set∇𝝭!(elements["Ωᵘ"])
-set𝝭!(elements["Ωᵖ"])
-set𝝭!(elements["Ωᵍᵖ"])
-set𝝭!(elements["Γ¹"])
-set𝝭!(elements["Γ²"])
-set𝝭!(elements["Γ³"])
-set𝝭!(elements["Γ⁴"])
-
-eval(opsupmix)
 kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
 kᵤₚ = zeros(2*nᵤ,nₚ)
 kₚₚ = zeros(nₚ,nₚ)
 f = zeros(2*nᵤ)
-fp= zeros(nₚ)
-opsup[3](elements["Ωᵘ"],kᵤᵤ)
-opsup[4](elements["Ωᵘ"],elements["Ωᵖ"],kᵤₚ)
-opsup[5](elements["Ωᵖ"],kₚₚ)
-# opsup[6](elements["Γᵗ"],f)
 
-αᵥ = 1e9
-eval(opsPenalty)
 
-opsα[1](elements["Γ¹"],kᵤᵤ,f)
-opsα[1](elements["Γ²"],kᵤᵤ,f)
-opsα[1](elements["Γ³"],kᵤᵤ,f)
-opsα[1](elements["Γ⁴"],kᵤᵤ,f)
+opsᵈ[1](elements["Ω"],kᵤᵤ)
+opsᵛ[1](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
+opsᵛ[2](elements["Ωᵖ"],kₚₚ)
+ops[3](elements["Γ"],kᵤᵤ,f)
+ops[4](elements["Ω"],f)
+
 
 # kᵈ = kᵤᵤ
 # kᵛ = kᵤₚ*(kₚₚ\kᵤₚ')
 k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
-f = [f;fp]
+f = [f;zeros(nₚ)]
 # d = (kᵛ+kᵈ)\f
 
 d = k\f
 d₁ = d[1:2:2*nᵤ]
 d₂ = d[2:2:2*nᵤ]
 q  = d[2*nᵤ+1:end]
+
 push!(nodes,:d₁=>d₁,:d₂=>d₂)
 push!(nodes_p,:q=>q)
 
-# @save compress=true "jld/patchtest_gauss_penalty.jld" d₁ d₂ d₃
-
 set∇𝝭!(elements["Ωᵍ"])
-h1,l2,h1_dil,h1_dev= opsup[8](elements["Ωᵍ"],elements["Ωᵍᵖ"])
-# h1,l2,h1_dil,h1_dev = opsup[8](elements["Ω"],elements["Ωᵖ"])
+h1,l2,h1_dil,h1_dev= ops[5](elements["Ωᵍ"],elements["Ωᵍᵖ"])
 L2 = log10(l2)
 H1 = log10(h1)
 H1_dil = log10(h1_dil)
 H1_dev = log10(h1_dev)
-# h = log10(12.0/ndiv)
            
 # println(L2,H1)
 println(l2,h1)
