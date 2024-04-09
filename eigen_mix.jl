@@ -2,7 +2,7 @@ using Revise, ApproxOperator, LinearAlgebra
 
 include("import_patchtest.jl")
 ndiv= 11
-nₚ = 140
+nₚ = 121
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_"*string(ndiv)*".msh")
 elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 
@@ -15,23 +15,23 @@ set𝝭!(elements["Γ"])
 
 Ē = 1.0
 # ν̄ = 0.3
-ν̄ = 0.499999999999999
+ν̄ = 0.49999999
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
 
-n = 10
+n = 2
 u(x,y) = (x+y)^n
-v(x,y) = -(x+y)^n
+v(x,y) = (x+y)^n
 ∂u∂x(x,y) = n*(x+y)^abs(n-1)
 ∂u∂y(x,y) = n*(x+y)^abs(n-1)
-∂v∂x(x,y) = -n*(x+y)^abs(n-1)
-∂v∂y(x,y) = -n*(x+y)^abs(n-1)
-∂²u∂x²(x,y) = n*(n-1)*(x+y)^abs(n-2)
+∂v∂x(x,y) = n*(x+y)^abs(n-1)
+∂v∂y(x,y) = n*(x+y)^abs(n-1)
+∂²u∂x²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
 ∂²u∂x∂y(x,y) = n*(n-1)*(x+y)^abs(n-2)
-∂²u∂y²(x,y) = n*(n-1)*(x+y)^abs(n-2)
-∂²v∂x²(x,y) = -n*(n-1)*(x+y)^abs(n-2)
-∂²v∂x∂y(x,y) = -n*(n-1)*(x+y)^abs(n-2)
-∂²v∂y²(x,y) = -n*(n-1)*(x+y)^abs(n-2)
+∂²u∂y²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
+∂²v∂x²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
+∂²v∂x∂y(x,y) = n*(n-1)*(x+y)^abs(n-2)
+∂²v∂y²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
 ∂ε₁₁∂x(x,y) = ∂²u∂x²(x,y)
 ∂ε₁₁∂y(x,y) = ∂²u∂x∂y(x,y)
 ∂ε₂₂∂x(x,y) = ∂²v∂x∂y(x,y)
@@ -52,7 +52,7 @@ eval(prescribe)
 ops = [
        Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>E,:ν=>ν),
        Operator{:∫vᵢtᵢds}(),
-       Operator{:∫vᵢgᵢds}(:α=>1e9*E),
+       Operator{:∫vᵢgᵢds}(:α=>1e13*E),
        Operator{:∫∫vᵢbᵢdxdy}(),
        Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄)
 ]
@@ -97,4 +97,5 @@ push!(nodes,:d₁=>d₁,:d₂=>d₂)
 push!(nodes_p, :q=>p)
 
 set∇𝝭!(elements["Ωᵍ"])
+set𝝭!(elements["Ωᵍᵖ"])
 error = ops[5](elements["Ωᵍ"], elements["Ωᵍᵖ"])
