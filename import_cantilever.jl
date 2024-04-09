@@ -5,7 +5,7 @@ import Gmsh: gmsh
 function import_cantilever_mix_tri3(filename1::String,filename2::String)
     gmsh.initialize()
     gmsh.open(filename1)
- 
+
     entities = getPhysicalGroups()
     nodes = get𝑿ᵢ()
     x = nodes.x

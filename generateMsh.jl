@@ -2,10 +2,12 @@
 using BenchmarkExample
 import Gmsh: gmsh
 
-n = 11
-filename = "patchtest"
-BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*".msh", transfinite = n)
+n = 21
+filename = "patchtest_"
+BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
 
+# filename = "patchtest_quad_"
+# BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true)
 # gmsh.initialize()
 # gmsh.open("./msh/"*filename*".msh")
 # entities = getPhysicalGroups()

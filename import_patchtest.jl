@@ -1,6 +1,94 @@
-using Gmsh
+using Gmsh, Statistics
 using CairoMakie
 # using GLMakie
+
+function import_patchtest_mix(filename1::String, filename2::String)
+    elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
+    gmsh.initialize()
+
+    gmsh.open(filename2)
+    entities = getPhysicalGroups()
+    nodes_p = get𝑿ᵢ()
+    xᵖ = nodes_p.x
+    yᵖ = nodes_p.y
+    zᵖ = nodes_p.z
+    Ω = getElements(nodes_p, entities["Ω"])
+    s, var𝐴 = cal_area_support(Ω)
+    s = 1.5*s*ones(length(nodes_p))
+    # s = 1.5/10*ones(length(nodes_p))
+    push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
+
+    integrationOrder_Ω = 2
+    integrationOrder_Ωᵍ = 1
+    integrationOrder_Γ = 1
+    gmsh.open(filename1)
+    entities = getPhysicalGroups()
+    nodes = get𝑿ᵢ()
+    elements["Ωᵘ"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
+    elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
+    push!(elements["Ωᵘ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    elements["Γ¹"] = getElements(nodes, entities["Γ¹"], integrationOrder_Γ)
+    elements["Γ²"] = getElements(nodes, entities["Γ²"], integrationOrder_Γ)
+    elements["Γ³"] = getElements(nodes, entities["Γ³"], integrationOrder_Γ)
+    elements["Γ⁴"] = getElements(nodes, entities["Γ⁴"], integrationOrder_Γ)
+    elements["Γ"] = elements["Γ¹"]∪elements["Γ²"]∪elements["Γ³"]∪elements["Γ⁴"]
+    push!(elements["Γ¹"], :𝝭=>:𝑠)
+    push!(elements["Γ²"], :𝝭=>:𝑠)
+    push!(elements["Γ³"], :𝝭=>:𝑠)
+    push!(elements["Γ⁴"], :𝝭=>:𝑠)
+
+    type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
+    sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)
+    elements["Ωᵖ"] = getElements(nodes_p, entities["Ω"], type, integrationOrder_Ω, sp)
+    nₘ = 6
+    𝗠 = (0,zeros(nₘ))
+    push!(elements["Ωᵖ"], :𝝭=>:𝑠)
+    push!(elements["Ωᵖ"], :𝗠=>𝗠)
+
+    gmsh.finalize()
+    return elements, nodes, nodes_p 
+end
+
+function import_patchtest_quad(filename::String)
+    gmsh.initialize()
+    gmsh.open(filename)
+
+    entities = getPhysicalGroups()
+    nodes = get𝑿ᵢ()
+
+    elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
+    elements["Ωᵛ"] = getElements(nodes, entities["Ω"], 0)
+    elements["Ωᵈ"] = getElements(nodes, entities["Ω"], 3)
+
+    push!(elements["Ωᵛ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵈ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+
+    gmsh.finalize()
+
+    x = getfield(nodes[1],:data)[:x][2]
+    y = getfield(nodes[1],:data)[:y][2]
+    z = getfield(nodes[1],:data)[:z][2]
+    xg = getfield(elements["Ωᵛ"][1].𝓖[1],:data)[:x][2]
+    yg = getfield(elements["Ωᵛ"][1].𝓖[1],:data)[:y][2]
+    zg = getfield(elements["Ωᵛ"][1].𝓖[1],:data)[:z][2]
+
+    lwb = 2.5;lwm =2.5;mso =15;msx =15;ppu = 2.5;α = 0.7;
+    f = Figure(backgroundcolor = :transparent)
+    ax = Axis(f[1,1],aspect = DataAspect(),backgroundcolor = :transparent)
+    hidespines!(ax)
+    hidedecorations!(ax)
+    lines!([0.0, 1.0, 1.0, 0.0, 0.0],[0.0, 0.0, 1.0, 1.0, 0.0], linewidth = lwb, color = :black)
+
+    for elm in elements["Ωᵛ"]
+        id = [node.𝐼 for node in elm.𝓒]
+        lines!(x[id[[1,2,3,4,1]]],y[id[[1,2,3,4,1]]], linewidth = lwm, color = :black)
+    end
+    scatter!(x,y,marker = :circle, markersize = mso, color = :black)
+    scatter!(xg,yg,marker = :cross, markersize = 5, color = :blue)
+
+    return elements, nodes, f
+end
 
 function import_patchtest_stripe(filename::String)
     gmsh.initialize()
@@ -235,4 +323,58 @@ function reset𝐴!(a::ApproxOperator.AbstractElement)
     y₂ = 𝓒[2].y
     y₃ = 𝓒[3].y
     a.𝐴 = 0.5*(x₁*y₂+x₂*y₃+x₃*y₁-x₂*y₁-x₃*y₂-x₁*y₃)
+end
+
+function cal_area_support(elms::Vector{ApproxOperator.AbstractElement})
+    𝐴s = zeros(length(elms))
+    for (i,elm) in enumerate(elms)
+        x₁ = elm.𝓒[1].x
+        y₁ = elm.𝓒[1].y
+        x₂ = elm.𝓒[2].x
+        y₂ = elm.𝓒[2].y
+        x₃ = elm.𝓒[3].x
+        y₃ = elm.𝓒[3].y
+        𝐴s[i] = 0.5*(x₁*y₂ + x₂*y₃ + x₃*y₁ - x₂*y₁ - x₃*y₂ - x₁*y₃)
+    end
+    avg𝐴 = mean(𝐴s)
+    var𝐴 = var(𝐴s)
+    s = (4/3^0.5*avg𝐴)^0.5
+    return s, var𝐴
+end
+
+prescribe = quote
+    
+    prescribe!(elements["Γ¹"],:g₁=>(x,y,z)->u(x,y))
+    prescribe!(elements["Γ¹"],:g₂=>(x,y,z)->v(x,y))
+    prescribe!(elements["Γ¹"],:n₁₁=>(x,y,z)->1.0)
+    prescribe!(elements["Γ¹"],:n₁₂=>(x,y,z)->0.0)
+    prescribe!(elements["Γ¹"],:n₂₂=>(x,y,z)->1.0)
+
+    
+    prescribe!(elements["Γ²"],:g₁=>(x,y,z)->u(x,y))
+    prescribe!(elements["Γ²"],:g₂=>(x,y,z)->v(x,y))
+    prescribe!(elements["Γ²"],:n₁₁=>(x,y,z)->1.0)
+    prescribe!(elements["Γ²"],:n₁₂=>(x,y,z)->0.0)
+    prescribe!(elements["Γ²"],:n₂₂=>(x,y,z)->1.0)
+    
+
+    prescribe!(elements["Γ³"],:g₁=>(x,y,z)->u(x,y))
+    prescribe!(elements["Γ³"],:g₂=>(x,y,z)->v(x,y))
+    prescribe!(elements["Γ³"],:n₁₁=>(x,y,z)->1.0)
+    prescribe!(elements["Γ³"],:n₁₂=>(x,y,z)->0.0)
+    prescribe!(elements["Γ³"],:n₂₂=>(x,y,z)->1.0)
+    
+
+    prescribe!(elements["Γ⁴"],:g₁=>(x,y,z)->u(x,y))
+    prescribe!(elements["Γ⁴"],:g₂=>(x,y,z)->v(x,y))
+    prescribe!(elements["Γ⁴"],:n₁₁=>(x,y,z)->1.0)
+    prescribe!(elements["Γ⁴"],:n₁₂=>(x,y,z)->0.0)
+    prescribe!(elements["Γ⁴"],:n₂₂=>(x,y,z)->1.0)
+   
+    prescribe!(elements["Ωᵍ"],:u=>(x,y,z)->u(x,y))
+    prescribe!(elements["Ωᵍ"],:v=>(x,y,z)->v(x,y))
+    prescribe!(elements["Ωᵍ"],:∂u∂x=>(x,y,z)->∂u∂x(x,y))
+    prescribe!(elements["Ωᵍ"],:∂u∂y=>(x,y,z)->∂u∂y(x,y))
+    prescribe!(elements["Ωᵍ"],:∂v∂x=>(x,y,z)->∂v∂x(x,y))
+    prescribe!(elements["Ωᵍ"],:∂v∂y=>(x,y,z)->∂v∂y(x,y))
 end
