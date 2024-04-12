@@ -1,5 +1,5 @@
 
-using Tensors, BenchmarkExample
+using Tensors, BenchmarkExample, Statistics, CairoMakie
 import Gmsh: gmsh
 
 function import_cantilever_mix_tri3(filename1::String,filename2::String)
@@ -27,7 +27,11 @@ function import_cantilever_mix_tri3(filename1::String,filename2::String)
     xᵖ = nodes_p.x
     yᵖ = nodes_p.y
     zᵖ = nodes_p.z
-
+    Ω = getElements(nodes_p, entities["Ω"])
+    s, var𝐴 = cal_area_support(Ω)
+    s = 1.2*s*ones(length(nodes_p))
+    # s = 1.5/10*ones(length(nodes_p))
+    push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
     type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
     sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)
     gmsh.open(filename1)
@@ -82,22 +86,7 @@ function import_cantilever_mix_quad4(filename1::String,filename2::String)
     gmsh.finalize()
     return elements, nodes, nodes_p,xᵖ,yᵖ,zᵖ, sp,type
 end
-function cal_area_support(elms::Vector{ApproxOperator.Tri3})
-    𝐴s = zeros(length(elms))
-    for (i,elm) in enumerate(elms)
-        x₁ = elm.x[elm.i[1]]
-        y₁ = elm.y[elm.i[1]]
-        x₂ = elm.x[elm.i[2]]
-        y₂ = elm.y[elm.i[2]]
-        x₃ = elm.x[elm.i[3]]
-        y₃ = elm.y[elm.i[3]]
-        𝐴s[i] = 0.5*(x₁*y₂ + x₂*y₃ + x₃*y₁ - x₂*y₁ - x₃*y₂ - x₁*y₃)
-    end
-    avg𝐴 = mean(𝐴s)
-    var𝐴 = var(𝐴s)
-    s = 4/3^0.5*avg𝐴
-    return s, var𝐴
-end
+
 prescribeForGauss = quote
     𝗠 = (0,zeros(nₘ))
     ∂𝗠∂x = (0,zeros(nₘ))
@@ -141,4 +130,21 @@ prescribeForPenalty = quote
     push!(elements["Γᵍ"], :𝗠=>𝗠,:∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
     push!(elements["Γᵍᵖ"], :𝗠=>𝗠,:∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
     
+end
+
+function cal_area_support(elms::Vector{ApproxOperator.AbstractElement})
+    𝐴s = zeros(length(elms))
+    for (i,elm) in enumerate(elms)
+        x₁ = elm.𝓒[1].x
+        y₁ = elm.𝓒[1].y
+        x₂ = elm.𝓒[2].x
+        y₂ = elm.𝓒[2].y
+        x₃ = elm.𝓒[3].x
+        y₃ = elm.𝓒[3].y
+        𝐴s[i] = 0.5*(x₁*y₂ + x₂*y₃ + x₃*y₁ - x₂*y₁ - x₃*y₂ - x₁*y₃)
+    end
+    avg𝐴 = mean(𝐴s)
+    var𝐴 = var(𝐴s)
+    s = (4/3^0.5*avg𝐴)^0.5
+    return s, var𝐴
 end

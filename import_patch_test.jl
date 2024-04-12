@@ -20,14 +20,12 @@ function import_patchtest_fem(filename::String)
     elements["Γ²"] = getElements(nodes, entities["Γ²"],  integrationOrder_Γ)
     elements["Γ³"] = getElements(nodes, entities["Γ³"],  integrationOrder_Γ)
     elements["Γ⁴"] = getElements(nodes, entities["Γ⁴"],  integrationOrder_Γ)
+    elements["Γ"] = elements["Γ¹"]∪elements["Γ²"]∪elements["Γ³"]∪elements["Γ⁴"]
     push!(elements["Γ¹"], :𝝭=>:𝑠)
     push!(elements["Γ²"], :𝝭=>:𝑠)
     push!(elements["Γ³"], :𝝭=>:𝑠)
     push!(elements["Γ⁴"], :𝝭=>:𝑠)
-    nₘ = 6
-    𝗠 = (0,zeros(nₘ))
-    ∂𝗠∂x = (0,zeros(nₘ))
-    ∂𝗠∂y = (0,zeros(nₘ))
+   
     push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
    
@@ -243,6 +241,9 @@ end
 
 prescribe = quote
     
+    prescribe!(elements["Ω"],:b₁=>(x,y,z)->b₁(x,y))
+    prescribe!(elements["Ω"],:b₂=>(x,y,z)->b₂(x,y))
+
     prescribe!(elements["Γ¹"],:g₁=>(x,y,z)->u(x,y))
     prescribe!(elements["Γ¹"],:g₂=>(x,y,z)->v(x,y))
     prescribe!(elements["Γ¹"],:n₁₁=>(x,y,z)->1.0)
@@ -276,4 +277,11 @@ prescribe = quote
     prescribe!(elements["Ωᵍ"],:∂u∂y=>(x,y,z)->∂u∂y(x,y))
     prescribe!(elements["Ωᵍ"],:∂v∂x=>(x,y,z)->∂v∂x(x,y))
     prescribe!(elements["Ωᵍ"],:∂v∂y=>(x,y,z)->∂v∂y(x,y))
+
+    # prescribe!(elements["Ωᵍᵖ"],:u=>(x,y,z)->u(x,y))
+    # prescribe!(elements["Ωᵍᵖ"],:v=>(x,y,z)->v(x,y))
+    # prescribe!(elements["Ωᵍᵖ"],:∂u∂x=>(x,y,z)->∂u∂x(x,y))
+    # prescribe!(elements["Ωᵍᵖ"],:∂u∂y=>(x,y,z)->∂u∂y(x,y))
+    # prescribe!(elements["Ωᵍᵖ"],:∂v∂x=>(x,y,z)->∂v∂x(x,y))
+    # prescribe!(elements["Ωᵍᵖ"],:∂v∂y=>(x,y,z)->∂v∂y(x,y))
 end

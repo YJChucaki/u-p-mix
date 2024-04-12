@@ -19,7 +19,7 @@ Ē = 1.0
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
 
-n = 2
+n = 10
 u(x,y) = (x+y)^n
 v(x,y) = (x+y)^n
 ∂u∂x(x,y) = n*(x+y)^abs(n-1)
@@ -98,4 +98,13 @@ push!(nodes_p, :q=>p)
 
 set∇𝝭!(elements["Ωᵍ"])
 set𝝭!(elements["Ωᵍᵖ"])
-error = ops[5](elements["Ωᵍ"], elements["Ωᵍᵖ"])
+# error = ops[5](elements["Ωᵍ"], elements["Ωᵍᵖ"])
+h1,l2,h1_dil,h1_dev= ops[5](elements["Ωᵍ"],elements["Ωᵍᵖ"])
+L2 = log10(l2)
+H1 = log10(h1)
+H1_dil = log10(h1_dil)
+H1_dev = log10(h1_dev)
+           
+# println(L2,H1)
+println(l2,h1)
+# println(H1_dil,H1_dev)

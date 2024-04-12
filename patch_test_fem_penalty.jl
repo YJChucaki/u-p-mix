@@ -8,13 +8,13 @@ elements, nodes = import_patchtest_fem("./msh/patchtest.msh")
 nᵤ = length(nodes)
 
 
-E = 3e6
+E = 1.0
 ν=0.3
 # ν=0.49999999999999
 Ē = E/(1-ν^2)
 ν̄ = ν/(1-ν)
 
-n = 10
+n = 3
 u(x,y) = (x+y)^n
 v(x,y) = -(x+y)^n
 ∂u∂x(x,y) = n*(x+y)^abs(n-1)
@@ -42,6 +42,7 @@ v(x,y) = -(x+y)^n
 b₁(x,y) = -∂σ₁₁∂x(x,y) - ∂σ₁₂∂y(x,y)
 b₂(x,y) = -∂σ₁₂∂x(x,y) - ∂σ₂₂∂y(x,y)
 
+eval(prescribe)
 
 set𝝭!(elements["Ω"])
 set∇𝝭!(elements["Ω"])
@@ -56,7 +57,7 @@ k = zeros(2*nᵤ,2*nᵤ)
 kα = zeros(2*nᵤ,2*nᵤ)
 f = zeros(2*nᵤ)
 opsFEM[1](elements["Ω"],k)
-opsFEM[2](elements["Ω"],k)
+opsFEM[2](elements["Ω"],f)
 αᵥ = 1e9
 eval(opsPenalty)
 

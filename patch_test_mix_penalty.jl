@@ -1,10 +1,11 @@
 
 using ApproxOperator, Tensors,  LinearAlgebra
-
-ndiv= 11
-
 include("import_patchtest.jl")
-nₚ = 50
+# for i=2:10
+   
+ndiv= 11
+nₚ = 118
+# println(nₚ)
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_"*string(ndiv)*".msh")
 elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 nᵤ = length(nodes)
@@ -12,26 +13,40 @@ nₚ = length(nodes_p)
  
 set∇𝝭!(elements["Ω"])
 set𝝭!(elements["Ωᵖ"])
-set𝝭!(elements["Ωᵍᵖ"])
 set𝝭!(elements["Γ"])
-Ē = 3e6
-ν̄ = 0.4999999999999
+Ē = 1.0
+ν̄ = 0.4999999
 # ν̄ = 0.3
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
-n = 1
-u(x,y) = (x+y)^n
-v(x,y) = -(x+y)^n
-∂u∂x(x,y) = n*(x+y)^abs(n-1)
-∂u∂y(x,y) = n*(x+y)^abs(n-1)
-∂v∂x(x,y) = -n*(x+y)^abs(n-1)
-∂v∂y(x,y) = -n*(x+y)^abs(n-1)
-∂²u∂x²(x,y) = n*(n-1)*(x+y)^abs(n-2)
-∂²u∂x∂y(x,y) = n*(n-1)*(x+y)^abs(n-2)
-∂²u∂y²(x,y) = n*(n-1)*(x+y)^abs(n-2)
-∂²v∂x²(x,y) = -n*(n-1)*(x+y)^abs(n-2)
-∂²v∂x∂y(x,y) = -n*(n-1)*(x+y)^abs(n-2)
-∂²v∂y²(x,y) = -n*(n-1)*(x+y)^abs(n-2)
+
+# n = 1
+# u(x,y) = (x+y)^n
+# v(x,y) = (x+y)^n
+# ∂u∂x(x,y) = n*(x+y)^abs(n-1)
+# ∂u∂y(x,y) = n*(x+y)^abs(n-1)
+# ∂v∂x(x,y) = n*(x+y)^abs(n-1)
+# ∂v∂y(x,y) = n*(x+y)^abs(n-1)
+# ∂²u∂x²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
+# ∂²u∂x∂y(x,y) = n*(n-1)*(x+y)^abs(n-2)
+# ∂²u∂y²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
+# ∂²v∂x²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
+# ∂²v∂x∂y(x,y) = n*(n-1)*(x+y)^abs(n-2)
+# ∂²v∂y²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
+n = 2
+u(x,y) = (1+2*x+3*y)^n
+v(x,y) = (4+5*x+6*y)^n
+∂u∂x(x,y) = 2*n*(1+2*x+3*y)^abs(n-1)
+∂u∂y(x,y) = 3*n*(1+2*x+3*y)^abs(n-1)
+∂v∂x(x,y) = 5*n*(4+5*x+6*y)^abs(n-1)
+∂v∂y(x,y) = 6*n*(4+5*x+6*y)^abs(n-1)
+∂²u∂x²(x,y)  = 4*n*(n-1)*(1+2*x+3*y)^abs(n-2)
+∂²u∂x∂y(x,y) = 6*n*(n-1)*(1+2*x+3*y)^abs(n-2)
+∂²u∂y²(x,y)  = 9*n*(n-1)*(1+2*x+3*y)^abs(n-2)
+∂²v∂x²(x,y)  = 25*n*(n-1)*(4+5*x+6*y)^abs(n-2)
+∂²v∂x∂y(x,y) = 30*n*(n-1)*(4+5*x+6*y)^abs(n-2)
+∂²v∂y²(x,y)  = 36*n*(n-1)*(4+5*x+6*y)^abs(n-2)
+
 ∂ε₁₁∂x(x,y) = ∂²u∂x²(x,y)
 ∂ε₁₁∂y(x,y) = ∂²u∂x∂y(x,y)
 ∂ε₂₂∂x(x,y) = ∂²v∂x∂y(x,y)
@@ -52,7 +67,7 @@ eval(prescribe)
 ops = [
        Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>E,:ν=>ν),
        Operator{:∫vᵢtᵢds}(),
-       Operator{:∫vᵢgᵢds}(:α=>1e9*E),
+       Operator{:∫vᵢgᵢds}(:α=>1e13*E),
        Operator{:∫∫vᵢbᵢdxdy}(),
        Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄)
 ]
@@ -86,12 +101,13 @@ f = [f;zeros(nₚ)]
 d = k\f
 d₁ = d[1:2:2*nᵤ]
 d₂ = d[2:2:2*nᵤ]
-q  = d[2*nᵤ+1:end]
+p  = d[2*nᵤ+1:end]
 
 push!(nodes,:d₁=>d₁,:d₂=>d₂)
-push!(nodes_p,:q=>q)
+push!(nodes_p,:q=>p)
 
 set∇𝝭!(elements["Ωᵍ"])
+set𝝭!(elements["Ωᵍᵖ"])
 h1,l2,h1_dil,h1_dev= ops[5](elements["Ωᵍ"],elements["Ωᵍᵖ"])
 L2 = log10(l2)
 H1 = log10(h1)
@@ -100,4 +116,5 @@ H1_dev = log10(h1_dev)
            
 # println(L2,H1)
 println(l2,h1)
-# println(H1_dil,H1_dev)
+println(h1_dil,h1_dev)
+# @save compress=true "jld/patchtest_mix_tri3_bubble_"*string(nₚ)*".jld" q

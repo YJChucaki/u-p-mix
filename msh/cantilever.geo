@@ -1,7 +1,7 @@
 
-a = 48.0;
+a = 72.0;
 b = 12.0;
-n = 8;
+n = 2;
 
 Point(1) = {0.0, -b/2, 0.0};
 Point(2) = {  a, -b/2, 0.0};
@@ -17,7 +17,7 @@ Curve Loop(1) = {1,2,3,4};
 
 Plane Surface(1) = {1};
 
-Transfinite Curve{1,3} = 4*n+1;
+Transfinite Curve{1,3} = 6*n+1;
 Transfinite Curve{2,4} = n+1;
 
 Physical Curve("Γᵗ") = {2};

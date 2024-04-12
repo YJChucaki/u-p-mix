@@ -2,9 +2,9 @@ using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie
 # NP=[40,80,120,140]
 # for n=1:4
     # i=NP[n]
-ndiv= 8
+ndiv= 11
 #  ndiv_p= 8
-i=260
+i=100
 # 40,60-3
 # 80-4
 # 100,120-5
@@ -14,7 +14,7 @@ include("import_prescrible_ops.jl")
 include("import_cantilever.jl")
 # elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
 # elements, nodes ,nodes_p = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
-elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3("./msh/square_"*string(ndiv)*".msh","./msh/square_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
@@ -22,12 +22,12 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3(".
     P = 1000
     Ē = 3e6
     # Ē = 1.0
-    ν̄ = 0.4999999
-    # ν̄ = 0.3
+    # ν̄ = 0.4999999
+    ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
-    L = 48
-    D = 12
+    L = 10
+    D = 10
     I = D^3/12
     EI = E*I
     K=Ē/3/(1-2ν̄ )
@@ -56,20 +56,17 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3(".
     opsup[4](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
     opsup[5](elements["Ωᵖ"],kₚₚ)
     opsup[6](elements["Γᵗ"],f)
-    αᵥ = 1e6
+    αᵥ = 1e13
 
     eval(opsPenalty)
     opsα[1](elements["Γᵍ"],kᵤᵤ,f)
     opsα[2](elements["Γᵍ"],elements["Γᵍᵖ"],kᵤₚ,fp)
 
-    #  kₚₚ⁻¹=inv(kₚₚ)
-    # d = (kᵤᵤ-kᵤₚ*kₚₚ⁻¹*kᵤₚ')\f
-    # q=-kₚₚ⁻¹*kᵤₚ'*d
-    # d₃ = d[1:2*nᵤ]
-    # d = (kᵤᵤ-kᵤₚ*kₚₚ⁻¹*kᵤₚ')\f
-    # q=-kₚₚ⁻¹*kᵤₚ'*d
+    
+
     k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
     f = [f;fp]
+
     d = k\f
     d₁ = d[1:2:2*nᵤ]
     d₂ = d[2:2:2*nᵤ]
@@ -112,7 +109,7 @@ ys = zeros(ind)
 color = zeros(ind,ind)
 
 for (I,ξ¹) in enumerate(LinRange(0.0, L, ind))
-    for (J,ξ²) in enumerate(LinRange(-6.0, D/2, ind))
+    for (J,ξ²) in enumerate(LinRange(0.0, D, ind))
         indices = sp(ξ¹,ξ²,0.0)
         Nᵖ = zeros(length(indices))
         data = Dict([:x=>(1,[ξ¹]),:y=>(1,[ξ²]),:z=>(1,[0.0]),:𝝭=>(4,Nᵖ),:𝗠=>(0,𝗠)])
@@ -133,12 +130,11 @@ for (I,ξ¹) in enumerate(LinRange(0.0, L, ind))
 end
 
 fig = Figure()
-ax = Axis(fig[1, 1], aspect = 4)
+ax = Axis(fig[1, 1])
 hidespines!(ax)
 hidedecorations!(ax)
 
 # s=surface!(xs,ys, color, colormap=:coolwarm)
-# s = contourf!(xs,ys, color, colormap=:coolwarm,levels=-1000:200:1000)
 s = contourf!(xs,ys, color, colormap=:coolwarm)
 Colorbar(fig[1, 2], s)
 
@@ -153,7 +149,7 @@ for elm in elements["Ω"]
 
 end
 # scatter!(x,y,marker = :circle, markersize = mso, color = :black)
-lines!([0.0,L,L,0.0,0.0],[-D/2,-D/2,D/2,D/2,-D/2], linewidth = lwb, color = :black)
+lines!([0.0,L,L,0.0,0.0],[0.0,0.0,D,D,0.0], linewidth = lwb, color = :black)
 # save("./png/cantilever_"*string(i)*".png",fig)
 # save("./png/cantilever_tri3_G3_level_"*string(i)*".png",fig)
 # save("./png/cantilever_tri3_G3_nonunoform_level_"*string(i)*".png",fig)
