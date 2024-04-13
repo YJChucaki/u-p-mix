@@ -2,9 +2,9 @@ using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie
 # NP=[40,80,120,140]
 # for n=1:4
     # i=NP[n]
-ndiv= 8
+ndiv= 32
 #  ndiv_p= 8
-i=260
+i=4100
 # 40,60-3
 # 80-4
 # 100,120-5
@@ -56,7 +56,7 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3(".
     opsup[4](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
     opsup[5](elements["Ωᵖ"],kₚₚ)
     opsup[6](elements["Γᵗ"],f)
-    αᵥ = 1e6
+    αᵥ = 1e9
 
     eval(opsPenalty)
     opsα[1](elements["Γᵍ"],kᵤᵤ,f)
@@ -68,6 +68,7 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3(".
     # d₃ = d[1:2*nᵤ]
     # d = (kᵤᵤ-kᵤₚ*kₚₚ⁻¹*kᵤₚ')\f
     # q=-kₚₚ⁻¹*kᵤₚ'*d
+
     k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
     f = [f;fp]
     d = k\f
