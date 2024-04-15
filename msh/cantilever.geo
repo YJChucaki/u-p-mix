@@ -1,7 +1,7 @@
 
-a = 72.0;
+a = 48.0;
 b = 12.0;
-n = 2;
+n = 8;
 
 Point(1) = {0.0, -b/2, 0.0};
 Point(2) = {  a, -b/2, 0.0};
@@ -17,17 +17,19 @@ Curve Loop(1) = {1,2,3,4};
 
 Plane Surface(1) = {1};
 
-Transfinite Curve{1,3} = 6*n+1;
+Transfinite Curve{1,3} = 4*n+1;
 Transfinite Curve{2,4} = n+1;
 
 Physical Curve("Γᵗ") = {2};
 Physical Curve("Γᵍ") = {4};
 Physical Curve("Γ") = {1,3};
-//Physical Surface("Ω") = {1};
+Physical Surface("Ω") = {1};
 
-//Transfinite Surface{1};
+Transfinite Surface{1};
 
 Mesh.Algorithm = 1;
 Mesh.MshFileVersion = 2;
 Mesh 2;
+Mesh.SecondOrderIncomplete = 1;
+SetOrder 2;
 //RecombineMesh;
