@@ -1,8 +1,8 @@
 using Revise, ApproxOperator, LinearAlgebra
 
 include("import_patchtest.jl")
-ndiv= 11
-nₚ = 121
+ndiv= 3
+nₚ = 100
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_"*string(ndiv)*".msh")
 elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 
@@ -14,8 +14,8 @@ set𝝭!(elements["Ωᵖ"])
 set𝝭!(elements["Γ"])
 
 Ē = 1.0
-# ν̄ = 0.3
-ν̄ = 0.49999999
+ν̄ = 0.3
+# ν̄ = 0.499999
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
 
@@ -52,7 +52,7 @@ eval(prescribe)
 ops = [
        Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>E,:ν=>ν),
        Operator{:∫vᵢtᵢds}(),
-       Operator{:∫vᵢgᵢds}(:α=>1e13*E),
+       Operator{:∫vᵢgᵢds}(:α=>1e10*E),
        Operator{:∫∫vᵢbᵢdxdy}(),
        Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄)
 ]
@@ -69,29 +69,33 @@ kᵤₚ = zeros(2*nᵤ,nₚ)
 kₚₚ = zeros(nₚ,nₚ)
 f = zeros(2*nᵤ)
 
-
-opsᵈ[1](elements["Ω"],kᵤᵤ)
-opsᵛ[1](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
-opsᵛ[2](elements["Ωᵖ"],kₚₚ)
-ops[3](elements["Γ"],kᵤᵤ,f)
+# opsᵈ[1](elements["Ω"],kᵤᵤ)
+# opsᵛ[1](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
+# opsᵛ[2](elements["Ωᵖ"],kₚₚ)
+# ops[3](elements["Γ"],kᵤᵤ,f)
 ops[4](elements["Ω"],f)
 
-kᵈ = kᵤᵤ
-kᵛ = -kᵤₚ*(kₚₚ\kᵤₚ')
-vᵈ = eigvals(kᵈ)
-vᵛ = eigvals(kᵛ)
+# kᵈ = kᵤᵤ
+# kᵛ = -kᵤₚ*(kₚₚ\kᵤₚ')
+# vᵈ = eigvals(kᵈ)
+# vᵛ = eigvals(kᵛ)
 # v = eigvals(kᵛ,kᵈ)
 
 # d = (kᵛ+kᵈ)\f
 # fig
 
-k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
-f = [f;zeros(nₚ)]
+# k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
+# f = [f;zeros(nₚ)]
+
+k = zeros(2*nᵤ,2*nᵤ)
+ops[1](elements["Ω"],k)
+ops[3](elements["Γ"],k,f)
 
 d = k\f
 d₁ = d[1:2:2*nᵤ]
 d₂ = d[2:2:2*nᵤ]
-p = d[2*nᵤ+1:end]
+# p = d[2*nᵤ+1:end]
+p = zeros(nₚ)
 
 push!(nodes,:d₁=>d₁,:d₂=>d₂)
 push!(nodes_p, :q=>p)

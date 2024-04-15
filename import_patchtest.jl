@@ -19,8 +19,8 @@ function import_patchtest_mix(filename1::String, filename2::String)
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
     integrationOrder_Ω = 2
-    integrationOrder_Ωᵍ = 1
-    integrationOrder_Γ = 1
+    integrationOrder_Ωᵍ = 10
+    integrationOrder_Γ = 2
     gmsh.open(filename1)
     entities = getPhysicalGroups()
     nodes = get𝑿ᵢ()
@@ -102,11 +102,24 @@ function import_patchtest_stripe(filename::String)
     entities = getPhysicalGroups()
     nodes = get𝑿ᵢ()
 
-    integrationOrder = 2
+    integrationOrder_Ω = 2
+    integrationOrder_Ωᵍ = 10
+    integrationOrder_Γ = 2
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
-    elements["Ω"] = getElements(nodes, entities["Ω"], integrationOrder)
-
+    elements["Ω"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
+    elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
     push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+
+    elements["Γ¹"] = getElements(nodes, entities["Γ¹"], integrationOrder_Γ)
+    elements["Γ²"] = getElements(nodes, entities["Γ²"], integrationOrder_Γ)
+    elements["Γ³"] = getElements(nodes, entities["Γ³"], integrationOrder_Γ)
+    elements["Γ⁴"] = getElements(nodes, entities["Γ⁴"], integrationOrder_Γ)
+    elements["Γ"] = elements["Γ¹"]∪elements["Γ²"]∪elements["Γ³"]∪elements["Γ⁴"]
+    push!(elements["Γ¹"], :𝝭=>:𝑠)
+    push!(elements["Γ²"], :𝝭=>:𝑠)
+    push!(elements["Γ³"], :𝝭=>:𝑠)
+    push!(elements["Γ⁴"], :𝝭=>:𝑠)
 
     gmsh.finalize()
 
@@ -187,6 +200,58 @@ function import_patchtest_cross(filename::String)
     stripe2cross!(elements["Ω"], nodes)
 
     push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+
+    gmsh.finalize()
+
+    x = getfield(nodes[1],:data)[:x][2]
+    y = getfield(nodes[1],:data)[:y][2]
+    z = getfield(nodes[1],:data)[:z][2]
+    xg = getfield(elements["Ω"][1].𝓖[1],:data)[:x][2]
+    yg = getfield(elements["Ω"][1].𝓖[1],:data)[:y][2]
+    zg = getfield(elements["Ω"][1].𝓖[1],:data)[:z][2]
+
+    lwb = 2.5;lwm =2.5;mso =15;msx =15;ppu = 2.5;α = 0.7;
+    f = Figure(backgroundcolor = :transparent)
+    ax = Axis(f[1,1],aspect = DataAspect(),backgroundcolor = :transparent)
+    hidespines!(ax)
+    hidedecorations!(ax)
+    lines!([0.0, 1.0, 1.0, 0.0, 0.0],[0.0, 0.0, 1.0, 1.0, 0.0], linewidth = lwb, color = :black)
+
+    for elm in elements["Ω"]
+        id = [node.𝐼 for node in elm.𝓒]
+        lines!(x[id[[1,2,3,1]]],y[id[[1,2,3,1]]], linewidth = lwm, color = :black)
+    end
+    scatter!(x,y,marker = :circle, markersize = mso, color = :black)
+    scatter!(xg,yg,marker = :cross, markersize = 5, color = :blue)
+
+    return elements, nodes, f
+end
+
+function import_patchtest_tri6(filename::String)
+    gmsh.initialize()
+    gmsh.open(filename)
+
+    entities = getPhysicalGroups()
+    nodes = get𝑿ᵢ()
+
+    integrationOrder_Ω = 2
+    integrationOrder_Ωᵍ = 10
+    integrationOrder_Γ = 2
+    elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
+    elements["Ω"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
+    # elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
+    # push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    # push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+
+    # elements["Γ¹"] = getElements(nodes, entities["Γ¹"], integrationOrder_Γ)
+    # elements["Γ²"] = getElements(nodes, entities["Γ²"], integrationOrder_Γ)
+    # elements["Γ³"] = getElements(nodes, entities["Γ³"], integrationOrder_Γ)
+    # elements["Γ⁴"] = getElements(nodes, entities["Γ⁴"], integrationOrder_Γ)
+    # elements["Γ"] = elements["Γ¹"]∪elements["Γ²"]∪elements["Γ³"]∪elements["Γ⁴"]
+    # push!(elements["Γ¹"], :𝝭=>:𝑠)
+    # push!(elements["Γ²"], :𝝭=>:𝑠)
+    # push!(elements["Γ³"], :𝝭=>:𝑠)
+    # push!(elements["Γ⁴"], :𝝭=>:𝑠)
 
     gmsh.finalize()
 
@@ -386,6 +451,9 @@ prescribe = quote
     prescribe!(elements["Ωᵍ"],:∂v∂x=>(x,y,z)->∂v∂x(x,y))
     prescribe!(elements["Ωᵍ"],:∂v∂y=>(x,y,z)->∂v∂y(x,y))
 
+end
+
+prescribe_Ωᵍᵖ = quote
     prescribe!(elements["Ωᵍᵖ"],:u=>(x,y,z)->u(x,y))
     prescribe!(elements["Ωᵍᵖ"],:v=>(x,y,z)->v(x,y))
     prescribe!(elements["Ωᵍᵖ"],:∂u∂x=>(x,y,z)->∂u∂x(x,y))
