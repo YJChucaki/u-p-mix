@@ -54,6 +54,61 @@ function import_patchtest_mix(filename1::String, filename2::String)
     return elements, nodes, nodes_p ,xᵖ,yᵖ,zᵖ, sp,type
 end
 
+function import_patchtest_mix_tri6(filename1::String, filename2::String)
+    elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
+    gmsh.initialize()
+
+    gmsh.open(filename2)
+    entities = getPhysicalGroups()
+    nodes_p = get𝑿ᵢ()
+    # xᵖ = getfield(nodes_p[1],:data)[:x][2]
+    # yᵖ = getfield(nodes_p[1],:data)[:y][2]
+    # zᵖ = getfield(nodes_p[1],:data)[:z][2]
+    xᵖ = nodes_p.x
+    yᵖ = nodes_p.y
+    zᵖ = nodes_p.z
+    Ω = getElements(nodes_p, entities["Ω"])
+    s, var𝐴 = cal_area_support(Ω)
+    s = 1.5*s*ones(length(nodes_p))
+    # s = 1.5/10*ones(length(nodes_p))
+    push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
+
+    integrationOrder_Ω = 4
+    integrationOrder_Ωᵍ = 10
+    integrationOrder_Γ = 4
+    gmsh.open(filename1)
+    entities = getPhysicalGroups()
+    nodes = get𝑿ᵢ()
+    elements["Ω"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
+    elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
+    push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    elements["Γ¹"] = getElements(nodes, entities["Γ¹"], integrationOrder_Γ)
+    elements["Γ²"] = getElements(nodes, entities["Γ²"], integrationOrder_Γ)
+    elements["Γ³"] = getElements(nodes, entities["Γ³"], integrationOrder_Γ)
+    elements["Γ⁴"] = getElements(nodes, entities["Γ⁴"], integrationOrder_Γ)
+    elements["Γ"] = elements["Γ¹"]∪elements["Γ²"]∪elements["Γ³"]∪elements["Γ⁴"]
+    push!(elements["Γ¹"], :𝝭=>:𝑠)
+    push!(elements["Γ²"], :𝝭=>:𝑠)
+    push!(elements["Γ³"], :𝝭=>:𝑠)
+    push!(elements["Γ⁴"], :𝝭=>:𝑠)
+
+    type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
+    sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)
+    elements["Ωᵖ"] = getElements(nodes_p, entities["Ω"], type, integrationOrder_Ω, sp)
+    elements["Ωᵍᵖ"] = getElements(nodes_p, entities["Ω"], type,  integrationOrder_Ωᵍ, sp)
+
+
+    nₘ = 6
+    𝗠 = (0,zeros(nₘ))
+    push!(elements["Ωᵖ"], :𝝭=>:𝑠)
+    push!(elements["Ωᵖ"], :𝗠=>𝗠)
+    push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠)
+    push!(elements["Ωᵍᵖ"], :𝗠=>𝗠)
+    gmsh.finalize()
+    return elements, nodes, nodes_p ,xᵖ,yᵖ,zᵖ, sp,type
+end
+
 function import_patchtest_quad(filename::String)
     gmsh.initialize()
     gmsh.open(filename)
@@ -234,24 +289,24 @@ function import_patchtest_tri6(filename::String)
     entities = getPhysicalGroups()
     nodes = get𝑿ᵢ()
 
-    integrationOrder_Ω = 2
+    integrationOrder_Ω = 4
     integrationOrder_Ωᵍ = 10
-    integrationOrder_Γ = 2
+    integrationOrder_Γ = 4
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
     elements["Ω"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
-    # elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
-    # push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
-    # push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
+    push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
 
-    # elements["Γ¹"] = getElements(nodes, entities["Γ¹"], integrationOrder_Γ)
-    # elements["Γ²"] = getElements(nodes, entities["Γ²"], integrationOrder_Γ)
-    # elements["Γ³"] = getElements(nodes, entities["Γ³"], integrationOrder_Γ)
-    # elements["Γ⁴"] = getElements(nodes, entities["Γ⁴"], integrationOrder_Γ)
-    # elements["Γ"] = elements["Γ¹"]∪elements["Γ²"]∪elements["Γ³"]∪elements["Γ⁴"]
-    # push!(elements["Γ¹"], :𝝭=>:𝑠)
-    # push!(elements["Γ²"], :𝝭=>:𝑠)
-    # push!(elements["Γ³"], :𝝭=>:𝑠)
-    # push!(elements["Γ⁴"], :𝝭=>:𝑠)
+    elements["Γ¹"] = getElements(nodes, entities["Γ¹"], integrationOrder_Γ)
+    elements["Γ²"] = getElements(nodes, entities["Γ²"], integrationOrder_Γ)
+    elements["Γ³"] = getElements(nodes, entities["Γ³"], integrationOrder_Γ)
+    elements["Γ⁴"] = getElements(nodes, entities["Γ⁴"], integrationOrder_Γ)
+    elements["Γ"] = elements["Γ¹"]∪elements["Γ²"]∪elements["Γ³"]∪elements["Γ⁴"]
+    push!(elements["Γ¹"], :𝝭=>:𝑠)
+    push!(elements["Γ²"], :𝝭=>:𝑠)
+    push!(elements["Γ³"], :𝝭=>:𝑠)
+    push!(elements["Γ⁴"], :𝝭=>:𝑠)
 
     gmsh.finalize()
 
@@ -262,21 +317,21 @@ function import_patchtest_tri6(filename::String)
     yg = getfield(elements["Ω"][1].𝓖[1],:data)[:y][2]
     zg = getfield(elements["Ω"][1].𝓖[1],:data)[:z][2]
 
-    lwb = 2.5;lwm =2.5;mso =15;msx =15;ppu = 2.5;α = 0.7;
-    f = Figure(backgroundcolor = :transparent)
-    ax = Axis(f[1,1],aspect = DataAspect(),backgroundcolor = :transparent)
-    hidespines!(ax)
-    hidedecorations!(ax)
-    lines!([0.0, 1.0, 1.0, 0.0, 0.0],[0.0, 0.0, 1.0, 1.0, 0.0], linewidth = lwb, color = :black)
+    # lwb = 2.5;lwm =2.5;mso =15;msx =15;ppu = 2.5;α = 0.7;
+    # f = Figure(backgroundcolor = :transparent)
+    # ax = Axis(f[1,1],aspect = DataAspect(),backgroundcolor = :transparent)
+    # hidespines!(ax)
+    # hidedecorations!(ax)
+    # lines!([0.0, 1.0, 1.0, 0.0, 0.0],[0.0, 0.0, 1.0, 1.0, 0.0], linewidth = lwb, color = :black)
 
-    for elm in elements["Ω"]
-        id = [node.𝐼 for node in elm.𝓒]
-        lines!(x[id[[1,2,3,1]]],y[id[[1,2,3,1]]], linewidth = lwm, color = :black)
-    end
-    scatter!(x,y,marker = :circle, markersize = mso, color = :black)
-    scatter!(xg,yg,marker = :cross, markersize = 5, color = :blue)
+    # for elm in elements["Ω"]
+    #     id = [node.𝐼 for node in elm.𝓒]
+    #     lines!(x[id[[1,2,3,1]]],y[id[[1,2,3,1]]], linewidth = lwm, color = :black)
+    # end
+    # scatter!(x,y,marker = :circle, markersize = mso, color = :black)
+    # scatter!(xg,yg,marker = :cross, markersize = 5, color = :blue)
 
-    return elements, nodes, f
+    return elements, nodes
 end
 
 function stripe2unionJack!(elms::Vector{ApproxOperator.AbstractElement})

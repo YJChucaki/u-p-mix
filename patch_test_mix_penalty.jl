@@ -4,14 +4,16 @@ include("import_patchtest.jl")
 # for i=2:10
    
 ndiv= 11
-nₚ = 96
+nₚ = 60
 # println(nₚ)
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_bubble_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
-elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
+elements,nodes,nodes_p = import_patchtest_mix_tri6("./msh/patchtest_tri6_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
+# elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 nᵤ = length(nodes)
 nₚ = length(nodes_p)
- 
+
+
 set∇𝝭!(elements["Ω"])
 set𝝭!(elements["Ωᵖ"])
 set𝝭!(elements["Γ"])
@@ -68,7 +70,7 @@ eval(prescribe)
 ops = [
        Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>E,:ν=>ν),
        Operator{:∫vᵢtᵢds}(),
-       Operator{:∫vᵢgᵢds}(:α=>1e13*E),
+       Operator{:∫vᵢgᵢds}(:α=>1e18*E),
        Operator{:∫∫vᵢbᵢdxdy}(),
        Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄)
 ]
