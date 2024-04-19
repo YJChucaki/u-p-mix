@@ -4,15 +4,15 @@ ndiv=11
 include("import_patchtest.jl")
 include("import_prescrible_ops.jl")
 # elements, nodes = import_patchtest_fem("./msh/patchtest.msh")
-# elements, nodes = import_patchtest_fem("./msh/patchtest.msh")
+# elements, nodes = import_patchtest_fem("./msh/patchtest_"*string(ndiv)*".msh")
 elements, nodes = import_patchtest_tri6("./msh/patchtest_tri6_"*string(ndiv)*".msh")
 
 nᵤ = length(nodes)
 
 
 E = 1.0
-ν=0.3
-# ν=0.49999999999999
+# ν=0.3
+ν=0.49999999999999
 Ē = E/(1-ν^2)
 ν̄ = ν/(1-ν)
 
@@ -44,7 +44,7 @@ v(x,y) = -(x+y)^n
 b₁(x,y) = -∂σ₁₁∂x(x,y) - ∂σ₁₂∂y(x,y)
 b₂(x,y) = -∂σ₁₂∂x(x,y) - ∂σ₂₂∂y(x,y)
 
-# n = 2
+# n = 3 
 # u(x,y) = (1+2*x+3*y)^n
 # v(x,y) = (4+5*x+6*y)^n
 # ∂u∂x(x,y) = 2*n*(1+2*x+3*y)^abs(n-1)
@@ -89,7 +89,7 @@ kα = zeros(2*nᵤ,2*nᵤ)
 f = zeros(2*nᵤ)
 opsFEM[1](elements["Ω"],k)
 opsFEM[2](elements["Ω"],f)
-αᵥ = 1e9
+αᵥ = 1e13
 eval(opsPenalty)
 
 opsα[1](elements["Γ¹"],kα,f)

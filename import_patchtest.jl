@@ -61,12 +61,12 @@ function import_patchtest_mix_tri6(filename1::String, filename2::String)
     gmsh.open(filename2)
     entities = getPhysicalGroups()
     nodes_p = get𝑿ᵢ()
-    # xᵖ = getfield(nodes_p[1],:data)[:x][2]
-    # yᵖ = getfield(nodes_p[1],:data)[:y][2]
-    # zᵖ = getfield(nodes_p[1],:data)[:z][2]
-    xᵖ = nodes_p.x
-    yᵖ = nodes_p.y
-    zᵖ = nodes_p.z
+    xᵖ = getfield(nodes_p[1],:data)[:x][2]
+    yᵖ = getfield(nodes_p[1],:data)[:y][2]
+    zᵖ = getfield(nodes_p[1],:data)[:z][2]
+    # xᵖ = nodes_p.x
+    # yᵖ = nodes_p.y
+    # zᵖ = nodes_p.z
     Ω = getElements(nodes_p, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
     s = 1.5*s*ones(length(nodes_p))

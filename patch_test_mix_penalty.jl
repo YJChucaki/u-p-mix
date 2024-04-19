@@ -4,7 +4,7 @@ include("import_patchtest.jl")
 # for i=2:10
    
 ndiv= 11
-nₚ = 60
+nₚ = 100
 # println(nₚ)
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_bubble_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
@@ -23,7 +23,7 @@ Ē = 1.0
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
 
-# n = 1
+# n = 3
 # u(x,y) = (x+y)^n
 # v(x,y) = (x+y)^n
 # ∂u∂x(x,y) = n*(x+y)^abs(n-1)
@@ -36,7 +36,7 @@ E = Ē/(1.0-ν̄^2)
 # ∂²v∂x²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
 # ∂²v∂x∂y(x,y) = n*(n-1)*(x+y)^abs(n-2)
 # ∂²v∂y²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
-n = 2
+n = 3
 u(x,y) = (1+2*x+3*y)^n
 v(x,y) = (4+5*x+6*y)^n
 ∂u∂x(x,y) = 2*n*(1+2*x+3*y)^abs(n-1)
@@ -70,7 +70,7 @@ eval(prescribe)
 ops = [
        Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>E,:ν=>ν),
        Operator{:∫vᵢtᵢds}(),
-       Operator{:∫vᵢgᵢds}(:α=>1e18*E),
+       Operator{:∫vᵢgᵢds}(:α=>1e16*E),
        Operator{:∫∫vᵢbᵢdxdy}(),
        Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄)
 ]
