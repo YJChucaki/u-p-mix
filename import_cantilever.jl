@@ -86,7 +86,30 @@ function import_cantilever_mix_quad4(filename1::String,filename2::String)
     gmsh.finalize()
     return elements, nodes, nodes_p,xᵖ,yᵖ,zᵖ, sp,type
 end
+function import_cantilever_fem(filename::String)
+    gmsh.initialize()
+    gmsh.open(filename)
 
+    entities = getPhysicalGroups()
+    nodes = get𝑿ᵢ()
+    x = nodes.x
+    y = nodes.y
+    z = nodes.z
+    integrationOrder_Ω = 4
+    integrationOrder_Γ = 4
+    integrationOrder_Ωᵍ =10
+    elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
+    elements["Ω"] = getElements(nodes, entities["Ω"],   integrationOrder_Ω)
+    elements["Γᵍ"] = getElements(nodes, entities["Γᵍ"],   integrationOrder_Γ)
+    elements["Γᵗ"] = getElements(nodes, entities["Γᵗ"],   integrationOrder_Γ)
+    elements["Ωᵍ"] = getElements(nodes, entities["Ω"],   integrationOrder_Ωᵍ)
+    
+  
+   
+    
+    gmsh.finalize()
+    return elements, nodes
+end
 prescribeForGauss = quote
     𝗠 = (0,zeros(nₘ))
     ∂𝗠∂x = (0,zeros(nₘ))
@@ -108,6 +131,23 @@ prescribeForGauss = quote
     push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Ωᵍᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
 end
+prescribeForGaussFEM = quote
+    𝗠 = (0,zeros(nₘ))
+    ∂𝗠∂x = (0,zeros(nₘ))
+    ∂𝗠∂y = (0,zeros(nₘ))
+    
+    prescribe!(elements["Ωᵍ"],:u=>(x,y,z)->-P*y/6/EI*((6*L-3x)*x + (2+ν)*(y^2-D^2/4)))
+    prescribe!(elements["Ωᵍ"],:v=>(x,y,z)->P/6/EI*(3*ν*y^2*(L-x) + (4+5*ν)*D^2*x/4 + (3*L-x)*x^2))
+    prescribe!(elements["Ωᵍ"],:∂u∂x=>(x,y,z)->-P/EI*(L-x)*y)
+    prescribe!(elements["Ωᵍ"],:∂u∂y=>(x,y,z)->-P/6/EI*((6*L-3*x)*x + (2+ν)*(3*y^2-D^2/4)))
+    prescribe!(elements["Ωᵍ"],:∂v∂x=>(x,y,z)->P/6/EI*((6*L-3*x)*x - 3*ν*y^2 + (4+5*ν)*D^2/4))
+    prescribe!(elements["Ωᵍ"],:∂v∂y=>(x,y,z)->P/EI*(L-x)*y*ν)
+
+    push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+end  
+
+    
 
 prescribeForPenalty = quote
     prescribe!(elements["Γᵗ"],:t₁=>(x,y,z)->0.0)
@@ -129,6 +169,24 @@ prescribeForPenalty = quote
     push!(elements["Γᵗ"], :𝗠=>𝗠,:∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
     push!(elements["Γᵍ"], :𝗠=>𝗠,:∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
     push!(elements["Γᵍᵖ"], :𝗠=>𝗠,:∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+    
+end
+
+prescribeForPenaltyFEM = quote
+    prescribe!(elements["Γᵗ"],:t₁=>(x,y,z)->0.0)
+    prescribe!(elements["Γᵗ"],:t₂=>(x,y,z)->P/2/I*(D^2/4-y^2))
+    prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->-P*y/6/EI*((6*L-3x)*x + (2+ν)*(y^2-D^2/4)))
+    prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->P/6/EI*(3*ν*y^2*(L-x) + (4+5*ν)*D^2*x/4 + (3*L-x)*x^2))
+    prescribe!(elements["Γᵍ"],:n₁₁=>(x,y,z)->1.0)
+    prescribe!(elements["Γᵍ"],:n₁₂=>(x,y,z)->0.0)
+    prescribe!(elements["Γᵍ"],:n₂₂=>(x,y,z)->1.0)
+
+    push!(elements["Γᵗ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+  
+    push!(elements["Γᵗ"], :𝗠=>𝗠,:∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+    push!(elements["Γᵍ"], :𝗠=>𝗠,:∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+   
     
 end
 

@@ -4,7 +4,7 @@ using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie
     # i=NP[n]
 ndiv= 8
 #  ndiv_p= 8
-i=260
+i=800
 # 40,60-3
 # 80-4
 # 100,120-5
@@ -158,5 +158,6 @@ lines!([0.0,L,L,0.0,0.0],[-D/2,-D/2,D/2,D/2,-D/2], linewidth = lwb, color = :bla
 # save("./png/cantilever_"*string(i)*".png",fig)
 # save("./png/cantilever_tri3_G3_level_"*string(i)*".png",fig)
 # save("./png/cantilever_tri3_G3_nonunoform_level_"*string(i)*".png",fig)
+save("./png/cantilever_tri6_G3_level_"*string(i)*".png",fig)
 fig
 # end

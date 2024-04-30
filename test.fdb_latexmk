@@ -1,0 +1,18 @@
+# Fdb version 4
+["pdflatex"] 1713838081.38086 "c:/Users/22019/Desktop/test/u-p-mix/test.tex" "test.pdf" "test" 1713838086.13829 0
+  "c:/Users/22019/Desktop/test/u-p-mix/test.tex" 1713837850 96 56322c013e731ab36c41d424a5d5298c ""
+  "c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1713785032 35752 024fb6c41858982481f6968b5fc26508 ""
+  "c:/texlive/2024/texmf-dist/tex/latex/base/article.cls" 1713788063 20144 147463a6a579f4597269ef9565205cfe ""
+  "c:/texlive/2024/texmf-dist/tex/latex/base/size10.clo" 1713788063 8448 dbc0dbf4156c0bb9ba01a1c685d3bad0 ""
+  "c:/texlive/2024/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def" 1713788018 29918 d08e4795c0778dfb000e82d9225c6ce2 ""
+  "c:/texlive/2024/texmf-dist/web2c/texmf.cnf" 1713784876 41983 7ec6bfd6bf34339a61f0f08f42298e60 ""
+  "c:/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1713791970 5519690 1698f96789543a09b6b0e33aada59581 ""
+  "c:/texlive/2024/texmf-var/web2c/pdftex/pdflatex.fmt" 1713792495 8222561 32832fc79a6c96c2634a4c70272010ed ""
+  "c:/texlive/2024/texmf.cnf" 1713791846 713 e69b156964470283e0530f5060668171 ""
+  "test.aux" 1713838084 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  "test.tex" 1713837850 96 56322c013e731ab36c41d424a5d5298c ""
+  (generated)
+  "test.aux"
+  "test.log"
+  "test.pdf"
+  (rewritten before read)
