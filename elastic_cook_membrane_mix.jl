@@ -1,18 +1,22 @@
 
-using ApproxOperator, LinearAlgebra, Printf ,XLSX
+using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie
 include("input.jl")
 # for i in 2:10
 ndiv= 30
 ndiv_p=9
-# elements, nodes, nodes_𝑝,elms = import_rkgsi_mix_quadratic(fid_𝑢,fid_𝑝)
-elements,nodes,nodes_p = import_fem_tri3("./msh/cook_membrane_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(ndiv_p)*".msh")
+i=297
 
 
+include("import_prescrible_ops.jl")
+include("import_cook_membrane.jl")
+# elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
+# elements, nodes ,nodes_p = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
+# elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p = import_cantilever_T6P3("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv)*".msh")
+elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri6("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 nᵤ = length(nodes)
 nₚ = length(nodes_p)
-
-s = 1.5*44/ndiv_p*ones(nₚ)
-push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
 
 
@@ -23,16 +27,17 @@ push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 E = 70.0
 # ν = 0.3333
 ν =0.4999999
-
+eval(prescribeForGauss)
+eval(prescribeForPenalty)
 
 set𝝭!(elements["Ω"])
 set∇𝝭!(elements["Ω"])
-# set𝝭!(elements["Ωᵍ"])
-# set∇𝝭!(elements["Ωᵍ"])
+set∇𝝭!(elements["Ωᵍ"])
 set𝝭!(elements["Ωᵖ"])
+set𝝭!(elements["Ωᵍᵖ"])
 set𝝭!(elements["Γᵍ"])
 set𝝭!(elements["Γᵗ"])
-
+set𝝭!(elements["Γᵍᵖ"])
 
 
 ApproxOperator.prescribe!(elements["Γᵗ"],:t₁=>(x,y,z)->0.0)
@@ -43,35 +48,30 @@ ApproxOperator.prescribe!(elements["Γᵍ"],:n₁₁=>(x,y,z)->1.0)
 ApproxOperator.prescribe!(elements["Γᵍ"],:n₁₂=>(x,y,z)->0.0)
 ApproxOperator.prescribe!(elements["Γᵍ"],:n₂₂=>(x,y,z)->1.0)
 
-ops = [
-    Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>E,:ν=>ν),
-    Operator{:∫∫εᵛᵢⱼσᵛᵢⱼdxdy}(:E=>E,:ν=>ν),
-    Operator{:∫∫εᵈᵢⱼσᵈᵢⱼdxdy}(:E=>E,:ν=>ν),
-    Operator{:∫∫p∇vdxdy}(),
-    Operator{:∫∫qpdxdy}(:E=>E,:ν=>ν),
-    Operator{:∫vᵢtᵢds}(),
-    Operator{:∫vᵢgᵢds}(:α=>1e9*E),
-    ]
-    
+eval(opsupmix)
+kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
+kᵤₚ = zeros(2*nᵤ,nₚ)
+kₚₚ = zeros(nₚ,nₚ)
+f = zeros(2*nᵤ)
+fp= zeros(nₚ)
+opsup[3](elements["Ω"],kᵤᵤ)
+opsup[4](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
+opsup[5](elements["Ωᵖ"],kₚₚ)
+opsup[6](elements["Γᵗ"],f)
+αᵥ = 1e9
 
-    kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
-    kᵤₚ = zeros(2*nᵤ,nₚ)
-    kₚₚ = zeros(nₚ,nₚ)
-    f = zeros(2*nᵤ)
-
-    ops[3](elements["Ω"],kᵤᵤ)
-    ops[4](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
-    ops[5](elements["Ωᵖ"],kₚₚ)
-    ops[7](elements["Γᵍ"],kᵤᵤ,f)
-    ops[6](elements["Γᵗ"],f)
-
-    k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
-    f = [f;zeros(nₚ)]
-
-    d = k\f
-    d₁ = d[1:2:2*nᵤ]
-    d₂ = d[2:2:2*nᵤ]
-    push!(nodes,:d₁=>d₁,:d₂=>d₂)
+eval(opsPenalty)
+opsα[1](elements["Γᵍ"],kᵤᵤ,f)
+opsα[2](elements["Γᵍ"],elements["Γᵍᵖ"],kᵤₚ,fp)
+   
+k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
+f = [f;fp]
+d = k\f
+d₁ = d[1:2:2*nᵤ]
+d₂ = d[2:2:2*nᵤ]
+q  = d[2*nᵤ+1:end]
+push!(nodes,:d₁=>d₁,:d₂=>d₂)
+push!(nodes_p,:q=>q)
 
 
 

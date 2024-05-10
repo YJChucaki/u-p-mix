@@ -2,6 +2,44 @@ using Gmsh, Statistics
 using CairoMakie
 # using GLMakie
 
+function import_patchtest_Q4P1(filename::String)
+    elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
+    gmsh.initialize()
+
+   
+    integrationOrder_Ω = 1
+    integrationOrder_Ωᵍ = 10
+    integrationOrder_Γ = 1
+    gmsh.open(filename)
+    entities = getPhysicalGroups()
+    nodes = get𝑿ᵢ()
+    elements["Ω"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
+    elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
+    push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    elements["Γ¹"] = getElements(nodes, entities["Γ¹"], integrationOrder_Γ)
+    elements["Γ²"] = getElements(nodes, entities["Γ²"], integrationOrder_Γ)
+    elements["Γ³"] = getElements(nodes, entities["Γ³"], integrationOrder_Γ)
+    elements["Γ⁴"] = getElements(nodes, entities["Γ⁴"], integrationOrder_Γ)
+    elements["Γ"] = elements["Γ¹"]∪elements["Γ²"]∪elements["Γ³"]∪elements["Γ⁴"]
+    push!(elements["Γ¹"], :𝝭=>:𝑠)
+    push!(elements["Γ²"], :𝝭=>:𝑠)
+    push!(elements["Γ³"], :𝝭=>:𝑠)
+    push!(elements["Γ⁴"], :𝝭=>:𝑠)
+
+    type = PiecewiseParametric{:Constant2D}
+    # type = PiecewisePolynomial{:Constant2D}
+    elements["Ωᵖ"] = getElements(nodes, entities["Ω"], type, integrationOrder_Ω)
+    elements["Ωᵍᵖ"] = getElements(nodes, entities["Ω"], type,  integrationOrder_Ωᵍ)
+
+
+    nₘ = 6
+    𝗠 = (0,zeros(nₘ))
+    push!(elements["Ωᵖ"], :𝝭=>:𝑠)
+    push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠)
+    gmsh.finalize()
+    return elements, nodes
+end
 function import_patchtest_mix(filename1::String, filename2::String)
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
     gmsh.initialize()
@@ -53,11 +91,48 @@ function import_patchtest_mix(filename1::String, filename2::String)
     gmsh.finalize()
     return elements, nodes, nodes_p ,xᵖ,yᵖ,zᵖ, sp,type
 end
-
+function import_patchtest_T6P3(filename1::String, filename2::String)
+    elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
+    gmsh.initialize()
+    integrationOrder_Ω = 4
+    integrationOrder_Ωᵍ = 10
+    integrationOrder_Γ = 4
+    gmsh.open(filename1)
+    entities = getPhysicalGroups()
+    nodes = get𝑿ᵢ()
+    elements["Ω"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
+    elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
+    push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    elements["Γ¹"] = getElements(nodes, entities["Γ¹"], integrationOrder_Γ)
+    elements["Γ²"] = getElements(nodes, entities["Γ²"], integrationOrder_Γ)
+    elements["Γ³"] = getElements(nodes, entities["Γ³"], integrationOrder_Γ)
+    elements["Γ⁴"] = getElements(nodes, entities["Γ⁴"], integrationOrder_Γ)
+    elements["Γ"] = elements["Γ¹"]∪elements["Γ²"]∪elements["Γ³"]∪elements["Γ⁴"]
+    push!(elements["Γ¹"], :𝝭=>:𝑠)
+    push!(elements["Γ²"], :𝝭=>:𝑠)
+    push!(elements["Γ³"], :𝝭=>:𝑠)
+    push!(elements["Γ⁴"], :𝝭=>:𝑠)
+    gmsh.open(filename2)
+    entities = getPhysicalGroups()
+    nodes_p = get𝑿ᵢ()
+    xᵖ = getfield(nodes_p[1],:data)[:x][2]
+    yᵖ = getfield(nodes_p[1],:data)[:y][2]
+    zᵖ = getfield(nodes_p[1],:data)[:z][2]
+    elements["Ωᵖ"] = getElements(nodes_p, entities["Ω"], integrationOrder_Ω)
+    elements["Ωᵍᵖ"] = getElements(nodes_p, entities["Ω"],   integrationOrder_Ωᵍ)
+    nₘ = 6
+    𝗠 = (0,zeros(nₘ))
+    push!(elements["Ωᵖ"], :𝝭=>:𝑠)
+    push!(elements["Ωᵖ"], :𝗠=>𝗠)
+    push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠)
+    push!(elements["Ωᵍᵖ"], :𝗠=>𝗠)
+    gmsh.finalize()
+    return elements, nodes, nodes_p ,xᵖ,yᵖ,zᵖ
+end
 function import_patchtest_mix_tri6(filename1::String, filename2::String)
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
     gmsh.initialize()
-
     gmsh.open(filename2)
     entities = getPhysicalGroups()
     nodes_p = get𝑿ᵢ()
@@ -69,10 +144,9 @@ function import_patchtest_mix_tri6(filename1::String, filename2::String)
     # zᵖ = nodes_p.z
     Ω = getElements(nodes_p, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 1.5*s*ones(length(nodes_p))
+    s = 2.5*s*ones(length(nodes_p))
     # s = 1.5/10*ones(length(nodes_p))
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
-
     integrationOrder_Ω = 4
     integrationOrder_Ωᵍ = 10
     integrationOrder_Γ = 4
@@ -93,13 +167,14 @@ function import_patchtest_mix_tri6(filename1::String, filename2::String)
     push!(elements["Γ³"], :𝝭=>:𝑠)
     push!(elements["Γ⁴"], :𝝭=>:𝑠)
 
+    # type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
     type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
     sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)
     elements["Ωᵖ"] = getElements(nodes_p, entities["Ω"], type, integrationOrder_Ω, sp)
     elements["Ωᵍᵖ"] = getElements(nodes_p, entities["Ω"], type,  integrationOrder_Ωᵍ, sp)
 
 
-    nₘ = 6
+    nₘ = 21
     𝗠 = (0,zeros(nₘ))
     push!(elements["Ωᵖ"], :𝝭=>:𝑠)
     push!(elements["Ωᵖ"], :𝗠=>𝗠)
@@ -108,7 +183,6 @@ function import_patchtest_mix_tri6(filename1::String, filename2::String)
     gmsh.finalize()
     return elements, nodes, nodes_p ,xᵖ,yᵖ,zᵖ, sp,type
 end
-
 function import_patchtest_quad(filename::String)
     gmsh.initialize()
     gmsh.open(filename)

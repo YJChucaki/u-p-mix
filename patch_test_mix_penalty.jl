@@ -4,14 +4,19 @@ include("import_patchtest.jl")
 # for i=2:10
    
 ndiv= 11
-nₚ = 220
+nₚ = 360
 # println(nₚ)
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_bubble_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
-elements,nodes,nodes_p = import_patchtest_mix_tri6("./msh/patchtest_tri6_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
+# elements,nodes,nodes_p = import_patchtest_mix_tri6("./msh/patchtest_tri6_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
+elements,nodes = import_patchtest_Q4P1("./msh/patchtest_quad_"*string(ndiv)*".msh")
+
 nᵤ = length(nodes)
-nₚ = length(nodes_p)
+# nₚ = length(nodes_p)
+
+##only for Q4P1
+nₚ = length(elements["Ωᵖ"])
 
 
 set∇𝝭!(elements["Ω"])
@@ -23,32 +28,32 @@ Ē = 1.0
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
 
-n = 3
-u(x,y) = (x+y)^n
-v(x,y) = (x+y)^n
-∂u∂x(x,y) = n*(x+y)^abs(n-1)
-∂u∂y(x,y) = n*(x+y)^abs(n-1)
-∂v∂x(x,y) = n*(x+y)^abs(n-1)
-∂v∂y(x,y) = n*(x+y)^abs(n-1)
-∂²u∂x²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
-∂²u∂x∂y(x,y) = n*(n-1)*(x+y)^abs(n-2)
-∂²u∂y²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
-∂²v∂x²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
-∂²v∂x∂y(x,y) = n*(n-1)*(x+y)^abs(n-2)
-∂²v∂y²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
 # n = 3
-# u(x,y) = (1+2*x+3*y)^n
-# v(x,y) = (4+5*x+6*y)^n
-# ∂u∂x(x,y) = 2*n*(1+2*x+3*y)^abs(n-1)
-# ∂u∂y(x,y) = 3*n*(1+2*x+3*y)^abs(n-1)
-# ∂v∂x(x,y) = 5*n*(4+5*x+6*y)^abs(n-1)
-# ∂v∂y(x,y) = 6*n*(4+5*x+6*y)^abs(n-1)
-# ∂²u∂x²(x,y)  = 4*n*(n-1)*(1+2*x+3*y)^abs(n-2)
-# ∂²u∂x∂y(x,y) = 6*n*(n-1)*(1+2*x+3*y)^abs(n-2)
-# ∂²u∂y²(x,y)  = 9*n*(n-1)*(1+2*x+3*y)^abs(n-2)
-# ∂²v∂x²(x,y)  = 25*n*(n-1)*(4+5*x+6*y)^abs(n-2)
-# ∂²v∂x∂y(x,y) = 30*n*(n-1)*(4+5*x+6*y)^abs(n-2)
-# ∂²v∂y²(x,y)  = 36*n*(n-1)*(4+5*x+6*y)^abs(n-2)
+# u(x,y) = (x+y)^n
+# v(x,y) = (x+y)^n
+# ∂u∂x(x,y) = n*(x+y)^abs(n-1)
+# ∂u∂y(x,y) = n*(x+y)^abs(n-1)
+# ∂v∂x(x,y) = n*(x+y)^abs(n-1)
+# ∂v∂y(x,y) = n*(x+y)^abs(n-1)
+# ∂²u∂x²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
+# ∂²u∂x∂y(x,y) = n*(n-1)*(x+y)^abs(n-2)
+# ∂²u∂y²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
+# ∂²v∂x²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
+# ∂²v∂x∂y(x,y) = n*(n-1)*(x+y)^abs(n-2)
+# ∂²v∂y²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
+n = 3
+u(x,y) = (1+2*x+3*y)^n
+v(x,y) = (4+5*x+6*y)^n
+∂u∂x(x,y) = 2*n*(1+2*x+3*y)^abs(n-1)
+∂u∂y(x,y) = 3*n*(1+2*x+3*y)^abs(n-1)
+∂v∂x(x,y) = 5*n*(4+5*x+6*y)^abs(n-1)
+∂v∂y(x,y) = 6*n*(4+5*x+6*y)^abs(n-1)
+∂²u∂x²(x,y)  = 4*n*(n-1)*(1+2*x+3*y)^abs(n-2)
+∂²u∂x∂y(x,y) = 6*n*(n-1)*(1+2*x+3*y)^abs(n-2)
+∂²u∂y²(x,y)  = 9*n*(n-1)*(1+2*x+3*y)^abs(n-2)
+∂²v∂x²(x,y)  = 25*n*(n-1)*(4+5*x+6*y)^abs(n-2)
+∂²v∂x∂y(x,y) = 30*n*(n-1)*(4+5*x+6*y)^abs(n-2)
+∂²v∂y²(x,y)  = 36*n*(n-1)*(4+5*x+6*y)^abs(n-2)
 
 ∂ε₁₁∂x(x,y) = ∂²u∂x²(x,y)
 ∂ε₁₁∂y(x,y) = ∂²u∂x∂y(x,y)
@@ -70,7 +75,7 @@ eval(prescribe)
 ops = [
        Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>E,:ν=>ν),
        Operator{:∫vᵢtᵢds}(),
-       Operator{:∫vᵢgᵢds}(:α=>1e16*E),
+       Operator{:∫vᵢgᵢds}(:α=>1e13*E),
        Operator{:∫∫vᵢbᵢdxdy}(),
        Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄)
 ]
@@ -89,6 +94,8 @@ f = zeros(2*nᵤ)
 
 
 opsᵈ[1](elements["Ω"],kᵤᵤ)
+
+
 opsᵛ[1](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
 opsᵛ[2](elements["Ωᵖ"],kₚₚ)
 ops[3](elements["Γ"],kᵤᵤ,f)
