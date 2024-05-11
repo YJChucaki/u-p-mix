@@ -78,7 +78,7 @@ opsupmix = quote
         # Operator{:∫vᵢgᵢds}(:α=>αᵥ*E),
         Operator{:Locking_ratio_mix}(:E=>Ē,:ν=>ν̄),
         Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄),
-        Operator{:Hₑ_Incompressible}(:E=>E,:ν=>ν),
+        Operator{:Hₑ_Incompressible}(:E=>Ē,:ν=>ν̄),
     ]
 end
 

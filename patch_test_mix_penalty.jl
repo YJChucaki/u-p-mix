@@ -3,28 +3,31 @@ using ApproxOperator, Tensors,  LinearAlgebra
 include("import_patchtest.jl")
 # for i=2:10
    
-ndiv= 11
-nₚ = 360
+ndiv= 3
+nₚ = 11
 # println(nₚ)
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_bubble_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
+# elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes,nodes_p = import_patchtest_mix_tri6("./msh/patchtest_tri6_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
-elements,nodes = import_patchtest_Q4P1("./msh/patchtest_quad_"*string(ndiv)*".msh")
-
+# elements,nodes = import_patchtest_Q4P1("./msh/patchtest_quad_"*string(ndiv)*".msh")
+# elements,nodes,nodes_p = import_patchtest_T6P3("./msh/patchtest_tri6_"*string(ndiv)*".msh","./msh/patchtest_"*string(nₚ)*".msh")
+elements,nodes = import_patchtest_Q8P3("./msh/patchtest_quad8_"*string(ndiv)*".msh")
 nᵤ = length(nodes)
 # nₚ = length(nodes_p)
 
-##only for Q4P1
-nₚ = length(elements["Ωᵖ"])
-
+## for Q4P1
+# nₚ = length(elements["Ωᵖ"])
+## for Q8P3
+nₚ = 3*length(elements["Ωᵖ"])
 
 set∇𝝭!(elements["Ω"])
 set𝝭!(elements["Ωᵖ"])
 set𝝭!(elements["Γ"])
 Ē = 1.0
-ν̄ = 0.4999999
-# ν̄ = 0.3
+# ν̄ = 0.4999999
+ν̄ = 0.3
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
 
@@ -41,7 +44,7 @@ E = Ē/(1.0-ν̄^2)
 # ∂²v∂x²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
 # ∂²v∂x∂y(x,y) = n*(n-1)*(x+y)^abs(n-2)
 # ∂²v∂y²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
-n = 3
+n = 2
 u(x,y) = (1+2*x+3*y)^n
 v(x,y) = (4+5*x+6*y)^n
 ∂u∂x(x,y) = 2*n*(1+2*x+3*y)^abs(n-1)
@@ -77,7 +80,8 @@ ops = [
        Operator{:∫vᵢtᵢds}(),
        Operator{:∫vᵢgᵢds}(:α=>1e13*E),
        Operator{:∫∫vᵢbᵢdxdy}(),
-       Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄)
+       Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄),
+       Operator{:Hₑ_Incompressible}(:E=>Ē,:ν=>ν̄)
 ]
 opsᵛ = [
     Operator{:∫∫p∇vdxdy}(),
@@ -107,24 +111,26 @@ ops[4](elements["Ω"],f)
 k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
 f = [f;zeros(nₚ)]
 # d = (kᵛ+kᵈ)\f
-
+v = eigvals(k)
 d = k\f
 d₁ = d[1:2:2*nᵤ]
 d₂ = d[2:2:2*nᵤ]
 p  = d[2*nᵤ+1:end]
 
 push!(nodes,:d₁=>d₁,:d₂=>d₂)
-push!(nodes_p,:q=>p)
+# push!(nodes_p,:q=>p)
 
 set∇𝝭!(elements["Ωᵍ"])
 set𝝭!(elements["Ωᵍᵖ"])
-h1,l2,h1_dil,h1_dev= ops[5](elements["Ωᵍ"],elements["Ωᵍᵖ"])
+h1,l2= ops[6](elements["Ωᵍ"])
+# h1,l2,h1_dil,h1_dev= ops[5](elements["Ωᵍ"],elements["Ωᵍᵖ"])
 L2 = log10(l2)
 H1 = log10(h1)
-H1_dil = log10(h1_dil)
-H1_dev = log10(h1_dev)
+# H1_dil = log10(h1_dil)
+# H1_dev = log10(h1_dev)
            
 # println(L2,H1)
 println(l2,h1)
-println(h1_dil,h1_dev)
+println(v)
+# println(h1_dil,h1_dev)
 # @save compress=true "jld/patchtest_mix_tri3_bubble_"*string(nₚ)*".jld" q

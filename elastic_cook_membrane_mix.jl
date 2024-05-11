@@ -2,19 +2,20 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie
 include("input.jl")
 # for i in 2:10
-ndiv= 30
-ndiv_p=9
-i=297
+ndiv= 4
+# ndiv_p=9
+i=4
 
 
 include("import_prescrible_ops.jl")
 include("import_cook_membrane.jl")
-# elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
-# elements, nodes ,nodes_p = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
-# elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri3("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
-# elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+
+# elements, nodes ,nodes_p = import_cook_membrane_mix("./msh/cook_membrane_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
+elements, nodes ,nodes_p = import_cantilever_mix("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p = import_cantilever_T6P3("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv)*".msh")
-elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix_tri6("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes  = import_cantilever_Q4P1("./msh/cantilever_quad_"*string(ndiv)*".msh")
+# elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 nᵤ = length(nodes)
 nₚ = length(nodes_p)
 
@@ -24,29 +25,22 @@ nₚ = length(nodes_p)
 # μ = 80.1938
 # E = 9*κ*μ/(3*κ+μ)
 # ν = (3*κ-2*μ)/2/(3*κ+μ)
-E = 70.0
+Ē = 70.0
 # ν = 0.3333
-ν =0.4999999
-eval(prescribeForGauss)
+ν̄  =0.4999999
+E = Ē/(1.0-ν̄^2)
+ ν = ν̄/(1.0-ν̄)
 eval(prescribeForPenalty)
 
 set𝝭!(elements["Ω"])
 set∇𝝭!(elements["Ω"])
 set∇𝝭!(elements["Ωᵍ"])
 set𝝭!(elements["Ωᵖ"])
-set𝝭!(elements["Ωᵍᵖ"])
 set𝝭!(elements["Γᵍ"])
 set𝝭!(elements["Γᵗ"])
-set𝝭!(elements["Γᵍᵖ"])
 
 
-ApproxOperator.prescribe!(elements["Γᵗ"],:t₁=>(x,y,z)->0.0)
-ApproxOperator.prescribe!(elements["Γᵗ"],:t₂=>(x,y,z)->6.25)
-ApproxOperator.prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->0.0)
-ApproxOperator.prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->0.0)
-ApproxOperator.prescribe!(elements["Γᵍ"],:n₁₁=>(x,y,z)->1.0)
-ApproxOperator.prescribe!(elements["Γᵍ"],:n₁₂=>(x,y,z)->0.0)
-ApproxOperator.prescribe!(elements["Γᵍ"],:n₂₂=>(x,y,z)->1.0)
+
 
 eval(opsupmix)
 kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
@@ -62,7 +56,7 @@ opsup[6](elements["Γᵗ"],f)
 
 eval(opsPenalty)
 opsα[1](elements["Γᵍ"],kᵤᵤ,f)
-opsα[2](elements["Γᵍ"],elements["Γᵍᵖ"],kᵤₚ,fp)
+# opsα[2](elements["Γᵍ"],elements["Γᵍᵖ"],kᵤₚ,fp)
    
 k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
 f = [f;fp]

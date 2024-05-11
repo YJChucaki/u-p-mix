@@ -33,4 +33,6 @@ Physical Curve("Γ") = {1,3};
 Mesh.Algorithm = 1;
 Mesh.MshFileVersion = 2;
 Mesh 2;
+Mesh.SecondOrderIncomplete = 1;
+SetOrder 2;
 //RecombineMesh;
