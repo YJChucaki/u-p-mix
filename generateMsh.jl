@@ -2,9 +2,9 @@
 using BenchmarkExample
 import Gmsh: gmsh
 
-n = 3
-filename = "patchtest_"
-BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
+n = 5
+# filename = "patchtest_"
+# BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
 
 # filename = "patchtest_tri6_"
 # BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, order = 2)

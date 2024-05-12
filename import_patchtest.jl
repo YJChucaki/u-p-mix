@@ -32,7 +32,36 @@ function import_patchtest_Q4P1(filename::String)
     gmsh.finalize()
     return elements, nodes
 end
-
+function import_patchtest_Q4R1(filename::String)
+    elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
+    gmsh.initialize()
+    integrationOrder_Ω = 3
+    integrationOrder_Ωᵖ = 1
+    integrationOrder_Ωᵍ = 10
+    integrationOrder_Γ = 2
+    gmsh.open(filename)
+    entities = getPhysicalGroups()
+    nodes = get𝑿ᵢ()
+    elements["Ω"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
+    elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
+    push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    elements["Γ¹"] = getElements(nodes, entities["Γ¹"], integrationOrder_Γ)
+    elements["Γ²"] = getElements(nodes, entities["Γ²"], integrationOrder_Γ)
+    elements["Γ³"] = getElements(nodes, entities["Γ³"], integrationOrder_Γ)
+    elements["Γ⁴"] = getElements(nodes, entities["Γ⁴"], integrationOrder_Γ)
+    elements["Γ"] = elements["Γ¹"]∪elements["Γ²"]∪elements["Γ³"]∪elements["Γ⁴"]
+    push!(elements["Γ¹"], :𝝭=>:𝑠)
+    push!(elements["Γ²"], :𝝭=>:𝑠)
+    push!(elements["Γ³"], :𝝭=>:𝑠)
+    push!(elements["Γ⁴"], :𝝭=>:𝑠)
+    elements["Ωᵖ"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
+    elements["Ωᵍᵖ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
+    push!(elements["Ωᵖ"], :𝝭=>:𝑠)
+    push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠)
+    gmsh.finalize()
+    return elements, nodes
+end
 function import_patchtest_Q8P3(filename::String)
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
     gmsh.initialize()

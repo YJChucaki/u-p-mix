@@ -3,7 +3,7 @@ using ApproxOperator, Tensors,  LinearAlgebra
 include("import_patchtest.jl")
 # for i=2:10
    
-ndiv= 3
+ndiv= 33
 nₚ = 11
 # println(nₚ)
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_bubble_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
@@ -11,23 +11,24 @@ nₚ = 11
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes,nodes_p = import_patchtest_mix_tri6("./msh/patchtest_tri6_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
-# elements,nodes = import_patchtest_Q4P1("./msh/patchtest_quad_"*string(ndiv)*".msh")
+elements,nodes = import_patchtest_Q4P1("./msh/patchtest_quad_"*string(ndiv)*".msh")
+# elements,nodes = import_patchtest_Q4R1("./msh/patchtest_quad_"*string(ndiv)*".msh")
 # elements,nodes,nodes_p = import_patchtest_T6P3("./msh/patchtest_tri6_"*string(ndiv)*".msh","./msh/patchtest_"*string(nₚ)*".msh")
-elements,nodes = import_patchtest_Q8P3("./msh/patchtest_quad8_"*string(ndiv)*".msh")
+# elements,nodes = import_patchtest_Q8P3("./msh/patchtest_quad8_"*string(ndiv)*".msh")
 nᵤ = length(nodes)
 # nₚ = length(nodes_p)
 
-## for Q4P1
-# nₚ = length(elements["Ωᵖ"])
+## for Q4P1 or Q4R1
+nₚ = length(elements["Ωᵖ"])
 ## for Q8P3
-nₚ = 3*length(elements["Ωᵖ"])
+# nₚ = 3*length(elements["Ωᵖ"])
 
 set∇𝝭!(elements["Ω"])
 set𝝭!(elements["Ωᵖ"])
 set𝝭!(elements["Γ"])
 Ē = 1.0
-# ν̄ = 0.4999999
-ν̄ = 0.3
+ν̄ = 0.4999999
+# ν̄ = 0.3
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
 
@@ -111,7 +112,7 @@ ops[4](elements["Ω"],f)
 k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
 f = [f;zeros(nₚ)]
 # d = (kᵛ+kᵈ)\f
-v = eigvals(k)
+γ = eigvals(k)
 d = k\f
 d₁ = d[1:2:2*nᵤ]
 d₂ = d[2:2:2*nᵤ]
@@ -131,6 +132,6 @@ H1 = log10(h1)
            
 # println(L2,H1)
 println(l2,h1)
-println(v)
+println(γ[1])
 # println(h1_dil,h1_dev)
 # @save compress=true "jld/patchtest_mix_tri3_bubble_"*string(nₚ)*".jld" q
