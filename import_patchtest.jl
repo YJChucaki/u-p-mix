@@ -144,7 +144,7 @@ function import_patchtest_mix(filename1::String, filename2::String)
     push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠)
     push!(elements["Ωᵍᵖ"], :𝗠=>𝗠)
     gmsh.finalize()
-    return elements, nodes, nodes_p ,xᵖ,yᵖ,zᵖ, sp,type
+    return elements, nodes, nodes_p , Ω
 end
 function import_patchtest_T6P3(filename1::String, filename2::String)
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()

@@ -105,7 +105,7 @@ function import_cantilever_mix(filename1::String,filename2::String)
     push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Ωᵍᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
     gmsh.finalize()
-    return elements, nodes, nodes_p,xᵖ,yᵖ,zᵖ, sp,type
+    return elements, nodes, nodes_p,Ω
 end
 
 function import_cantilever_T6P3(filename1::String,filename2::String)
@@ -186,10 +186,10 @@ end
 prescribeForPenalty = quote
     prescribe!(elements["Γᵗ"],:t₁=>(x,y,z)->0.0)
     prescribe!(elements["Γᵗ"],:t₂=>(x,y,z)->P/2/I*(D^2/4-y^2)) 
-    # prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->-P*y/6/EI*((6*L-3x)*x + (2+ν)*(y^2-D^2/4)))
-    # prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->P/6/EI*(3*ν*y^2*(L-x) + (4+5*ν)*D^2*x/4 + (3*L-x)*x^2))
-    prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->0.0)
-    prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->0.0)
+    prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->-P*y/6/EI*((6*L-3x)*x + (2+ν)*(y^2-D^2/4)))
+    prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->P/6/EI*(3*ν*y^2*(L-x) + (4+5*ν)*D^2*x/4 + (3*L-x)*x^2))
+    # prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->0.0)
+    # prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->0.0)
     # prescribe!(elements["Γᵍᵖ"],:p₁=>(x,y,z)->-P/EI*(L-x)*y/2)
     # prescribe!(elements["Γᵍᵖ"],:p₂=>(x,y,z)->-P/EI*(L-x)*y/2)
     # prescribe!(elements["Γᵍᵖ"],:n₁=>(x,y,z)->1.0)
