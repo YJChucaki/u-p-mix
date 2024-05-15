@@ -63,8 +63,8 @@ function import_cantilever_mix(filename1::String,filename2::String)
     x = nodes.x
     y = nodes.y
     z = nodes.z
-    integrationOrder_Ω = 2
-    integrationOrder_Γ = 2
+    integrationOrder_Ω = 5
+    integrationOrder_Γ = 5
     integrationOrder_Ωᵍ =10
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
     elements["Ω"] = getElements(nodes, entities["Ω"],   integrationOrder_Ω)
@@ -84,10 +84,11 @@ function import_cantilever_mix(filename1::String,filename2::String)
     zᵖ = nodes_p.z
     Ω = getElements(nodes_p, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 1.5*s*ones(length(nodes_p))
-    # s = 1.5/10*ones(length(nodes_p))
+    s = 4.0*s*ones(length(nodes_p))
+    # s =1.8*12/ndiv_p*ones(length(nodes_p))
+    # s = 1.3/10*ones(length(nodes_p))
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
-   
+    # type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
     type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
     sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)
     gmsh.open(filename1)

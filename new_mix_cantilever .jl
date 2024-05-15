@@ -1,14 +1,15 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf
 
-ndiv= 8
-i=273
-
+ndiv=16
+i=1000
+# ndiv_p=4
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
 include("vtk.jl")
-elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
-# elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
-# elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+elements, nodes ,nodes_p ,Ω= import_cantilever_mix("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_quad8_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p = import_cantilever_T6P3("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv)*".msh")
 # elements, nodes  = import_cantilever_Q4P1("./msh/cantilever_quad_"*string(ndiv)*".msh")
 # elements, nodes  = import_cantilever_Q4R1("./msh/cantilever_quad_"*string(ndiv)*".msh")

@@ -3,24 +3,24 @@ using ApproxOperator, Tensors,  LinearAlgebra
 include("import_patchtest.jl")
 # for i=2:10
    
-ndiv= 11
-nₚ = 30
+ndiv= 17
+# nₚ = 20
 # println(nₚ)
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_bubble_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
-elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
+# elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
-# elements,nodes,nodes_p = import_patchtest_mix_tri6("./msh/patchtest_tri6_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
-# elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
+elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_tri6_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
+# elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_quad8_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes = import_patchtest_Q4P1("./msh/patchtest_quad_"*string(ndiv)*".msh")
 # elements,nodes = import_patchtest_Q4R1("./msh/patchtest_quad_"*string(ndiv)*".msh")
-# elements,nodes,nodes_p = import_patchtest_T6P3("./msh/patchtest_tri6_"*string(ndiv)*".msh","./msh/patchtest_"*string(nₚ)*".msh")
+# elements,nodes,nodes_p = import_patchtest_T6P3("./msh/patchtest_tri6_"*string(ndiv)*".msh","./msh/patchtest_"*string(ndiv)*".msh")
 # elements,nodes = import_patchtest_Q8P3("./msh/patchtest_quad8_"*string(ndiv)*".msh")
 nᵤ = length(nodes)
-nₚ = length(nodes_p)
+# nₚ = length(nodes_p)
 
 ## for Q4P1 or Q4R1
-# nₚ = length(elements["Ωᵖ"])
-## for Q8P3
+nₚ = length(elements["Ωᵖ"])
+# for Q8P3
 # nₚ = 3*length(elements["Ωᵖ"])
 
 set∇𝝭!(elements["Ω"])
@@ -112,19 +112,26 @@ ops[4](elements["Ω"],f)
 k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
 f = [f;zeros(nₚ)]
 # d = (kᵛ+kᵈ)\f
-γ = eigvals(k)
+kᵈ = kᵤᵤ
+kᵛ = -kᵤₚ*(kₚₚ\kᵤₚ')
+vᵈ = eigvals(kᵈ)
+vᵛ = eigvals(kᵛ)
+γ = eigvals(kᵛ,kᵈ)
+println(γ[2*nᵤ-nₚ+1])
 d = k\f
 d₁ = d[1:2:2*nᵤ]
 d₂ = d[2:2:2*nᵤ]
 p  = d[2*nᵤ+1:end]
 
 push!(nodes,:d₁=>d₁,:d₂=>d₂)
-push!(nodes_p,:q=>p)
+# push!(nodes_p,:q=>p)
+
+
 
 set∇𝝭!(elements["Ωᵍ"])
 set𝝭!(elements["Ωᵍᵖ"])
-# h1,l2= ops[6](elements["Ωᵍ"])
-h1,l2,h1_dil,h1_dev= ops[5](elements["Ωᵍ"],elements["Ωᵍᵖ"])
+h1,l2= ops[6](elements["Ωᵍ"])
+# h1,l2,h1_dil,h1_dev= ops[5](elements["Ωᵍ"],elements["Ωᵍᵖ"])
 L2 = log10(l2)
 H1 = log10(h1)
 # H1_dil = log10(h1_dil)
@@ -132,6 +139,6 @@ H1 = log10(h1)
            
 # println(L2,H1)
 println(l2,h1)
-println(γ[1])
+# println(log10(sqrt(γ[1])))
 # println(h1_dil,h1_dev)
 # @save compress=true "jld/patchtest_mix_tri3_bubble_"*string(nₚ)*".jld" q

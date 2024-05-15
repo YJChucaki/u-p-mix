@@ -1,7 +1,7 @@
 
 a = 1.0;
 b = 1.0;
-n = 11;
+n = 2;
 
 Point(1) = {0.0, 0.0, 0.0};
 Point(2) = {  a, 0.0, 0.0};
@@ -18,16 +18,16 @@ Curve Loop(1) = {1,2,3,4};
 Plane Surface(1) = {1};
 
 Transfinite Curve{1,2,3,4} = n;
-Transfinite Surface{1};
+//Transfinite Surface{1};
 Physical Curve("Γ₁") = {1};
 Physical Curve("Γ₂") = {2};
 Physical Curve("Γ₃") = {3};
 Physical Curve("Γ₄") = {4};
-Physical Surface("Ω") = {1};
+//Physical Surface("Ω") = {1};
 
 Mesh.Algorithm = 8;
 Mesh.MshFileVersion = 2;
 Mesh 2;
-Mesh.SecondOrderIncomplete = 1;
-RecombineMesh;
-SetOrder 2;
+//Mesh.SecondOrderIncomplete = 1;
+//RecombineMesh;
+//SetOrder 2;
