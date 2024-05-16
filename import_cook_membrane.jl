@@ -78,7 +78,7 @@ function import_cook_membrane_mix(filename1::String,filename2::String)
     push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Ωᵍᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
     gmsh.finalize()
-    return elements, nodes, nodes_p,xᵖ,yᵖ,zᵖ, sp,type
+    return elements, nodes, nodes_p,Ω
 end
 function import_cook_membrane_mix_tri6(filename1::String,filename2::String)
     gmsh.initialize()

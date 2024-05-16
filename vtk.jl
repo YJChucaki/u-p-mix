@@ -4,12 +4,13 @@ VTK_mix_pressure = quote
 #  fo = open("./vtk/cantilever_tri3_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
 #  fo = open("./vtk/cantilever_quad4_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
 #  fo = open("./vtk/cantilever_quad8_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
- fo = open("./vtk/cantilever_tri6_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
+#  fo = open("./vtk/cantilever_tri6_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
+ fo = open("./vtk/cook_membrane_tri3_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
  @printf fo "# vtk DataFile Version 2.0\n"
 #  @printf fo "cantilever_quad4_mix\n"
-#  @printf fo "cantilever_quad8_mix\n"
+ @printf fo "cantilever_quad8_mix\n"
 #  @printf fo "cantilever_tri3_mix\n"
- @printf fo "cantilever_tri6_mix\n"
+#  @printf fo "cantilever_tri6_mix\n"
  @printf fo "ASCII\n"
  @printf fo "DATASET POLYDATA\n"
  @printf fo "POINTS %i float\n" nₚ

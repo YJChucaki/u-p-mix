@@ -1,24 +1,24 @@
 
-using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie
+using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf
 include("input.jl")
 # for i in 2:10
-ndiv= 4
+ndiv= 32
 # ndiv_p=9
-i=4
+i=20
 
 
 include("import_prescrible_ops.jl")
 include("import_cook_membrane.jl")
-
-# elements, nodes ,nodes_p = import_cook_membrane_mix("./msh/cook_membrane_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
-elements, nodes ,nodes_p = import_cantilever_mix("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+include("vtk.jl")
+elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
+# elements, nodes ,nodes_p = import_cook_membrane_mix("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p = import_cantilever_T6P3("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv)*".msh")
 # elements, nodes  = import_cantilever_Q4P1("./msh/cantilever_quad_"*string(ndiv)*".msh")
 # elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 nᵤ = length(nodes)
 nₚ = length(nodes_p)
-
+nₑₚ = length(Ω)
 
 
 # κ = 400942
@@ -66,7 +66,7 @@ d₂ = d[2:2:2*nᵤ]
 q  = d[2*nᵤ+1:end]
 push!(nodes,:d₁=>d₁,:d₂=>d₂)
 push!(nodes_p,:q=>q)
-
+eval(VTK_mix_pressure)
 
 
 
