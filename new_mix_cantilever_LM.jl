@@ -1,7 +1,7 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf
 
-ndiv=16
-i=260
+ndiv=4
+i=40
 # ndiv_p=4
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
@@ -19,7 +19,7 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_"*string(n
     nₚ = length(nodes_p)
     nₑ = length(elements["Ω"])
     nₑₚ = length(Ω)
-    n_Γᵍ = length(elements["Γᵍ"])
+    ng = length(elements["Γᵍ"])
     ##for Q4P1 
     # nₚ = length(elements["Ωᵖ"])
     ##for Q8P3
@@ -48,35 +48,30 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_"*string(n
     # set𝝭!(elements["Γᵍᵖ"])
    
     eval(opsupmix)
+    k̄ = zeros(2*(nᵤ+ng),2*(nᵤ+ng))
+    G = zeros(2*nᵤ,2*ng) 
     kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
-    kᵤₚ = zeros(2*nᵤ,nₚ)
+    kᵤₚ = zeros(2*(nᵤ+ng),nₚ)
     kₚₚ = zeros(nₚ,nₚ)
     f = zeros(2*nᵤ)
-    fp = zeros(nₚ)
-    G = zeros(2*nᵤ,2*n_Γᵍ)
-    fq = zeros(2*n_Γᵍ)
-    k̄ = zeros(2*(nᵤ+n_Γᵍ),2*(nᵤ+n_Γᵍ))
+    fp= zeros(nₚ)
+    fq= zeros(2*ng)
     opsup[3](elements["Ω"],kᵤᵤ)
     opsup[4](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
     opsup[5](elements["Ωᵖ"],kₚₚ)
     opsup[6](elements["Γᵗ"],f)
-    αᵥ = 1e6
 
-    # eval(opsPenalty)
-    # opsα[1](elements["Γᵍ"],kᵤᵤ,f)
+
     eval(opsLagrangeMultiplier)
-    opsλ[1](elements["Ω"],elements["Γᵍ"],G,fq)
+    opsλ[1](elements["Γᵍ"],elements["Γᵍ"],G,fq)
     # opsα[2](elements["Γᵍ"],elements["Γᵍᵖ"],kᵤₚ,fp)
-
-    # k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
-    # f = [f;fp]
-    k̄ = [kᵤᵤ G;G' zeros(2*n_Γᵍ,2*n_Γᵍ)]
-    k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
-    f = [f;fq;fp]
+    k̄ = [kᵤᵤ G;G' zeros(2*ng,2*ng)]
+    k = [k̄ kᵤₚ;kᵤₚ' kₚₚ]
+    f = [f;fp]
     d = k\f
     d₁ = d[1:2:2*nᵤ]
     d₂ = d[2:2:2*nᵤ]
-    q  = d[2*nᵤ+1:end]
+    q  = d[2*(nᵤ+ng)+1:end]
     push!(nodes,:d₁=>d₁,:d₂=>d₂)
     push!(nodes_p,:q=>q)
 
@@ -94,7 +89,7 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_"*string(n
     # println(h1_dil,h1_dev)
     # h = log10(10.0/ndiv)
 
-    eval(VTK_mix_pressure)
+    # eval(VTK_mix_pressure)
     # eval(VTK_mix_displacement)
     # eval(VTK_Q4P1_displacement_pressure)
     # eval(VTK_T6P3_pressure)

@@ -98,6 +98,12 @@ opsNitsche = quote
     ]
 end
 
+opsLagrangeMultiplier = quote
+    opsλ = [
+        Operator{:∫λᵢgᵢds}(),
+        
+    ]
+end
 opsHR = quote
     opsh = [
         Operator{:∫𝒏𝑵𝒈dΓ_HR}(),

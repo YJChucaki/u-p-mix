@@ -51,7 +51,7 @@ function import_cantilever_Q8P3(filename::String)
     push!(elements["Ωᵖ"], :𝝭=>:𝑠)
     push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠)
     
-    gmsh.finalize()
+    # gmsh.finalize()
     return elements, nodes
 end
 function import_cantilever_mix(filename1::String,filename2::String)
@@ -105,7 +105,7 @@ function import_cantilever_mix(filename1::String,filename2::String)
     push!(elements["Ωᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
     push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Ωᵍᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
-    gmsh.finalize()
+    # gmsh.finalize()
     return elements, nodes, nodes_p,Ω
 end
 
@@ -146,7 +146,7 @@ function import_cantilever_T6P3(filename1::String,filename2::String)
     elements["Ωᵍᵖ"] = getElements(nodes_p, entities["Ω"],  integrationOrder_Ωᵍ)
     push!(elements["Ωᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
-    gmsh.finalize()
+    # gmsh.finalize()
     return elements, nodes, nodes_p
 end
 function import_cantilever_fem(filename::String)

@@ -2,9 +2,9 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf
 include("input.jl")
 # for i in 2:10
-ndiv= 32
+ndiv= 30
 # ndiv_p=9
-i=20
+i=4
 
 
 include("import_prescrible_ops.jl")

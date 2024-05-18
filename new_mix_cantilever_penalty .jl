@@ -19,7 +19,6 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_"*string(n
     nₚ = length(nodes_p)
     nₑ = length(elements["Ω"])
     nₑₚ = length(Ω)
-    n_Γᵍ = length(elements["Γᵍ"])
     ##for Q4P1 
     # nₚ = length(elements["Ωᵖ"])
     ##for Q8P3
@@ -52,27 +51,20 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_"*string(n
     kᵤₚ = zeros(2*nᵤ,nₚ)
     kₚₚ = zeros(nₚ,nₚ)
     f = zeros(2*nᵤ)
-    fp = zeros(nₚ)
-    G = zeros(2*nᵤ,2*n_Γᵍ)
-    fq = zeros(2*n_Γᵍ)
-    k̄ = zeros(2*(nᵤ+n_Γᵍ),2*(nᵤ+n_Γᵍ))
+    fp= zeros(nₚ)
     opsup[3](elements["Ω"],kᵤᵤ)
     opsup[4](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
     opsup[5](elements["Ωᵖ"],kₚₚ)
     opsup[6](elements["Γᵗ"],f)
     αᵥ = 1e6
 
-    # eval(opsPenalty)
-    # opsα[1](elements["Γᵍ"],kᵤᵤ,f)
-    eval(opsLagrangeMultiplier)
-    opsλ[1](elements["Ω"],elements["Γᵍ"],G,fq)
+    eval(opsPenalty)
+    opsα[1](elements["Γᵍ"],kᵤᵤ,f)
     # opsα[2](elements["Γᵍ"],elements["Γᵍᵖ"],kᵤₚ,fp)
 
-    # k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
-    # f = [f;fp]
-    k̄ = [kᵤᵤ G;G' zeros(2*n_Γᵍ,2*n_Γᵍ)]
+
     k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
-    f = [f;fq;fp]
+    f = [f;fp]
     d = k\f
     d₁ = d[1:2:2*nᵤ]
     d₂ = d[2:2:2*nᵤ]
