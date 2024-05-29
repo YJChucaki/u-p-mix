@@ -2,8 +2,9 @@
 using BubbleMsh
 # path = "./msh/plate_with_hole_new.msh"
 # path = "./msh/cantilever.msh"
-# path = "./msh/cook_membrane.msh"
-path = "./msh/patchtest.msh"
+# path = "./msh/cantilever_new_bubble.msh"
+path = "./msh/cook_membrane.msh"
+# path = "./msh/patchtest.msh"
 
 #cantilever
 # 4165:3845,0.225,0.1
@@ -11,14 +12,15 @@ path = "./msh/patchtest.msh"
 # 500:0.65
 # 93:0.9
 
-# bubblemsh(path,[24.0,0.0,0.0],[23.0,5.0,0.0],12,3.8,0.07)
-
+# bubblemsh(path,[24.0,0.0,0.0],[23.0,5.0,0.0],193,0.9,0.07)
+# bubblemsh(path,[28.0,0.0,0.0],[19.5,5.5,0.0],176,0.93,0.07)
+# bubblemsh(path,[4.0,0.0,0.0],[3.5,5.5,0.0],10,1.5,0.07)
 
 #cook_membrane
-# bubblemsh(path,[24.0,37.0,0.0],[23.0,10.0,0.0],70,2.2,0.1)
+bubblemsh(path,[25.0,30.0,0.0],[20.0,9.0,0.0],55,2.9,0.1)
 #plate_with_hole
 # bubblemsh(path,[2.5,2.5,0.0],[1.8,1.8,0.0],1274,0.11,0.07)
 #square
 # 127:10,80,0.6
 # 420：,344,0.0285,0.05
-bubblemsh(path,[0.5,0.5,0.0],[0.48,0.48,0.0],1,0.575,0.05)
+# bubblemsh(path,[0.5,0.5,0.0],[0.48,0.48,0.0],384,0.0285,0.05)

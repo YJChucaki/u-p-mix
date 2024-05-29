@@ -61,9 +61,11 @@ opsGauss = quote
 end
 opsFEM = quote
     opsFEM =[
-        Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>Ē,:ν=>ν̄ ),
+        Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>Ē,:ν=>ν̄  ),
         Operator{:∫∫vᵢbᵢdxdy}(),
-        Operator{:Hₑ_PlaneStress}(:E=>Ē,:ν=>ν̄ )
+        Operator{:∫vᵢtᵢds}(),
+        Operator{:Hₑ_PlaneStress}(:E=>Ē,:ν=>ν̄ ),
+        Operator{:Hₑ_Incompressible}(:E=>Ē,:ν=>ν̄),
        
     ]
 end
@@ -75,7 +77,6 @@ opsupmix = quote
         Operator{:∫∫p∇vdxdy}(),
         Operator{:∫∫qpdxdy}(:E=>Ē,:ν=>ν̄),
         Operator{:∫vᵢtᵢds}(),
-        # Operator{:∫vᵢgᵢds}(:α=>αᵥ*E),
         Operator{:Locking_ratio_mix}(:E=>Ē,:ν=>ν̄),
         Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄),
         Operator{:Hₑ_Incompressible}(:E=>Ē,:ν=>ν̄),
@@ -104,6 +105,13 @@ opsLagrangeMultiplier = quote
         
     ]
 end
+opsDirect = quote
+    opsD = [
+        Operator{:g₂}(),
+        
+    ]
+end
+
 opsHR = quote
     opsh = [
         Operator{:∫𝒏𝑵𝒈dΓ_HR}(),

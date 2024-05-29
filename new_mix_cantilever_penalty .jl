@@ -1,12 +1,13 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf
 
-ndiv=16
-i=260
+ndiv=32
+# i=2000
 # ndiv_p=4
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
-include("vtk.jl")
-elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+include("wirteVTK.jl")
+# elements, nodes ,nodes_p,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p,Ω = import_cantilever_mix_internal("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*"_internal.msh","./msh/cantilever_"*string(ndiv)*"_internal.msh")
 # elements, nodes ,nodes_p ,Ω= import_cantilever_mix("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_quad8_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
@@ -15,10 +16,11 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_"*string(n
 # elements, nodes  = import_cantilever_Q4R1("./msh/cantilever_quad_"*string(ndiv)*".msh")
 # elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes  = import_cantilever_Q8P3("./msh/cantilever_quad8_"*string(ndiv)*".msh")
+elements, nodes  = import_cantilever_fem("./msh/cantilever_quad8_"*string(ndiv)*".msh")
     nᵤ = length(nodes)
-    nₚ = length(nodes_p)
+    # nₚ = length(nodes_p)
     nₑ = length(elements["Ω"])
-    nₑₚ = length(Ω)
+    # nₑₚ = length(Ω)
     ##for Q4P1 
     # nₚ = length(elements["Ωᵖ"])
     ##for Q8P3
@@ -56,8 +58,8 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_"*string(n
     opsup[4](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
     opsup[5](elements["Ωᵖ"],kₚₚ)
     opsup[6](elements["Γᵗ"],f)
-    αᵥ = 1e6
 
+    αᵥ = 1e9
     eval(opsPenalty)
     opsα[1](elements["Γᵍ"],kᵤᵤ,f)
     # opsα[2](elements["Γᵍ"],elements["Γᵍᵖ"],kᵤₚ,fp)
@@ -70,7 +72,7 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_"*string(n
     d₂ = d[2:2:2*nᵤ]
     q  = d[2*nᵤ+1:end]
     push!(nodes,:d₁=>d₁,:d₂=>d₂)
-    push!(nodes_p,:q=>q)
+    # push!(nodes_p,:q=>q)
 
     # h1,l2,h1_dil,h1_dev = opsup[8](elements["Ωᵍ"],elements["Ωᵍᵖ"])
     # h1,l2 = opsup[8](elements["Ωᵍ"],elements["Ωᵖ"])
@@ -86,14 +88,15 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_"*string(n
     # println(h1_dil,h1_dev)
     # h = log10(10.0/ndiv)
 
-    eval(VTK_mix_pressure)
+    # eval(VTK_mix_pressure)
+    # eval(VTK_mix_pressure_u)
     # eval(VTK_mix_displacement)
     # eval(VTK_Q4P1_displacement_pressure)
     # eval(VTK_T6P3_pressure)
 
 
 
- ##contour!
+#  #contour!
 # 𝗠 = zeros(21)
 # ind = 20
 # xs = zeros(ind)
@@ -129,16 +132,16 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_"*string(n
 # s = contourf!(xs,ys, color, colormap=:coolwarm)
 # Colorbar(fig[1, 2], s)
 
-# # # elements
+# # # # elements
 # lwb = 2.5;lwm =2.5;mso =5;msx =15;ppu = 2.5;α = 0.7;
-# for elm in elements["Ω"]
+# # for elm in elements["Ω"]
    
-#     x = [x.x for x in elm.𝓒[[1,2,3,1]]]
-#     y = [x.y for x in elm.𝓒[[1,2,3,1]]]
+# #     x = [x.x for x in elm.𝓒[[1,2,3,1]]]
+# #     y = [x.y for x in elm.𝓒[[1,2,3,1]]]
    
-#     lines!(x,y, linewidth = 0.3, color = :black)
+# #     lines!(x,y, linewidth = 0.3, color = :black)
 
-# end
+# # end
 # # scatter!(x,y,marker = :circle, markersize = mso, color = :black)
 # lines!([0.0,L,L,0.0,0.0],[-D/2,-D/2,D/2,D/2,-D/2], linewidth = lwb, color = :black)
 # # save("./png/cantilever_"*string(i)*".png",fig)
