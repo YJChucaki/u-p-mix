@@ -44,7 +44,7 @@ elements, nodes  = import_cantilever_fem("./msh/cantilever_"*string(ndiv)*".msh"
     opsFEM[1](elements["Ω"],k)
     opsFEM[3](elements["Γᵗ"],f)
    
-    αᵥ = 1e12
+    αᵥ = 1e9
     eval(opsPenalty)
     opsα[1](elements["Γᵍ"],k,f)
     # opsα[2](elements["Γᵍ"],elements["Γᵍᵖ"],kᵤₚ,fp)

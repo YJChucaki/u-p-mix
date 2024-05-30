@@ -108,6 +108,70 @@ function import_cantilever_mix(filename1::String,filename2::String)
     # gmsh.finalize()
     return elements, nodes, nodes_p,Ω,xᵖ,yᵖ,zᵖ, sp,type
 end
+function import_cantilever_mix_HR(filename1::String,filename2::String)
+    elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
+    integrationOrder_Ω = 3
+    integrationOrder_Γ = 2
+    integrationOrder_Ωᵍ = 10
+
+    gmsh.initialize()
+
+    gmsh.open(filename2)
+    entities = getPhysicalGroups()
+    nodes_p = get𝑿ᵢ()
+    xᵖ = nodes_p.x
+    yᵖ = nodes_p.y
+    zᵖ = nodes_p.z
+    Ω = getElements(nodes_p, entities["Ω"])
+    s, var𝐴 = cal_area_support(Ω)
+    s = 1.5*s*ones(length(nodes_p))
+    # s = 2.5*s*ones(length(nodes_p))
+    push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
+
+    gmsh.open(filename1)
+    entities = getPhysicalGroups()
+    nodes = get𝑿ᵢ()
+
+    elements["Ω"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
+    elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
+    elements["Γᵗ"] = getElements(nodes, entities["Γᵗ"], integrationOrder_Γ, normal = true)
+    elements["Γᵍ"] = getElements(nodes, entities["Γᵍ"], integrationOrder_Γ, normal = true)
+    
+    
+    push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γᵗ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    
+    type = PiecewisePolynomial{:Constant2D}
+    # type = PiecewisePolynomial{:Linear2D}
+    elements["Ωˢ"] = getPiecewiseElements(entities["Ω"], type, integrationOrder_Ω)
+    elements["∂Ωˢ"] = getPiecewiseBoundaryElements(entities["Γ"], entities["Ω"], type, integrationOrder_Γ)
+    elements["Γˢ"] = getElements(entities["Γᵍ"], elements["∂Ωˢ"])
+    push!(elements["Ωˢ"], :𝝭=>:𝑠)
+    push!(elements["∂Ωˢ"], :𝝭=>:𝑠)
+
+    type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
+    # type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
+    sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)
+    elements["Ωᵖ"] = getElements(nodes_p, entities["Ω"], type, integrationOrder_Ω, sp)
+    elements["Ωᵍᵖ"] = getElements(nodes_p, entities["Ω"], type,  integrationOrder_Ωᵍ, sp)
+    elements["Γᵖ"] = getElements(nodes_p, entities["Γᵍ"], type, integrationOrder_Γ, sp)
+    
+    nₘ = 6
+    # nₘ = 21
+    𝗠 = (0,zeros(nₘ))
+    push!(elements["Ωᵖ"], :𝝭=>:𝑠)
+    push!(elements["Ωᵖ"], :𝗠=>𝗠)
+    push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠)
+    push!(elements["Ωᵍᵖ"], :𝗠=>𝗠)
+    push!(elements["Γᵖ"], :𝝭=>:𝑠)
+    push!(elements["Γᵖ"], :𝗠=>𝗠)
+   
+
+    return elements, nodes, nodes_p, Ω
+end
+
 function import_cantilever_mix_internal(filename1::String,filename2::String,filename3::String)
     gmsh.initialize()
     gmsh.open(filename1)

@@ -34,7 +34,7 @@ Transfinite Curve{4,5,6,7} = n/2+1;
 Physical Curve("Γᵗ") = {2};
 Physical Curve("Γᵍ") = {4};
 Physical Curve("Γ") = {1,3,5,6,7};
-//Physical Surface("Ω") = {2};
+Physical Surface("Ω") = {2};
 
 //Transfinite Surface{2};
 
