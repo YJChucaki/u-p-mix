@@ -4,8 +4,8 @@ include("import_patchtest.jl")
 include("wirteVTK.jl")
 # for i=2:10
    
-ndiv= 11
-i = 220
+ndiv= 9
+nₚ = 20
 # println(nₚ)
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_bubble_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes,nodes_p,Ω = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
@@ -30,8 +30,8 @@ set∇𝝭!(elements["Ω"])
 set𝝭!(elements["Ωᵖ"])
 set𝝭!(elements["Γ"])
 Ē = 1.0
-# ν̄ = 0.4999999
-ν̄ = 0.3
+ν̄ = 0.499999
+# ν̄ = 0.3
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
 
@@ -49,6 +49,7 @@ E = Ē/(1.0-ν̄^2)
 # ∂²v∂x∂y(x,y) = n*(n-1)*(x+y)^abs(n-2)
 # ∂²v∂y²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
 n = 1
+n = 1
 u(x,y) = (1+2*x+3*y)^n
 v(x,y) = (4+5*x+6*y)^n
 ∂u∂x(x,y) = 2*n*(1+2*x+3*y)^abs(n-1)
@@ -62,12 +63,20 @@ v(x,y) = (4+5*x+6*y)^n
 ∂²v∂x∂y(x,y) = 30*n*(n-1)*(4+5*x+6*y)^abs(n-2)
 ∂²v∂y²(x,y)  = 36*n*(n-1)*(4+5*x+6*y)^abs(n-2)
 
+ε₁₁(x,y) = ∂u∂x(x,y)
+ε₂₂(x,y) = ∂v∂y(x,y)
+ε₁₂(x,y) = 0.5*(∂u∂y(x,y) + ∂v∂x(x,y))
 ∂ε₁₁∂x(x,y) = ∂²u∂x²(x,y)
 ∂ε₁₁∂y(x,y) = ∂²u∂x∂y(x,y)
 ∂ε₂₂∂x(x,y) = ∂²v∂x∂y(x,y)
 ∂ε₂₂∂y(x,y) = ∂²v∂y²(x,y)
 ∂ε₁₂∂x(x,y) = 0.5*(∂²u∂x∂y(x,y) + ∂²v∂x²(x,y))
 ∂ε₁₂∂y(x,y) = 0.5*(∂²u∂y²(x,y) + ∂²v∂x∂y(x,y))
+σ₁₁(x,y) = Ē/(1+ν̄)/(1-2*ν̄)*((1-ν̄)*ε₁₁(x,y) + ν̄*ε₂₂(x,y))
+σ₂₂(x,y) = Ē/(1+ν̄)/(1-2*ν̄)*(ν̄*ε₁₁(x,y) + (1-ν̄)*ε₂₂(x,y))
+σ₃₃(x,y) = Ē*ν̄/(1+ν̄)/(1-2*ν̄)*(ε₁₁(x,y) + ε₂₂(x,y))
+σ₁₂(x,y) = E/(1+ν)*ε₁₂(x,y)
+𝑝(x,y) = (σ₁₁(x,y)+σ₂₂(x,y)+σ₃₃(x,y))/3
 ∂σ₁₁∂x(x,y) = E/(1-ν^2)*(∂ε₁₁∂x(x,y) + ν*∂ε₂₂∂x(x,y))
 ∂σ₁₁∂y(x,y) = E/(1-ν^2)*(∂ε₁₁∂y(x,y) + ν*∂ε₂₂∂y(x,y))
 ∂σ₂₂∂x(x,y) = E/(1-ν^2)*(ν*∂ε₁₁∂x(x,y) + ∂ε₂₂∂x(x,y))
@@ -95,10 +104,12 @@ opsᵈ = [
     Operator{:∫∫εᵈᵢⱼσᵈᵢⱼdxdy}(:E=>Ē,:ν=>ν̄ )
 ]
 
+kᵅ = zeros(2*nᵤ,2*nᵤ)
+fᵅ = zeros(2*nᵤ)
 kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
 kᵤₚ = zeros(2*nᵤ,nₚ)
 kₚₚ = zeros(nₚ,nₚ)
-f = zeros(2*nᵤ)
+fᵤ = zeros(2*nᵤ)
 
 
 opsᵈ[1](elements["Ω"],kᵤᵤ)
@@ -106,14 +117,14 @@ opsᵈ[1](elements["Ω"],kᵤᵤ)
 
 opsᵛ[1](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
 opsᵛ[2](elements["Ωᵖ"],kₚₚ)
-ops[3](elements["Γ"],kᵤᵤ,f)
-ops[4](elements["Ω"],f)
+ops[3](elements["Γ"],kᵅ,fᵅ)
+ops[4](elements["Ω"],fᵤ)
 
 
 # kᵈ = kᵤᵤ
 # kᵛ = kᵤₚ*(kₚₚ\kᵤₚ')
-k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
-f = [f;zeros(nₚ)]
+k = [kᵤᵤ+kᵅ kᵤₚ;kᵤₚ' kₚₚ]
+f = [fᵤ+fᵅ;zeros(nₚ)]
 # d = (kᵛ+kᵈ)\f
 kᵈ = kᵤᵤ
 kᵛ = -kᵤₚ*(kₚₚ\kᵤₚ')
@@ -147,3 +158,37 @@ println(H1_dil,H1_dev)
 # println(log10(sqrt(γ[1])))
 # println(h1_dil,h1_dev)
 # @save compress=true "jld/patchtest_mix_tri3_bubble_"*string(nₚ)*".jld" q
+
+
+d̄ = zeros(2*nᵤ+nₚ)
+d̃ = zeros(2*nᵤ)
+d̄₁ = zeros(nᵤ)
+d̄₂ = zeros(nᵤ)
+p̄ = zeros(nₚ)
+for (i,node) in enumerate(nodes)
+    x = node.x
+    y = node.y
+    d̄₁[i] = u(x,y)
+    d̄₂[i] = v(x,y)
+    d̄[2*i-1] = u(x,y)
+    d̄[2*i] = v(x,y)
+    d̃[2*i-1] = u(x,y)
+    d̃[2*i] = v(x,y)
+end
+
+for (i,node) in enumerate(nodes_p)
+    x = node.x
+    y = node.y
+    p̄[i] = 𝑝(x,y)
+    d̄[2*nᵤ+i] = 𝑝(x,y)
+end
+
+err_d₁ = d₁ - d̄₁
+err_d₂ = d₂ - d̄₂
+err_p = p - p̄
+
+# err = k*d̄ .- f
+# err = kᵅ*d̃ .- fᵅ
+# err = [kᵤᵤ kᵤₚ]*d̄ - fᵤ
+# err = kᵤᵤ*d̃
+err = kᵤₚ*p̄
