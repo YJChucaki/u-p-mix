@@ -2,7 +2,7 @@
 using BenchmarkExample
 import Gmsh: gmsh
 
-n = 4
+n = 33
 # filename = "patchtest_"
 # BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
 

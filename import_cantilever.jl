@@ -84,7 +84,7 @@ function import_cantilever_mix(filename1::String,filename2::String)
     zᵖ = nodes_p.z
     Ω = getElements(nodes_p, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 4.0*s*ones(length(nodes_p))
+    s = 5.0*s*ones(length(nodes_p))
     # s =1.8*12/ndiv_p*ones(length(nodes_p))
     # s = 1.3/10*ones(length(nodes_p))
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
@@ -124,7 +124,7 @@ function import_cantilever_mix_HR(filename1::String,filename2::String)
     zᵖ = nodes_p.z
     Ω = getElements(nodes_p, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 1.5*s*ones(length(nodes_p))
+    s = 2.5*s*ones(length(nodes_p))
     # s = 2.5*s*ones(length(nodes_p))
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
@@ -147,7 +147,7 @@ function import_cantilever_mix_HR(filename1::String,filename2::String)
     # type = PiecewisePolynomial{:Linear2D}
     elements["Ωˢ"] = getPiecewiseElements(entities["Ω"], type, integrationOrder_Ω)
     elements["∂Ωˢ"] = getPiecewiseBoundaryElements(entities["Γ"], entities["Ω"], type, integrationOrder_Γ)
-    elements["Γˢ"] = getElements(entities["Γᵍ"], elements["∂Ωˢ"])
+    elements["Γˢ"] = getElements(entities["Γᵍ"],entities["Γ"], elements["∂Ωˢ"])
     push!(elements["Ωˢ"], :𝝭=>:𝑠)
     push!(elements["∂Ωˢ"], :𝝭=>:𝑠)
 

@@ -1,7 +1,7 @@
 VTK_mix_pressure = quote
  #number of an elemnt nodes
  nₑₙ=3
- fo = open("./vtk/patchtest_tri3_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
+ fo = open("./vtk/patchtest_tri3_mix_HR_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
 #  fo = open("./vtk/patchtest_tri6_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
 #  fo = open("./vtk/cantilever_tri3_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
 #  fo = open("./vtk/cantilever_quad4_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
@@ -41,7 +41,15 @@ VTK_mix_pressure = quote
  for p in nodes_p
     @printf fo "%f\n" p.q 
  end
-
+# for (j,p) in enumerate(elements["Ωᵖ"])
+#     ξ,  = p.𝓖
+#     N = ξ[:𝝭]
+#     p = 0.0
+#     for (i,xᵢ) in enumerate(p.𝓒)
+#         p += N[i]*xᵢ.q
+#     end
+#     @printf fo "%f\n" p
+# end
  close(fo)
 end
 VTK_mix_pressure_u = quote
