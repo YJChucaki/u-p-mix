@@ -1,7 +1,7 @@
 
 using Gmsh, Statistics
 
-function import_mix(filename1::String,filename2::String)
+function import_mix_bubble(filename1::String,filename2::String)
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
     integrationOrder_Ω = 3
     integrationOrder_Γ = 2
@@ -37,17 +37,9 @@ function import_mix(filename1::String,filename2::String)
     push!(elements["Γ³"], :𝝭=>:𝑠)
     push!(elements["Γ⁴"], :𝝭=>:𝑠)
 
-    type = PiecewisePolynomial{:Constant2D}
-    # type = PiecewisePolynomial{:Linear2D}
+    type = PiecewiseParametric{:BubbleTri}
     elements["Ωˢ"] = getPiecewiseElements(entities["Ω"], type, integrationOrder_Ω)
-    elements["∂Ωˢ"] = getPiecewiseBoundaryElements(entities["Γ"], entities["Ω"], type, integrationOrder_Γ)
-    elements["Γ¹ˢ"] = getElements(entities["Γ¹"], entities["Γ"], elements["∂Ωˢ"])
-    elements["Γ²ˢ"] = getElements(entities["Γ²"], entities["Γ"], elements["∂Ωˢ"])
-    elements["Γ³ˢ"] = getElements(entities["Γ³"], entities["Γ"], elements["∂Ωˢ"])
-    elements["Γ⁴ˢ"] = getElements(entities["Γ⁴"], entities["Γ"], elements["∂Ωˢ"])
-    elements["Γˢ"] = elements["Γ¹ˢ"]∪elements["Γ²ˢ"]∪elements["Γ³ˢ"]∪elements["Γ⁴ˢ"]
     push!(elements["Ωˢ"], :𝝭=>:𝑠)
-    push!(elements["∂Ωˢ"], :𝝭=>:𝑠)
 
     type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
     # type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
