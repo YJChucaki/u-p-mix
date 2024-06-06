@@ -1,7 +1,7 @@
 
-a = 10.0;
-b = 10.0;
-n = 12;
+a = 1.0;
+b = 1.0;
+n = 2;
 
 Point(1) = {0.0, 0.0, 0.0};
 Point(2) = {  a, 0.0, 0.0};
@@ -20,8 +20,9 @@ Plane Surface(1) = {1};
 
 Transfinite Curve{1,2,3,4} = n+1;
 
-Physical Curve("Γᵗ") = {2,3,4};
-Physical Curve("Γᵍ") = {1};
+Physical Curve("Γᵗ") = {2};
+Physical Curve("Γᵍ") = {4};
+Physical Curve("Γ") = {1,3};
 //Physical Surface("Ω") = {1};
 
 //Transfinite Surface{1};

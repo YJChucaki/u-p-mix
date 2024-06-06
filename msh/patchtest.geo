@@ -1,7 +1,7 @@
 
 a = 1.0;
 b = 1.0;
-n = 21;
+n = 32;
 
 Point(1) = {0.0, 0.0, 0.0};
 Point(2) = {  a, 0.0, 0.0};
@@ -15,7 +15,7 @@ Line(4) = {4,1};
 
 Curve Loop(1) = {1,2,3,4};
 
-//Plane Surface(1) = {1};
+Plane Surface(1) = {1};
 
 Transfinite Curve{1,2,3,4} = n;
 //Transfinite Surface{1};

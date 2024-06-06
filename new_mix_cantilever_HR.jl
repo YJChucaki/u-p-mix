@@ -1,7 +1,7 @@
-using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf
+using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf, Pardiso
 
-ndiv=33
-i=4165
+ndiv=5
+i=72
 # ndiv_p=4
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
@@ -20,8 +20,8 @@ elements, nodes, nodes_p, Ω  = import_cantilever_mix_HR("./msh/cantilever_HR_"*
     P = 1000
     Ē = 3e6
     # Ē = 1.0
-    ν̄ = 0.499999999
-    # ν̄ = 0.3
+    # ν̄ = 0.499999999
+    ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
     L = 48
