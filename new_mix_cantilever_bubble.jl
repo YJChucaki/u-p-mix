@@ -1,4 +1,4 @@
-using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf, Pardiso
+using ApproxOperator, JLD,LinearAlgebra, Printf 
 
 ndiv=17
 i=1058
@@ -62,7 +62,7 @@ ops = [
     Operator{:∫∫εᵈᵢⱼσᵈᵢⱼdxdy}(:E=>Ē,:ν=>ν̄),
     Operator{:∫vᵢtᵢds}(),
     Operator{:∫∫vᵢbᵢdxdy}(),
-    Operator{:∫vᵢgᵢds}(:α=>1e15*E),
+    Operator{:∫vᵢgᵢds}(:α=>1e10*E),
     Operator{:Hₑ_PlaneStress}(:E=>E,:ν=>ν),
     Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄),
 ]
@@ -72,6 +72,7 @@ kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
 kₚᵤ = zeros(nₚ,2*nᵤ)
 kₛᵤ = zeros(4*nₛ,2*nᵤ)
 kₒᵤ = zeros(2*nₒ,2*nᵤ)
+kₚₒ = zeros(nₚ,2*nₒ)
 kₚₚ = zeros(nₚ,nₚ)
 kₛₛ = zeros(4*nₛ,4*nₛ)
 kₒₒ = zeros(2*nₒ,2*nₒ)
@@ -85,6 +86,7 @@ dₛ = zeros(4*nₛ)
     
 opsᵖ[1](elements["Ωᵖ"],kₚₚ)
 opsᵖ[2](elements["Ω"],elements["Ωᵖ"],kₚᵤ)
+opsᵖ[2](elements["Ωᵇ"],elements["Ωᵖ"],kₚₒ)
 # opsᵖ[3](elements["Γᵍ"],elements["Γᵖ"],kₚᵤ,fₚ)
 
 # opsˢ[1](elements["Ωˢ"],kₛₛ)
@@ -94,8 +96,9 @@ opsᵖ[2](elements["Ω"],elements["Ωᵖ"],kₚᵤ)
 
 
 ops[1](elements["Ω"],kᵤᵤ)
-ops[2](elements["Γᵗ"],fᵤ)
 ops[1](elements["Ωᵇ"],kₒₒ)
+ops[1](elements["Ω"],elements["Ωᵇ"],kₒᵤ)
+ops[2](elements["Γᵗ"],fᵤ)
 ops[4](elements["Γᵍ"],kᵤᵤ,fᵤ)
 
 
@@ -105,8 +108,8 @@ ops[4](elements["Γᵍ"],kᵤᵤ,fᵤ)
 #      kₛᵤ zeros(4*nₛ,nₚ) kₛₛ zeros(4*nₛ,2*nₒ);
 #      kₒᵤ zeros(2*nₒ,nₚ) zeros(2*nₒ,4*nₛ) kₒₒ]
 k = [kᵤᵤ kₚᵤ' kₒᵤ';
-     kₚᵤ kₚₚ zeros(nₚ,2*nₒ);
-     kₒᵤ zeros(2*nₒ,nₚ) kₒₒ]
+     kₚᵤ kₚₚ kₚₒ;
+     kₒᵤ kₚₒ' kₒₒ]
 # f = [fᵤ;fₚ;fₛ;fₒ]
 f = [fᵤ;fₚ;fₒ]
     d = k\f
@@ -135,7 +138,7 @@ push!(nodes_p,:q=>q)
 
     
 
-    # eval(VTK_mix_pressure)
+    eval(VTK_mix_pressure)
     # eval(VTK_mix_pressure_u)
     # eval(VTK_mix_displacement)
     # eval(VTK_Q4P1_displacement_pressure)

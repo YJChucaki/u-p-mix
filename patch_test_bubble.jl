@@ -4,7 +4,7 @@ using ApproxOperator, LinearAlgebra
 include("import_patchtest_bubble.jl")
 
 ndiv = 11
-nₚ = 200
+nₚ = 100
 elements, nodes, nodes_p = import_mix_bubble("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 nᵤ = length(nodes)
 nₒ = length(elements["Ω"])
@@ -24,7 +24,7 @@ Ē = 1.0
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
 
-n = 1
+n = 2
 u(x,y) = (1+2*x+3*y)^n
 v(x,y) = (4+5*x+6*y)^n
 ∂u∂x(x,y) = 2*n*(1+2*x+3*y)^abs(n-1)
@@ -82,13 +82,14 @@ ops = [
     Operator{:∫∫εᵈᵢⱼσᵈᵢⱼdxdy}(:E=>Ē,:ν=>ν̄),
     Operator{:∫vᵢtᵢds}(),
     Operator{:∫∫vᵢbᵢdxdy}(),
-    Operator{:∫vᵢgᵢds}(:α=>1e15*E),
+    Operator{:∫vᵢgᵢds}(:α=>1e10*E),
     Operator{:Hₑ_PlaneStress}(:E=>E,:ν=>ν),
 ]
 
 kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
 kₚᵤ = zeros(nₚ,2*nᵤ)
 kₛᵤ = zeros(4*nₛ,2*nᵤ)
+kₚₒ = zeros(nₚ,2*nₒ)
 kₒᵤ = zeros(2*nₒ,2*nᵤ)
 kₚₚ = zeros(nₚ,nₚ)
 kₛₛ = zeros(4*nₛ,4*nₛ)
@@ -100,6 +101,7 @@ fₒ = zeros(2*nₒ)
 
 opsᵖ[1](elements["Ωᵖ"],kₚₚ)
 opsᵖ[2](elements["Ω"],elements["Ωᵖ"],kₚᵤ)
+opsᵖ[2](elements["Ωᵇ"],elements["Ωᵖ"],kₚₒ)
 # opsᵖ[3](elements["Γ"],elements["Γᵖ"],kₚᵤ,fₚ)
 
 # opsˢ[1](elements["Ωˢ"],kₛₛ)
@@ -108,6 +110,7 @@ opsᵖ[2](elements["Ω"],elements["Ωᵖ"],kₚᵤ)
 
 ops[1](elements["Ω"],kᵤᵤ)
 ops[1](elements["Ωᵇ"],kₒₒ)
+ops[1](elements["Ω"],elements["Ωᵇ"],kₒᵤ)
 ops[3](elements["Ω"],fᵤ)
 ops[3](elements["Ωᵇ"],fₒ)
 ops[4](elements["Γ"],kᵤᵤ,fᵤ)
@@ -118,8 +121,8 @@ ops[4](elements["Γ"],kᵤᵤ,fᵤ)
 #      kₛᵤ zeros(4*nₛ,nₚ) kₛₛ zeros(4*nₛ,2*nₒ);
 #      kₒᵤ zeros(2*nₒ,nₚ) zeros(2*nₒ,4*nₛ) kₒₒ]
 k = [kᵤᵤ kₚᵤ' kₒᵤ';
-     kₚᵤ kₚₚ zeros(nₚ,2*nₒ);
-     kₒᵤ zeros(2*nₒ,nₚ) kₒₒ]
+     kₚᵤ kₚₚ kₚₒ;
+     kₒᵤ kₚₒ' kₒₒ]
 f = [fᵤ;fₚ;fₒ]
 
 # # k = zeros(2*nᵤ,2*nᵤ)
@@ -130,15 +133,15 @@ f = [fᵤ;fₚ;fₒ]
 
 d = k\f
 
-# dᵤ = zeros(2*nᵤ)
-# dₚ = zeros(nₚ)
-# dₛ = zeros(4*nₛ)
-# for (i,node) in enumerate(nodes)
-#     x = node.x
-#     y = node.y
-#     dᵤ[2*i-1] = u(x,y)
-#     dᵤ[2*i]   = v(x,y)
-# end
+dᵤ = zeros(2*nᵤ)
+dₚ = zeros(nₚ)
+dₛ = zeros(4*nₛ)
+for (i,node) in enumerate(nodes)
+    x = node.x
+    y = node.y
+    dᵤ[2*i-1] = u(x,y)
+    dᵤ[2*i]   = v(x,y)
+end
 
 # for (i,node) in enumerate(nodes_p)
 #     x = node.x
