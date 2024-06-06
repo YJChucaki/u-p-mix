@@ -1,15 +1,15 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf, Pardiso
 
-ndiv=5
-i=72
+ndiv=17
+i=1058
 # ndiv_p=4
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
 include("wirteVTK.jl")
 
-elements, nodes, nodes_p, Ω  = import_cantilever_mix_HR("./msh/cantilever_HR_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes, Ω  = import_cantilever_mix_HR("./msh/cantilever.msh","./msh/cantilever_bubble_"*string(i)*".msh")
-
+    nₒ = length(elements["Ω"])
     nₑ = length(elements["Ω"])
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
@@ -22,8 +22,8 @@ elements, nodes, nodes_p, Ω  = import_cantilever_mix_HR("./msh/cantilever_HR_"*
     P = 1000
     Ē = 3e6
     # Ē = 1.0
-    # ν̄ = 0.499999999
-    ν̄ = 0.3
+    ν̄ = 0.499999999
+    # ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
     L = 48
@@ -38,6 +38,7 @@ elements, nodes, nodes_p, Ω  = import_cantilever_mix_HR("./msh/cantilever_HR_"*
     set∇𝝭!(elements["Ωᵍ"])
     set𝝭!(elements["Ωˢ"])
     set𝝭!(elements["Ωᵖ"])
+    set∇𝝭!(elements["Ωᵇ"])
     set𝝭!(elements["Ωᵍᵖ"])
     set𝝭!(elements["Γᵍ"])
     set𝝭!(elements["Γᵗ"])
@@ -58,11 +59,11 @@ opsˢ = [
 ]
 
 ops = [
+    Operator{:∫∫εᵈᵢⱼσᵈᵢⱼdxdy}(:E=>Ē,:ν=>ν̄),
     Operator{:∫vᵢtᵢds}(),
     Operator{:∫∫vᵢbᵢdxdy}(),
-    Operator{:Hₑ_PlaneStress}(:E=>Ē,:ν=>ν̄),
-    Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>E,:ν=>ν),
-    Operator{:∫vᵢgᵢds}(:α=>1e10*E),
+    Operator{:∫vᵢgᵢds}(:α=>1e15*E),
+    Operator{:Hₑ_PlaneStress}(:E=>E,:ν=>ν),
     Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄),
 ]
   
@@ -70,29 +71,44 @@ ops = [
 kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
 kₚᵤ = zeros(nₚ,2*nᵤ)
 kₛᵤ = zeros(4*nₛ,2*nᵤ)
+kₒᵤ = zeros(2*nₒ,2*nᵤ)
 kₚₚ = zeros(nₚ,nₚ)
 kₛₛ = zeros(4*nₛ,4*nₛ)
+kₒₒ = zeros(2*nₒ,2*nₒ)
 fᵤ = zeros(2*nᵤ)
 fₚ = zeros(nₚ)
 fₛ = zeros(4*nₛ)
+fₒ = zeros(2*nₒ)
 dᵤ = zeros(2*nᵤ)
 dₚ = zeros(nₚ)
 dₛ = zeros(4*nₛ)
     
 opsᵖ[1](elements["Ωᵖ"],kₚₚ)
 opsᵖ[2](elements["Ω"],elements["Ωᵖ"],kₚᵤ)
-opsᵖ[3](elements["Γᵍ"],elements["Γᵖ"],kₚᵤ,fₚ)
+# opsᵖ[3](elements["Γᵍ"],elements["Γᵖ"],kₚᵤ,fₚ)
 
-opsˢ[1](elements["Ωˢ"],kₛₛ)
-opsˢ[2](elements["Ω"],elements["Ωˢ"],kₛᵤ)
-opsˢ[3](elements["Γᵍ"],elements["Γˢ"],kₛᵤ,fₛ)
+# opsˢ[1](elements["Ωˢ"],kₛₛ)
+# opsˢ[2](elements["Ω"],elements["Ωˢ"],kₛᵤ)
+# opsˢ[3](elements["Γᵍ"],elements["Γˢ"],kₛᵤ,fₛ)
 
-ops[1](elements["Γᵗ"],fᵤ)
 
-k = [zeros(2*nᵤ,2*nᵤ) kₚᵤ' kₛᵤ';
-     kₚᵤ kₚₚ zeros(nₚ,4*nₛ);
-     kₛᵤ zeros(4*nₛ,nₚ) kₛₛ]
-f = [fᵤ;fₚ;fₛ]
+
+ops[1](elements["Ω"],kᵤᵤ)
+ops[2](elements["Γᵗ"],fᵤ)
+ops[1](elements["Ωᵇ"],kₒₒ)
+ops[4](elements["Γᵍ"],kᵤᵤ,fᵤ)
+
+
+
+# k = [kᵤᵤ kₚᵤ' kₛᵤ' kₒᵤ';
+#      kₚᵤ kₚₚ zeros(nₚ,4*nₛ) zeros(nₚ,2*nₒ);
+#      kₛᵤ zeros(4*nₛ,nₚ) kₛₛ zeros(4*nₛ,2*nₒ);
+#      kₒᵤ zeros(2*nₒ,nₚ) zeros(2*nₒ,4*nₛ) kₒₒ]
+k = [kᵤᵤ kₚᵤ' kₒᵤ';
+     kₚᵤ kₚₚ zeros(nₚ,2*nₒ);
+     kₒᵤ zeros(2*nₒ,nₚ) kₒₒ]
+# f = [fᵤ;fₚ;fₛ;fₒ]
+f = [fᵤ;fₚ;fₒ]
     d = k\f
     
 d₁ = d[1:2:2*nᵤ]
@@ -119,7 +135,7 @@ push!(nodes_p,:q=>q)
 
     
 
-    eval(VTK_mix_pressure)
+    # eval(VTK_mix_pressure)
     # eval(VTK_mix_pressure_u)
     # eval(VTK_mix_displacement)
     # eval(VTK_Q4P1_displacement_pressure)

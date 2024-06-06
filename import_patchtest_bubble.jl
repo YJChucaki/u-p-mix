@@ -1,9 +1,10 @@
 
-using Gmsh, Statistics
+using Statistics
+import Gmsh: gmsh
 
-function import_mix(filename1::String,filename2::String)
+function import_mix_bubble(filename1::String,filename2::String)
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
-    integrationOrder_Ω = 3
+    integrationOrder_Ω = 4
     integrationOrder_Γ = 2
     integrationOrder_Ωᵍ = 10
 
@@ -48,6 +49,10 @@ function import_mix(filename1::String,filename2::String)
     elements["Γˢ"] = elements["Γ¹ˢ"]∪elements["Γ²ˢ"]∪elements["Γ³ˢ"]∪elements["Γ⁴ˢ"]
     push!(elements["Ωˢ"], :𝝭=>:𝑠)
     push!(elements["∂Ωˢ"], :𝝭=>:𝑠)
+
+    type = PiecewiseParametric{:Bubble,:Tri3}
+    elements["Ωᵇ"] = getPiecewiseElements(entities["Ω"], type, integrationOrder_Ω)
+    push!(elements["Ωᵇ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
 
     type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
     # type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
@@ -101,6 +106,8 @@ prescribe = quote
     
     prescribe!(elements["Ω"],:b₁=>(x,y,z)->b₁(x,y))
     prescribe!(elements["Ω"],:b₂=>(x,y,z)->b₂(x,y))
+    prescribe!(elements["Ωᵇ"],:b₁=>(x,y,z)->b₁(x,y))
+    prescribe!(elements["Ωᵇ"],:b₂=>(x,y,z)->b₂(x,y))
 
     prescribe!(elements["Γ¹"],:g₁=>(x,y,z)->u(x,y))
     prescribe!(elements["Γ¹"],:g₂=>(x,y,z)->v(x,y))

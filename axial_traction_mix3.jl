@@ -3,8 +3,8 @@ using ApproxOperator, LinearAlgebra
 
 include("import_patchtest_mix3.jl")
 
-ndiv = 11
-nₚ = 200
+ndiv = 9
+nₚ = 140
 elements, nodes, nodes_p = import_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 nᵤ = length(nodes)
 nₛ = length(elements["Ω"])
@@ -16,25 +16,25 @@ set𝝭!(elements["Γ"])
 set𝝭!(elements["Γᵖ"])
 set𝝭!(elements["Γˢ"])
 
+P = 1.0
 Ē = 1.0
-ν̄ = 0.499999
+ν̄ = 0.499999999999999
 # ν̄ = 0.3
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
 
-n = 1
-u(x,y) = (1+2*x+3*y)^n
-v(x,y) = (4+5*x+6*y)^n
-∂u∂x(x,y) = 2*n*(1+2*x+3*y)^abs(n-1)
-∂u∂y(x,y) = 3*n*(1+2*x+3*y)^abs(n-1)
-∂v∂x(x,y) = 5*n*(4+5*x+6*y)^abs(n-1)
-∂v∂y(x,y) = 6*n*(4+5*x+6*y)^abs(n-1)
-∂²u∂x²(x,y)  = 4*n*(n-1)*(1+2*x+3*y)^abs(n-2)
-∂²u∂x∂y(x,y) = 6*n*(n-1)*(1+2*x+3*y)^abs(n-2)
-∂²u∂y²(x,y)  = 9*n*(n-1)*(1+2*x+3*y)^abs(n-2)
-∂²v∂x²(x,y)  = 25*n*(n-1)*(4+5*x+6*y)^abs(n-2)
-∂²v∂x∂y(x,y) = 30*n*(n-1)*(4+5*x+6*y)^abs(n-2)
-∂²v∂y²(x,y)  = 36*n*(n-1)*(4+5*x+6*y)^abs(n-2)
+u(x,y) = (1-ν̄^2)/Ē*P*x
+v(x,y) = -ν̄*(1+ν̄)/Ē*P*y
+∂u∂x(x,y) = (1-ν̄^2)/Ē*P
+∂u∂y(x,y) = 0.0
+∂v∂x(x,y) = 0.0
+∂v∂y(x,y) = -ν̄*(1+ν̄)/Ē*P
+∂²u∂x²(x,y)  = 0.0
+∂²u∂x∂y(x,y) = 0.0
+∂²u∂y²(x,y)  = 0.0
+∂²v∂x²(x,y)  = 0.0
+∂²v∂x∂y(x,y) = 0.0
+∂²v∂y²(x,y)  = 0.0
 
 ε₁₁(x,y) = ∂u∂x(x,y)
 ε₂₂(x,y) = ∂v∂y(x,y)
@@ -62,7 +62,7 @@ v(x,y) = (4+5*x+6*y)^n
 b₁(x,y) = -∂σ₁₁∂x(x,y) - ∂σ₁₂∂y(x,y)
 b₂(x,y) = -∂σ₁₂∂x(x,y) - ∂σ₂₂∂y(x,y)
 
-eval(prescribe)
+eval(prescribe_at)
 
 opsᵖ = [
     Operator{:∫∫qpdxdy}(:E=>Ē,:ν=>ν̄),
@@ -79,7 +79,7 @@ opsˢ = [
 ops = [
     Operator{:∫vᵢtᵢds}(),
     Operator{:∫∫vᵢbᵢdxdy}(),
-    Operator{:Hₑ_PlaneStress}(:E=>Ē,:ν=>ν̄),
+    Operator{:Hₑ_PlaneStress}(:E=>E,:ν=>ν),
     Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>E,:ν=>ν),
     Operator{:∫vᵢgᵢds}(:α=>1e10*E)
 ]
@@ -95,13 +95,15 @@ fₛ = zeros(4*nₛ)
 
 opsᵖ[1](elements["Ωᵖ"],kₚₚ)
 opsᵖ[2](elements["Ω"],elements["Ωᵖ"],kₚᵤ)
-opsᵖ[3](elements["Γ"],elements["Γᵖ"],kₚᵤ,fₚ)
+opsᵖ[3](elements["Γ¹"],elements["Γ¹ᵖ"],kₚᵤ,fₚ)
+opsᵖ[3](elements["Γ⁴"],elements["Γ⁴ᵖ"],kₚᵤ,fₚ)
 
 opsˢ[1](elements["Ωˢ"],kₛₛ)
 opsˢ[2](elements["Ω"],elements["Ωˢ"],kₛᵤ)
-opsˢ[3](elements["Γ"],elements["Γˢ"],kₛᵤ,fₛ)
+opsˢ[3](elements["Γ¹"],elements["Γ¹ˢ"],kₛᵤ,fₛ)
+opsˢ[3](elements["Γ⁴"],elements["Γ⁴ˢ"],kₛᵤ,fₛ)
 
-ops[2](elements["Ω"],fᵤ)
+ops[1](elements["Γ²"],fᵤ)
 
 k = [zeros(2*nᵤ,2*nᵤ) kₚᵤ' kₛᵤ';
      kₚᵤ kₚₚ zeros(nₚ,4*nₛ);
@@ -171,7 +173,7 @@ d₁ = d[1:2:2*nᵤ]
 d₂ = d[2:2:2*nᵤ]
 push!(nodes,:d₁=>d₁,:d₂=>d₂)
 set∇𝝭!(elements["Ωᵍ"])
-h1,l2= ops[3](elements["Ωᵍ"])
+h1,l2= ops[3](elements["Ωᵍ"][1:1])
 L2 = log10(l2)
 H1 = log10(h1)
            
