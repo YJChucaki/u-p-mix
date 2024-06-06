@@ -143,8 +143,8 @@ function import_cantilever_mix_HR(filename1::String,filename2::String)
     push!(elements["Γᵗ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Γᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     
-    type = PiecewisePolynomial{:Constant2D}
-    # type = PiecewisePolynomial{:Linear2D}
+    # type = PiecewisePolynomial{:Constant2D}
+    type = PiecewisePolynomial{:Linear2D}
     elements["Ωˢ"] = getPiecewiseElements(entities["Ω"], type, integrationOrder_Ω)
     elements["∂Ωˢ"] = getPiecewiseBoundaryElements(entities["Γ"], entities["Ω"], type, integrationOrder_Γ)
     elements["Γˢ"] = getElements(entities["Γᵍ"],entities["Γ"], elements["∂Ωˢ"])
