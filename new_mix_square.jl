@@ -2,9 +2,9 @@ using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie
 # NP=[40,80,120,140]
 # for n=1:4
     # i=NP[n]
-ndiv= 11
+ndiv= 3
 #  ndiv_p= 8
-i=100
+i=5
 # 40,60-3
 # 80-4
 # 100,120-5
@@ -14,7 +14,7 @@ include("import_prescrible_ops.jl")
 include("import_cantilever.jl")
 # elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
 # elements, nodes ,nodes_p = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
-elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_"*string(ndiv)*".msh","./msh/square_bubble_"*string(i)*".msh")
+elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
