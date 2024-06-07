@@ -1,5 +1,5 @@
 
-using Tensors, BenchmarkExample, Statistics, CairoMakie
+using Statistics 
 import Gmsh: gmsh
 
 function import_cantilever_Q4P1(filename::String)
