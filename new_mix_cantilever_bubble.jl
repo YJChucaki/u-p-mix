@@ -1,18 +1,21 @@
-using ApproxOperator, JLD,LinearAlgebra, Printf 
+using ApproxOperator, JLD,LinearAlgebra, Printf ,Pardiso
 
-ndiv=17
-i=1058
+ndiv=5
+i=72
 # ndiv_p=4
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
 include("wirteVTK.jl")
 
-elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes, Ω  = import_cantilever_mix_HR("./msh/cantilever.msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")   
     nₒ = length(elements["Ω"])
     nₑ = length(elements["Ω"])
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
+
     nₛ = 3*nₑ
     nₑₚ = length(Ω)
     ##for Q4P1 
@@ -36,14 +39,14 @@ elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_H
     set𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ωᵍ"])
-    set𝝭!(elements["Ωˢ"])
+    # set𝝭!(elements["Ωˢ"])
     set𝝭!(elements["Ωᵖ"])
     set∇𝝭!(elements["Ωᵇ"])
     set𝝭!(elements["Ωᵍᵖ"])
     set𝝭!(elements["Γᵍ"])
     set𝝭!(elements["Γᵗ"])
     set𝝭!(elements["Γᵖ"])
-    set𝝭!(elements["Γˢ"])
+    # set𝝭!(elements["Γˢ"])
     # set𝝭!(elements["Γᵍᵖ"])
    
 opsᵖ = [
@@ -70,11 +73,11 @@ ops = [
     
 kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
 kₚᵤ = zeros(nₚ,2*nᵤ)
-kₛᵤ = zeros(4*nₛ,2*nᵤ)
+# kₛᵤ = zeros(4*nₛ,2*nᵤ)
 kₒᵤ = zeros(2*nₒ,2*nᵤ)
 kₚₒ = zeros(nₚ,2*nₒ)
 kₚₚ = zeros(nₚ,nₚ)
-kₛₛ = zeros(4*nₛ,4*nₛ)
+# kₛₛ = zeros(4*nₛ,4*nₛ)
 kₒₒ = zeros(2*nₒ,2*nₒ)
 fᵤ = zeros(2*nᵤ)
 fₚ = zeros(nₚ)
@@ -137,7 +140,6 @@ push!(nodes_p,:q=>q)
     # h = log10(10.0/ndiv)
 
     
-
     eval(VTK_mix_pressure)
     # eval(VTK_mix_pressure_u)
     # eval(VTK_mix_displacement)

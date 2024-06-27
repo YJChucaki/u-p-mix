@@ -4,7 +4,7 @@ include("import_patchtest.jl")
 # for i=2:10
    
 ndiv= 21
-nₚ = 80
+nₚ = 411
 
 elements,nodes,nodes_p = import_patchtest_mix_LM("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh","./msh/patchtest_lambda_"*string(ndiv)*".msh")
 nᵤ = length(nodes)
@@ -22,8 +22,8 @@ set𝝭!(elements["Ωᵖ"])
 set𝝭!(elements["Γ"])
 set𝝭!(elements["Γ_λ"])
 Ē = 1.0
-# ν̄ = 0.4999999
-ν̄ = 0.3
+ν̄ = 0.4999999
+# ν̄ = 0.3
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
 
@@ -89,7 +89,7 @@ opsᵈ = [
 k̄ = zeros(2*(nᵤ+ng),2*(nᵤ+ng))
 G = zeros(2*ng,2*nᵤ) 
 kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
-kᵤₚ = zeros(2*(nᵤ+ng),nₚ)
+kₚᵤ = zeros(nₚ,2*(nᵤ+ng))
 kₚₚ = zeros(nₚ,nₚ)
 f = zeros(2*nᵤ)
 fp= zeros(nₚ)
@@ -98,7 +98,7 @@ fq= zeros(2*ng)
 opsᵈ[1](elements["Ω"],kᵤᵤ)
 
 
-opsᵛ[1](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
+opsᵛ[1](elements["Ω"],elements["Ωᵖ"],kₚᵤ)
 opsᵛ[2](elements["Ωᵖ"],kₚₚ)
 ops[3](elements["Γ"],elements["Γ_λ"],G,fq)
 ops[4](elements["Ω"],f)
@@ -107,7 +107,7 @@ ops[4](elements["Ω"],f)
 # kᵈ = kᵤᵤ
 # kᵛ = kᵤₚ*(kₚₚ\kᵤₚ')
 k̄ = [kᵤᵤ G';G zeros(2*ng,2*ng)]
-k = [k̄  kᵤₚ;kᵤₚ' kₚₚ]
+k = [k̄  kₚᵤ';kₚᵤ kₚₚ]
 f = [f;fq;fp]
 # d = (kᵛ+kᵈ)\f
 # kᵈ = kᵤᵤ

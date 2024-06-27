@@ -4,30 +4,32 @@ include("input.jl")
 # for i in 2:10
 ndiv= 30
 # ndiv_p=9
-i=4
+i=10
 
 
 include("import_prescrible_ops.jl")
 include("import_cook_membrane.jl")
-include("vtk.jl")
-elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
-# elements, nodes ,nodes_p = import_cook_membrane_mix("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
-# elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
-# elements, nodes ,nodes_p = import_cantilever_T6P3("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv)*".msh")
-# elements, nodes  = import_cantilever_Q4P1("./msh/cantilever_quad_"*string(ndiv)*".msh")
-# elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# include("wirteVTK.jl")
+# elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
+# elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_tri6_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
+# elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_quad8_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
+# elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_quad_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
+# elements, nodes = import_cook_membrane_Q4P1("./msh/cook_membrane_quad_"*string(ndiv)*".msh")
+# elements, nodes ,nodes_p = import_cook_membrane_T6P3("./msh/cook_membrane_tri6_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(ndiv)*".msh")
+elements, nodes = import_cook_membrane_Q8P3("./msh/cook_membrane_quad8_"*string(ndiv)*".msh")
 nᵤ = length(nodes)
-nₚ = length(nodes_p)
-nₑₚ = length(Ω)
-
-
+# nₚ = length(nodes_p)
+# nₑₚ = length(Ω)
+# nₚ = length(elements["Ωᵖ"])
+nₚ = 3*length(elements["Ωᵖ"])
+nₑ = length(elements["Ω"])
 # κ = 400942
 # μ = 80.1938
 # E = 9*κ*μ/(3*κ+μ)
 # ν = (3*κ-2*μ)/2/(3*κ+μ)
 Ē = 70.0
 # ν = 0.3333
-ν̄  =0.4999999
+ν̄  =0.499999
 E = Ē/(1.0-ν̄^2)
  ν = ν̄/(1.0-ν̄)
 eval(prescribeForPenalty)
@@ -44,12 +46,12 @@ set𝝭!(elements["Γᵗ"])
 
 eval(opsupmix)
 kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
-kᵤₚ = zeros(2*nᵤ,nₚ)
+kₚᵤ = zeros(nₚ,2*nᵤ)
 kₚₚ = zeros(nₚ,nₚ)
 f = zeros(2*nᵤ)
 fp= zeros(nₚ)
 opsup[3](elements["Ω"],kᵤᵤ)
-opsup[4](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
+opsup[4](elements["Ω"],elements["Ωᵖ"],kₚᵤ)
 opsup[5](elements["Ωᵖ"],kₚₚ)
 opsup[6](elements["Γᵗ"],f)
 αᵥ = 1e9
@@ -58,16 +60,17 @@ eval(opsPenalty)
 opsα[1](elements["Γᵍ"],kᵤᵤ,f)
 # opsα[2](elements["Γᵍ"],elements["Γᵍᵖ"],kᵤₚ,fp)
    
-k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
+k = [kᵤᵤ kₚᵤ';kₚᵤ kₚₚ]
 f = [f;fp]
 d = k\f
 d₁ = d[1:2:2*nᵤ]
 d₂ = d[2:2:2*nᵤ]
 q  = d[2*nᵤ+1:end]
 push!(nodes,:d₁=>d₁,:d₂=>d₂)
-push!(nodes_p,:q=>q)
-eval(VTK_mix_pressure)
+# push!(nodes_p,:q=>q)
 
+# eval(VTK_mix_pressure)
+# eval(VTK_Q4P1_displacement_pressure)
 
 
 # # fo = open("./vtk/cook_membrance_rkgsi_mix_"*string(ndiv_𝑢)*".vtk","w")

@@ -25,11 +25,12 @@ function import_patchtest_Q4P1(filename::String)
     push!(elements["Γ³"], :𝝭=>:𝑠)
     push!(elements["Γ⁴"], :𝝭=>:𝑠)
     type = PiecewisePolynomial{:Constant2D}
-    elements["Ωᵖ"] = getMacroElements( entities["Ω"], type, integrationOrder_Ω, 1; )
-    elements["Ωᵍᵖ"] = getMacroElements( entities["Ω"], type,  integrationOrder_Ωᵍ, 1;)
+    # type = PiecewiseParametric{:Constant2D}
+    elements["Ωᵖ"] = getPiecewiseElements( entities["Ω"], type, integrationOrder_Ω;)
+    elements["Ωᵍᵖ"] = getPiecewiseElements( entities["Ω"], type,  integrationOrder_Ωᵍ;)
     push!(elements["Ωᵖ"], :𝝭=>:𝑠)
     push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠)
-    gmsh.finalize()
+ 
     return elements, nodes
 end
 function import_patchtest_Q4R1(filename::String)
@@ -86,9 +87,8 @@ function import_patchtest_Q8P3(filename::String)
     push!(elements["Γ⁴"], :𝝭=>:𝑠)
 
     type = PiecewisePolynomial{:Linear2D}
-    elements["Ωᵖ"] = getMacroElements( entities["Ω"], type, integrationOrder_Ω, 1; )
-    elements["Ωᵍᵖ"] = getMacroElements( entities["Ω"], type,  integrationOrder_Ωᵍ, 1;)
-
+    elements["Ωᵖ"] = getPiecewiseElements( entities["Ω"], type, integrationOrder_Ω )
+    elements["Ωᵍᵖ"] =getPiecewiseElements( entities["Ω"], type,  integrationOrder_Ωᵍ)
     push!(elements["Ωᵖ"], :𝝭=>:𝑠)
     push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠)
     gmsh.finalize()
@@ -106,13 +106,13 @@ function import_patchtest_mix(filename1::String, filename2::String)
     zᵖ = nodes_p.z
     Ω = getElements(nodes_p, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 1.5*s*ones(length(nodes_p))
+    s = 5.5*s*ones(length(nodes_p))
     # s = 1.5/10*ones(length(nodes_p))
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
-    integrationOrder_Ω = 2
+    integrationOrder_Ω = 6
     integrationOrder_Ωᵍ = 10
-    integrationOrder_Γ = 2
+    integrationOrder_Γ = 6
     gmsh.open(filename1)
     entities = getPhysicalGroups()
     nodes = get𝑿ᵢ()
@@ -129,14 +129,14 @@ function import_patchtest_mix(filename1::String, filename2::String)
     push!(elements["Γ²"], :𝝭=>:𝑠)
     push!(elements["Γ³"], :𝝭=>:𝑠)
     push!(elements["Γ⁴"], :𝝭=>:𝑠)
-    type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
-    # type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
+    # type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
+    type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
     sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)
     elements["Ωᵖ"] = getElements(nodes_p, entities["Ω"], type, integrationOrder_Ω, sp)
     elements["Ωᵍᵖ"] = getElements(nodes_p, entities["Ω"], type,  integrationOrder_Ωᵍ, sp)
 
 
-    nₘ = 6
+    nₘ = 21
     𝗠 = (0,zeros(nₘ))
     push!(elements["Ωᵖ"], :𝝭=>:𝑠)
     push!(elements["Ωᵖ"], :𝗠=>𝗠)
@@ -443,14 +443,25 @@ function import_patchtest_cross(filename::String)
 
     entities = getPhysicalGroups()
     nodes = get𝑿ᵢ()
-
-    integrationOrder = 2
+    integrationOrder_Ω = 2
+    integrationOrder_Ωᵍ = 10
+    integrationOrder_Γ = 2
+ 
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
-    elements["Ω"] = getElements(nodes, entities["Ω"], integrationOrder)
+    elements["Ω"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
+    elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
     stripe2cross!(elements["Ω"], nodes)
-
     push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
-
+    push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    elements["Γ¹"] = getElements(nodes, entities["Γ¹"], integrationOrder_Γ)
+    elements["Γ²"] = getElements(nodes, entities["Γ²"], integrationOrder_Γ)
+    elements["Γ³"] = getElements(nodes, entities["Γ³"], integrationOrder_Γ)
+    elements["Γ⁴"] = getElements(nodes, entities["Γ⁴"], integrationOrder_Γ)
+    elements["Γ"] = elements["Γ¹"]∪elements["Γ²"]∪elements["Γ³"]∪elements["Γ⁴"]
+    push!(elements["Γ¹"], :𝝭=>:𝑠)
+    push!(elements["Γ²"], :𝝭=>:𝑠)
+    push!(elements["Γ³"], :𝝭=>:𝑠)
+    push!(elements["Γ⁴"], :𝝭=>:𝑠)
     gmsh.finalize()
 
     x = getfield(nodes[1],:data)[:x][2]
@@ -484,9 +495,9 @@ function import_patchtest_fem(filename::String)
     entities = getPhysicalGroups()
     nodes = get𝑿ᵢ()
 
-    integrationOrder_Ω = 4
+    integrationOrder_Ω = 6
     integrationOrder_Ωᵍ = 10
-    integrationOrder_Γ = 4
+    integrationOrder_Γ = 6
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
     elements["Ω"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
     elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)

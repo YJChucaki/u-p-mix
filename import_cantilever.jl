@@ -20,12 +20,12 @@ function import_cantilever_Q4P1(filename::String)
     push!(elements["Γᵗ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Γᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     type = PiecewisePolynomial{:Constant2D}
-    elements["Ωᵖ"] = getMacroElements( entities["Ω"], type, integrationOrder_Ω, 1; )
-    elements["Ωᵍᵖ"] = getMacroElements( entities["Ω"], type,  integrationOrder_Ωᵍ, 1;)
+    # type = PiecewiseParametric{:Constant2D}
+    elements["Ωᵖ"] = getPiecewiseElements( entities["Ω"], type, integrationOrder_Ω;)
+    elements["Ωᵍᵖ"] = getPiecewiseElements( entities["Ω"], type,  integrationOrder_Ωᵍ;)
     push!(elements["Ωᵖ"], :𝝭=>:𝑠)
     push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠)
     
-    gmsh.finalize()
     return elements, nodes
 end
 function import_cantilever_Q8P3(filename::String)
@@ -46,8 +46,8 @@ function import_cantilever_Q8P3(filename::String)
     push!(elements["Γᵗ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Γᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     type = PiecewisePolynomial{:Linear2D}
-    elements["Ωᵖ"] = getMacroElements( entities["Ω"], type, integrationOrder_Ω, 1; )
-    elements["Ωᵍᵖ"] = getMacroElements( entities["Ω"], type,  integrationOrder_Ωᵍ, 1;)
+    elements["Ωᵖ"] = getPiecewiseElements( entities["Ω"], type, integrationOrder_Ω )
+    elements["Ωᵍᵖ"] =getPiecewiseElements( entities["Ω"], type,  integrationOrder_Ωᵍ)
     push!(elements["Ωᵖ"], :𝝭=>:𝑠)
     push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠)
     
@@ -84,7 +84,7 @@ function import_cantilever_mix(filename1::String,filename2::String)
     zᵖ = nodes_p.z
     Ω = getElements(nodes_p, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 2.0*s*ones(length(nodes_p))
+    s = 2.5*s*ones(length(nodes_p))
     # s =1.8*12/ndiv_p*ones(length(nodes_p))
     # s = 1.3/10*ones(length(nodes_p))
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
@@ -208,19 +208,20 @@ function import_cantilever_mix_bubble(filename1::String,filename2::String)
     push!(elements["Γᵗ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Γᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     
-    # type = PiecewisePolynomial{:Constant2D}
-    type = PiecewisePolynomial{:Linear2D}
-    elements["Ωˢ"] = getPiecewiseElements(entities["Ω"], type, integrationOrder_Ω)
-    elements["∂Ωˢ"] = getPiecewiseBoundaryElements(entities["Γ"], entities["Ω"], type, integrationOrder_Γ)
-    elements["Γˢ"] = getElements(entities["Γᵍ"],entities["Γ"], elements["∂Ωˢ"])
-    push!(elements["Ωˢ"], :𝝭=>:𝑠)
-    push!(elements["∂Ωˢ"], :𝝭=>:𝑠)
+    # # type = PiecewisePolynomial{:Constant2D}
+    # type = PiecewisePolynomial{:Linear2D}
+    # elements["Ωˢ"] = getPiecewiseElements(entities["Ω"], type, integrationOrder_Ω)
+    # elements["∂Ωˢ"] = getPiecewiseBoundaryElements(entities["Γ"], entities["Ω"], type, integrationOrder_Γ)
+    # elements["Γˢ"] = getElements(entities["Γᵍ"],entities["Γ"], elements["∂Ωˢ"])
+    # push!(elements["Ωˢ"], :𝝭=>:𝑠)
+    # push!(elements["∂Ωˢ"], :𝝭=>:𝑠)
 
     
     type = PiecewiseParametric{:Bubble,:Tri3}
+    #   type = PiecewiseParametric{:Bubble,:Quad}
     elements["Ωᵇ"] = getPiecewiseElements(entities["Ω"], type, integrationOrder_Ω)
     push!(elements["Ωᵇ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
-    
+
     type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
     # type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
     sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)

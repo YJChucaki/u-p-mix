@@ -3,16 +3,16 @@ include("import_prescrible_ops.jl")
 include("import_cantilever.jl")
 
 # for i in 40:50
-    ndiv= 16
-    # elements,nodes,nodes_p = import_fem_tri3("./msh/square_"*string(ndiv)*".msh","./msh/square_"*string(ndiv_p)*".msh")
-    # elements,nodes,nodes_p = import_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
-    # elements,nodes,nodes_p= import_quad("./msh/square_quad_"*string(ndiv)*".msh","./msh/square_quad_"*string(ndiv_p)*".msh")
+    ndiv= 4
+  
     elements,nodes= import_cantilever_fem("./msh/cantilever_tri6_"*string(ndiv)*".msh")
-    
+    #  elements,nodes= import_cantilever_fem("./msh/cantilever_"*string(ndiv)*".msh")
+    # elements,nodes= import_cantilever_fem("./msh/cantilever_quad_"*string(ndiv)*".msh")
+    # elements,nodes= import_cantilever_fem("./msh/cantilever_quad8_"*string(ndiv)*".msh")
     P = 1000
     Ē = 3e6
-    ν̄ = 0.4999999999
-    # ν̄ = 0.3
+    # ν̄ = 0.4999999
+    ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
     L = 48
@@ -22,8 +22,8 @@ include("import_cantilever.jl")
     
     nₘ=21
     nᵤ = length(nodes)
-    eval(prescribeForGaussFEM)
-    eval(prescribeForPenaltyFEM)
+    eval(prescribeForGauss)
+    eval(prescribeForPenalty)
     set∇𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ωᵍ"])
     set𝝭!(elements["Γᵍ"])

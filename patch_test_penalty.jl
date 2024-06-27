@@ -5,20 +5,25 @@ include("wirteVTK.jl")
 # for i=2:10
    
 ndiv= 11
-elements,nodes = import_patchtest_fem("./msh/patchtest_quad_"*string(ndiv)*".msh")
+# elements,nodes = import_patchtest_fem("./msh/patchtest_quad8_"*string(ndiv)*".msh")
+# elements, nodes = import_patchtest_fem("./msh/patchtest_tri6_"*string(ndiv)*".msh")
+# elements, nodes = import_patchtest_cross("./msh/patchtest_"*string(ndiv)*".msh")
+# elements, nodes = import_patchtest_stripe("./msh/patchtest_"*string(ndiv)*".msh")
+elements, nodes = import_patchtest_fem("./msh/patchtest_"*string(ndiv)*".msh")
+
 nᵤ = length(nodes)
 nₑ = length(elements["Ω"])
 
 
 set∇𝝭!(elements["Ω"])
 set𝝭!(elements["Γ"])
-Ē = 1.0
-ν̄ = 0.4999999
-# ν̄ = 0.3
-E = Ē/(1.0-ν̄^2)
-ν = ν̄/(1.0-ν̄)
+E = 1.0
+ν= 0.4999999
+# ν = 0.3
+# E = Ē/(1.0-ν̄^2)
+# ν = ν̄/(1.0-ν̄)
 
-# n = 3
+# n = 2
 # u(x,y) = (x+y)^n
 # v(x,y) = (x+y)^n
 # ∂u∂x(x,y) = n*(x+y)^abs(n-1)
@@ -31,7 +36,7 @@ E = Ē/(1.0-ν̄^2)
 # ∂²v∂x²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
 # ∂²v∂x∂y(x,y) = n*(n-1)*(x+y)^abs(n-2)
 # ∂²v∂y²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
-n = 1
+n = 2
 u(x,y) = (1+2*x+3*y)^n
 v(x,y) = (4+5*x+6*y)^n
 ∂u∂x(x,y) = 2*n*(1+2*x+3*y)^abs(n-1)
@@ -63,26 +68,27 @@ b₂(x,y) = -∂σ₁₂∂x(x,y) - ∂σ₂₂∂y(x,y)
 eval(prescribe)
 
 ops = [
-       Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>Ē,:ν=>ν̄ ),
+       Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>E,:ν=>ν ),
        Operator{:∫vᵢtᵢds}(),
-       Operator{:∫vᵢgᵢds}(:α=>1e10*E),
+       Operator{:∫vᵢgᵢds}(:α=>1e15*E),
        Operator{:∫∫vᵢbᵢdxdy}(),
-       Operator{:Hₑ_Incompressible}(:E=>Ē,:ν=>ν̄)
+       Operator{:Hₑ_Incompressible}(:E=>E,:ν=>ν)
 ]
 
-
+kᵅ = zeros(2*nᵤ,2*nᵤ)
+fᵅ = zeros(2*nᵤ)
 k = zeros(2*nᵤ,2*nᵤ)
 f = zeros(2*nᵤ)
 
 
 
 ops[1](elements["Ω"],k)
-# ops[2](elements["Γ"],f)
-ops[3](elements["Γ"],k,f)
+ops[3](elements["Γ"],kᵅ,fᵅ)
+ops[4](elements["Ω"],f)
 
+f = f+fᵅ
 
-
-d = k\f
+d = (k+kᵅ)\f
 d₁ = d[1:2:2*nᵤ]
 d₂ = d[2:2:2*nᵤ]
 

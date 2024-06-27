@@ -24,7 +24,7 @@ Ē = 1.0
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
 
-n = 2
+n = 1
 u(x,y) = (1+2*x+3*y)^n
 v(x,y) = (4+5*x+6*y)^n
 ∂u∂x(x,y) = 2*n*(1+2*x+3*y)^abs(n-1)
@@ -82,7 +82,7 @@ ops = [
     Operator{:∫∫εᵈᵢⱼσᵈᵢⱼdxdy}(:E=>Ē,:ν=>ν̄),
     Operator{:∫vᵢtᵢds}(),
     Operator{:∫∫vᵢbᵢdxdy}(),
-    Operator{:∫vᵢgᵢds}(:α=>1e10*E),
+    Operator{:∫vᵢgᵢds}(:α=>1e15*E),
     Operator{:Hₑ_PlaneStress}(:E=>E,:ν=>ν),
 ]
 

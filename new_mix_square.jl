@@ -2,9 +2,9 @@ using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie
 # NP=[40,80,120,140]
 # for n=1:4
     # i=NP[n]
-ndiv= 3
-#  ndiv_p= 8
-i=5
+ndiv= 17
+#  ndiv_p=8
+i=200
 # 40,60-3
 # 80-4
 # 100,120-5
@@ -12,18 +12,28 @@ i=5
 
 include("import_prescrible_ops.jl")
 include("import_cantilever.jl")
-# elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
-# elements, nodes ,nodes_p = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
-elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
-# elements, nodes ,nodes_p,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix_quad4("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
-    nᵤ = length(nodes)
+# elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_quad8_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
+elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_tri6_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
+# elements, nodes = import_cantilever_Q4P1("./msh/square_quad_"*string(ndiv)*".msh")
+# elements, nodes = import_cantilever_Q8P3("./msh/square_quad8_"*string(ndiv)*".msh")
+# elements, nodes ,nodes_p = import_cantilever_mix("./msh/square_tri6_"*string(ndiv)*".msh","./msh/square_"*string(ndiv)*".msh")
+# elements, nodes ,nodes_p = import_cantilever_T6P3("./msh/square_tri6_"*string(ndiv)*".msh","./msh/square_"*string(ndiv)*".msh")   
+
+nᵤ = length(nodes)
     nₚ = length(nodes_p)
+
+    ##for Q4P1 
+    # nₚ = length(elements["Ωᵖ"])
+    ##for Q8P3 
+    # nₚ = 3*length(elements["Ωᵖ"])
     nₘ=21
     P = 0
-    Ē = 1.0
+    Ē = 3e6
     # Ē = 1.0
-    ν̄ = 0.4999999
-    # ν̄ = 0.3
+    # ν̄ = 0.4999999
+    ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
     L = 10
@@ -63,7 +73,6 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/
     # opsα[2](elements["Γᵍ"],elements["Γᵍᵖ"],kᵤₚ,fp)
 
     
-
     k = [kᵤᵤ kₚᵤ';kₚᵤ kₚₚ]
     f = [f;fp]
 
@@ -71,8 +80,8 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/
     d₁ = d[1:2:2*nᵤ]
     d₂ = d[2:2:2*nᵤ]
     q  = d[2*nᵤ+1:end]
-    push!(nodes,:d₁=>d₁,:d₂=>d₂)
-    push!(nodes_p,:q=>q)
+    # push!(nodes,:d₁=>d₁,:d₂=>d₂)
+    # push!(nodes_p,:q=>q)
 
     kᵈ = kᵤᵤ
     kᵛ = -kₚᵤ'*(kₚₚ\kₚᵤ)
@@ -81,12 +90,12 @@ elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/
     γ = eigvals(kᵛ,kᵈ)
     println(γ[2*nᵤ-nₚ+1])
 
-    h1,l2,h1_dil,h1_dev = opsup[8](elements["Ωᵍ"],elements["Ωᵍᵖ"])
+    # h1,l2,h1_dil,h1_dev = opsup[8](elements["Ωᵍ"],elements["Ωᵍᵖ"])
     # h1,l2 = opsup[8](elements["Ω"],elements["Ωᵖ"])
-    L2 = log10(l2)
-    H1 = log10(h1)
-    H1_dil = log10(h1_dil)
-    H1_dev = log10(h1_dev)
+    # L2 = log10(l2)
+    # H1 = log10(h1)
+    # H1_dil = log10(h1_dil)
+    # H1_dev = log10(h1_dev)
    
     # println(L2,H1)
     # println(H1_dil,H1_dev)
