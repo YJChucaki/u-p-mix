@@ -4,10 +4,10 @@ include("import_heat_conduction.jl")
 include("wirteVTK.jl")
 # for i=2:10
    
-ndiv=5
-nₚ = 10
+ndiv =3
+nₚ = 5
 # println(nₚ)
-elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_"*string(ndiv)*".msh")
+elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 
 nᵤ = length(nodes)
 nₚ = length(nodes_p)
@@ -18,21 +18,22 @@ nₑ = length(elements["Ω"])
 set∇𝝭!(elements["Ω"])
 set∇𝝭!(elements["Ωᵖ"])
 set∇𝝭!(elements["Γ"])
-D=20   #thermal conductivity coefficient
+D=1   #thermal conductivity coefficient
 t=1 #thickness
 
-n = 1
+n = 3
 T(x,y) = (x+y)^n
 ∂T∂x(x,y) = n*(x+y)^abs(n-1)
 ∂T∂y(x,y) = n*(x+y)^abs(n-1)
 ∂²T∂x²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
 ∂²T∂y²(x,y) = n*(n-1)*(x+y)^abs(n-2)
 s(x,y) = -D*(∂²T∂x²(x,y)+∂²T∂y²(x,y))
+
 eval(prescribe)
 
 ops = [
        Operator{:∫Tᵢhᵢds}(:t=>t),
-       Operator{:∫Tᵢgᵢds}(:α=>1e15*D,:t=>t),
+       Operator{:∫Tᵢgᵢds}(:α=>1e12*D,:t=>t),
        Operator{:∫∫Tᵢsᵢdxdy}(:t=>t),
        Operator{:T_error}(:D=>D,:t=>t),
 ]
@@ -57,9 +58,8 @@ ops[3](elements["Ωᵖ"],f)
 kₚᵤ⁻=kₚᵤ'*inv(kₚᵤ*kₚᵤ')
 kₐ=-kᵤᵤ*kₚᵤ⁻
 k=(kₐ'*inv(kₐ*kₐ'))*(kₚᵤ')
-ops[2](elements["Γ"],kᵅ,fᵅ)
-
- q = (k+kᵅ)\(f+fᵅ) #temperatures
+ops[2](elements["Γ"],kᵅ,f)
+ q = (k+kᵅ)\f #temperatures
 
 # k = [kᵤᵤ (kₚᵤ+kᵅ)';kₚᵤ+kᵅ kₚₚ]
 # k = [kᵤᵤ kₚᵤ';kₚᵤ kₚₚ+kᵅ]

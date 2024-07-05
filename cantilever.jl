@@ -3,16 +3,16 @@ include("import_prescrible_ops.jl")
 include("import_cantilever.jl")
 
 # for i in 40:50
-    ndiv= 4
+    ndiv= 8
   
-    elements,nodes= import_cantilever_fem("./msh/cantilever_tri6_"*string(ndiv)*".msh")
+    # elements,nodes= import_cantilever_fem("./msh/cantilever_tri6_"*string(ndiv)*".msh")
     #  elements,nodes= import_cantilever_fem("./msh/cantilever_"*string(ndiv)*".msh")
-    # elements,nodes= import_cantilever_fem("./msh/cantilever_quad_"*string(ndiv)*".msh")
+    elements,nodes= import_cantilever_fem("./msh/cantilever_quad_"*string(ndiv)*".msh")
     # elements,nodes= import_cantilever_fem("./msh/cantilever_quad8_"*string(ndiv)*".msh")
     P = 1000
     Ē = 3e6
-    # ν̄ = 0.4999999
-    ν̄ = 0.3
+    ν̄ = 0.4
+    # ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
     L = 48
@@ -36,18 +36,19 @@ include("import_cantilever.jl")
         Operator{:∫vᵢtᵢds}(),
         Operator{:∫vᵢgᵢds}(:α=>1e9*E),
         Operator{:Hₑ_PlaneStress}(:E=>E,:ν=>ν),
-        Operator{:Hₑ_Incompressible}(:E=>E,:ν=>ν),
+        Operator{:Hₑ_Incompressible}(:E=>Ē,:ν=>ν̄),
         
     ]
 
     k = zeros(2*nᵤ,2*nᵤ)
+    kᵍ = zeros(2*nᵤ,2*nᵤ)
     f = zeros(2*nᵤ)
-
+    f = zeros(2*nᵤ)
     ops[1](elements["Ω"],k)
     ops[3](elements["Γᵗ"],f)
-    ops[4](elements["Γᵍ"],k,f)
+    ops[4](elements["Γᵍ"],kᵍ,f)
 
-    d = k\f
+    d = (k+kᵍ)\f
     d₁ = d[1:2:2*nᵤ]
     d₂ = d[2:2:2*nᵤ]
 
@@ -57,7 +58,7 @@ include("import_cantilever.jl")
     L2 = log10(l2)
     H1 = log10(h1)
     h = log10(12.0/ndiv)
-    println(L2,H1,h)
+    println(L2,H1)
     # h = log10(10.0/ndiv)
 
 #     index = 40:50

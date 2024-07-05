@@ -141,20 +141,22 @@ function import_patchtest_mix(filename1::String, filename2::String)
     elements["Γ"] = elements["Γ¹"]∪elements["Γ²"]∪elements["Γ³"]∪elements["Γ⁴"]
     nₘ = 21
     𝗠 = (0,zeros(nₘ))
-    push!(elements["Γ¹"], :𝝭=>:𝑠)
-    push!(elements["Γ¹"], :𝗠=>𝗠)
-    push!(elements["Γ²"], :𝝭=>:𝑠)
-    push!(elements["Γ²"], :𝗠=>𝗠)
-    push!(elements["Γ³"], :𝝭=>:𝑠)
-    push!(elements["Γ³"], :𝗠=>𝗠)
-    push!(elements["Γ⁴"], :𝝭=>:𝑠)
-    push!(elements["Γ⁴"], :𝗠=>𝗠)
+    ∂𝗠∂x = (0,zeros(nₘ))
+    ∂𝗠∂y = (0,zeros(nₘ))
+    push!(elements["Γ¹"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γ¹"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+    push!(elements["Γ²"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γ²"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+    push!(elements["Γ³"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γ³"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+    push!(elements["Γ⁴"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γ⁴"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
 
    
-    push!(elements["Ωᵖ"], :𝝭=>:𝑠)
-    push!(elements["Ωᵖ"], :𝗠=>𝗠)
-    push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠)
-    push!(elements["Ωᵍᵖ"], :𝗠=>𝗠)
+    push!(elements["Ωᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵖ"],  :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+    push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
     # gmsh.finalize()
     return elements, nodes, nodes_p , Ω
 end
@@ -528,13 +530,12 @@ function import_patchtest_fem(filename::String)
     push!(elements["Γ⁴"], :𝝭=>:𝑠)
 
     # gmsh.finalize()
-
-    x = getfield(nodes[1],:data)[:x][2]
-    y = getfield(nodes[1],:data)[:y][2]
-    z = getfield(nodes[1],:data)[:z][2]
-    xg = getfield(elements["Ω"][1].𝓖[1],:data)[:x][2]
-    yg = getfield(elements["Ω"][1].𝓖[1],:data)[:y][2]
-    zg = getfield(elements["Ω"][1].𝓖[1],:data)[:z][2]
+    # x = getfield(nodes[1],:data)[:x][2]
+    # y = getfield(nodes[1],:data)[:y][2]
+    # z = getfield(nodes[1],:data)[:z][2]
+    # xg = getfield(elements["Ω"][1].𝓖[1],:data)[:x][2]
+    # yg = getfield(elements["Ω"][1].𝓖[1],:data)[:y][2]
+    # zg = getfield(elements["Ω"][1].𝓖[1],:data)[:z][2]
 
     # lwb = 2.5;lwm =2.5;mso =15;msx =15;ppu = 2.5;α = 0.7;
     # f = Figure(backgroundcolor = :transparent)
@@ -689,7 +690,7 @@ end
 prescribe = quote
     
     prescribe!(elements["Ωᵖ"],:s=>(x,y,z)->s(x,y))
-    
+    prescribe!(elements["Ω"],:s=>(x,y,z)->s(x,y))
 
     prescribe!(elements["Γ¹"],:g=>(x,y,z)->T(x,y))
     prescribe!(elements["Γ²"],:g=>(x,y,z)->T(x,y))
@@ -698,7 +699,21 @@ prescribe = quote
    
 
     prescribe!(elements["Ωᵍᵖ"],:T=>(x,y,z)->T(x,y))
+    prescribe!(elements["Ωᵍ"],:T=>(x,y,z)->T(x,y))
+
+end
+prescribeForFem = quote
     
+    prescribe!(elements["Ω"],:s=>(x,y,z)->s(x,y))
+
+    prescribe!(elements["Γ¹"],:g=>(x,y,z)->T(x,y))
+    prescribe!(elements["Γ²"],:g=>(x,y,z)->T(x,y))
+    prescribe!(elements["Γ³"],:g=>(x,y,z)->T(x,y))
+    prescribe!(elements["Γ⁴"],:g=>(x,y,z)->T(x,y))
+   
+
+    
+    prescribe!(elements["Ωᵍ"],:T=>(x,y,z)->T(x,y))
 
 end
 

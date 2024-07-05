@@ -106,7 +106,7 @@ function import_patchtest_mix(filename1::String, filename2::String)
     zᵖ = nodes_p.z
     Ω = getElements(nodes_p, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 5.5*s*ones(length(nodes_p))
+    s = 2.5*s*ones(length(nodes_p))
     # s = 1.5/10*ones(length(nodes_p))
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
@@ -129,8 +129,8 @@ function import_patchtest_mix(filename1::String, filename2::String)
     push!(elements["Γ²"], :𝝭=>:𝑠)
     push!(elements["Γ³"], :𝝭=>:𝑠)
     push!(elements["Γ⁴"], :𝝭=>:𝑠)
-    # type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
-    type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
+    type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
+    # type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
     sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)
     elements["Ωᵖ"] = getElements(nodes_p, entities["Ω"], type, integrationOrder_Ω, sp)
     elements["Ωᵍᵖ"] = getElements(nodes_p, entities["Ω"], type,  integrationOrder_Ωᵍ, sp)
@@ -503,7 +503,6 @@ function import_patchtest_fem(filename::String)
     elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
     push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
-
     elements["Γ¹"] = getElements(nodes, entities["Γ¹"], integrationOrder_Γ)
     elements["Γ²"] = getElements(nodes, entities["Γ²"], integrationOrder_Γ)
     elements["Γ³"] = getElements(nodes, entities["Γ³"], integrationOrder_Γ)

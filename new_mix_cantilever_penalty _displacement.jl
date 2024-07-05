@@ -1,15 +1,15 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf,Pardiso
 
-ndiv=8
-i=450
+ndiv=4
+i=200
 # ndiv_p=4 
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
 include("wirteVTK.jl")
 # elements, nodes ,nodes_p,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p,Ω = import_cantilever_mix_internal("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*"_internal.msh","./msh/cantilever_"*string(ndiv)*"_internal.msh")
-# elements, nodes ,nodes_p ,Ω= import_cantilever_mix("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
-elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+elements, nodes ,nodes_p ,Ω= import_cantilever_mix("./msh/cantilever_tri6_"*string(ndiv)*"b.msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_HR_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p = import_cantilever_T6P3("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv)*".msh")
 # elements, nodes  = import_cantilever_Q4P1("./msh/cantilever_quad_"*string(ndiv)*".msh")
@@ -20,7 +20,8 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_quad_"*str
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
     nₑ = length(elements["Ω"])
-    # nₑₚ = length(Ω)
+    nₑₚ = length(Ω)
+  
     ##for Q4P1 
     # nₚ = length(elements["Ωᵖ"])
     ##for Q8P3
@@ -28,8 +29,8 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_quad_"*str
     P = 1000
     Ē = 3e6
     # Ē = 1.0
-    ν̄ = 0.0
-    # ν̄ = 0.3
+    # ν̄ = 0.4999999
+    ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
     L = 48
@@ -38,7 +39,7 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_quad_"*str
     EI = E*I
     K=Ē/3/(1-2ν̄ )
     eval(prescribeForGauss)
-    eval(prescribeForPenalty)
+    eval(prescribeForDisplacement)
     set𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ωᵍ"])
@@ -46,7 +47,11 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_quad_"*str
     set𝝭!(elements["Ωᵍᵖ"])
     set𝝭!(elements["Γᵍ"])
     set𝝭!(elements["Γᵗ"])
+    set𝝭!(elements["Γ₁"])
+    set𝝭!(elements["Γ₃"])
     # set𝝭!(elements["Γᵍᵖ"])
+    
+    
    
     eval(opsupmix)
     kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
@@ -57,11 +62,14 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_quad_"*str
     opsup[3](elements["Ω"],kᵤᵤ)
     opsup[4](elements["Ω"],elements["Ωᵖ"],kₚᵤ)
     opsup[5](elements["Ωᵖ"],kₚₚ)
-    opsup[6](elements["Γᵗ"],f)
+    # opsup[6](elements["Γᵗ"],f)
 
     αᵥ = 1e12
     eval(opsPenalty)
     opsα[1](elements["Γᵍ"],kᵤᵤ,f)
+    opsα[1](elements["Γᵗ"],kᵤᵤ,f)
+    opsα[1](elements["Γ₁"],kᵤᵤ,f)
+    opsα[1](elements["Γ₃"],kᵤᵤ,f)
     # opsα[2](elements["Γᵍ"],elements["Γᵍᵖ"],kᵤₚ,fp)
 
 
@@ -75,8 +83,8 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_quad_"*str
     push!(nodes_p,:q=>q)
 
     # h1,l2,h1_dil,h1_dev = opsup[8](elements["Ωᵍ"],elements["Ωᵍᵖ"])
-    # h1,l2 = opsup[8](elements["Ωᵍ"],elements["Ωᵖ"])
-    h1,l2 = opsup[9](elements["Ωᵍ"])
+    h1,l2 = opsup[8](elements["Ωᵍ"],elements["Ωᵖ"])
+    # h1,l2 = opsup[9](elements["Ωᵍ"])
     L2 = log10(l2)
     H1 = log10(h1)
     # H1_dil = log10(h1_dil)
@@ -88,9 +96,9 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_quad_"*str
     # println(h1_dil,h1_dev)
     # h = log10(10.0/ndiv)
 
-    # eval(VTK_mix_pressure)
-    # eval(VTK_mix_pressure_u)
-    # eval(VTK_mix_displacement)
+    eval(VTK_mix_pressure)
+    eval(VTK_mix_pressure_u)
+    eval(VTK_displacement)
     # eval(VTK_Q4P1_displacement_pressure)
     # eval(VTK_T6P3_pressure)
 

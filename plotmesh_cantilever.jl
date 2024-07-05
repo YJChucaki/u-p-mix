@@ -1,9 +1,9 @@
 using ApproxOperator,CairoMakie,Tensors, BenchmarkExample, Statistics
 import Gmsh: gmsh
 lwb = 1.5;lwm =1.5;mso =10;msx =10;ppu = 2.5;α = 0.7;
-filename1 = "./msh/cantilever_tri6_4.msh"
+filename1 = "./msh/cantilever_8.msh"
 filename2 = "./msh/cantilever_bubble_273.msh"
-savename = "./png/7.png"
+savename = "./png/8.png"
 
 gmsh.initialize()
 gmsh.open(filename1)
@@ -48,7 +48,7 @@ scatter!(x,y,marker = :circle, markersize = mso, color = :black)
 
 for elm in elements["Ωᵖ"]
     id = [node.𝐼 for node in elm.𝓒]
-    lines!(xᵖ[id[[1,2,3,1]]],yᵖ[id[[1,2,3,1]]], linewidth = lwm, color = :blue)
+    # lines!(xᵖ[id[[1,2,3,1]]],yᵖ[id[[1,2,3,1]]], linewidth = lwm, color = :blue)
 end
 scatter!(xᵖ,yᵖ,marker = :xcross, markersize = msx, color = (:blue, α))
 

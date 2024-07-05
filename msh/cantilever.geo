@@ -23,6 +23,8 @@ Transfinite Curve{2,4} = n+1;
 
 Physical Curve("Γᵗ") = {2};
 Physical Curve("Γᵍ") = {4};
+Physical Curve("Γ₁") = {1};
+Physical Curve("Γ₃") = {3};
 Physical Curve("Γ") = {1,2,3,4};
 Physical Surface("Ω") = {1};
 
@@ -31,6 +33,6 @@ Transfinite Surface{1};
 Mesh.Algorithm = 1;
 Mesh.MshFileVersion = 2;
 Mesh 2;
-//Mesh.SecondOrderIncomplete = 1;
-//SetOrder 2;
+Mesh.SecondOrderIncomplete = 1;
+SetOrder 2;
 //RecombineMesh;

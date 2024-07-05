@@ -2,9 +2,10 @@ using ApproxOperator,CairoMakie
 
 include("import_patchtest.jl")
 
-nₚ = 90
-lwb = 2.5;lwm =2.5;mso =15;msx =15;ppu = 2.5;α = 0.7;
-filename1 = "./msh/patchtest_9.msh"
+nₚ = 441
+# lwb = 2.5;lwm =2.5;mso =15;msx =15;ppu = 2.5;α = 0.7;
+lwb = 1.5;lwm =1.5;mso =10;msx =15;ppu = 2.5;α = 0.7;
+filename1 = "./msh/patchtest_quad_21.msh"
 filename2 = "./msh/patchtest_bubble_"*string(nₚ)*".msh"
 savename = "./png/patchtest_msh_bubble_"*string(nₚ)*".png"
 elms, nodes, nodes_p = import_patchtest_mix(filename1,filename2)
@@ -38,6 +39,6 @@ scatter!(x,y,marker = :circle, markersize = mso, color = :black)
 #     id = [i for i in elm.i]
 #     # lines!(xᵖ[id[[1,2,3,1]]],yᵖ[id[[1,2,3,1]]], linewidth = lwm, color = :blue)
 # end
-scatter!(xᵖ,yᵖ,marker = :xcross, markersize = msx, color = (:blue, α))
+# scatter!(xᵖ,yᵖ,marker = :xcross, markersize = msx, color = (:blue, α))
 save(savename,f,px_per_unit = ppu)
 f

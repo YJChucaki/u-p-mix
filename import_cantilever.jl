@@ -70,11 +70,15 @@ function import_cantilever_mix(filename1::String,filename2::String)
     elements["Ω"] = getElements(nodes, entities["Ω"],   integrationOrder_Ω)
     elements["Γᵍ"] = getElements(nodes, entities["Γᵍ"],   integrationOrder_Γ)
     elements["Γᵗ"] = getElements(nodes, entities["Γᵗ"],   integrationOrder_Γ)
+    # elements["Γ₁"] = getElements(nodes, entities["Γ₁"],   integrationOrder_Γ)
+    # elements["Γ₃"] = getElements(nodes, entities["Γ₃"],   integrationOrder_Γ)
     elements["Ωᵍ"] = getElements(nodes, entities["Ω"],   integrationOrder_Ωᵍ)
     push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Γᵗ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Γᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    # push!(elements["Γ₁"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    # push!(elements["Γ₃"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     
     gmsh.open(filename2)
     entities = getPhysicalGroups()
@@ -107,6 +111,44 @@ function import_cantilever_mix(filename1::String,filename2::String)
     push!(elements["Ωᵍᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
     # gmsh.finalize()
     return elements, nodes, nodes_p,Ω,xᵖ,yᵖ,zᵖ, sp,type
+end
+function import_cantilever_reduce(filename1::String)
+    gmsh.initialize()
+    gmsh.open(filename1)
+    entities = getPhysicalGroups()
+    nodes = get𝑿ᵢ()
+    x = nodes.x
+    y = nodes.y
+    z = nodes.z
+    integrationOrder_Ω = 4
+    integrationOrder_Γ = 4
+    integrationOrder_Ωᵍ =10
+    elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
+    elements["Ω"] = getElements(nodes, entities["Ω"],   integrationOrder_Ω)
+    elements["Γᵍ"] = getElements(nodes, entities["Γᵍ"],   integrationOrder_Γ)
+    elements["Γᵗ"] = getElements(nodes, entities["Γᵗ"],   integrationOrder_Γ)
+    # elements["Γ₁"] = getElements(nodes, entities["Γ₁"],   integrationOrder_Γ)
+    # elements["Γ₃"] = getElements(nodes, entities["Γ₃"],   integrationOrder_Γ)
+    elements["Ωᵍ"] = getElements(nodes, entities["Ω"],   integrationOrder_Ωᵍ)
+    push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γᵗ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    # push!(elements["Γ₁"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    # push!(elements["Γ₃"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    entities = getPhysicalGroups()
+    nodes_p = get𝑿ᵢ()
+    xᵖ = nodes_p.x
+    yᵖ = nodes_p.y
+    zᵖ = nodes_p.z
+    integrationOrder_1 = 0
+    elements["Ωᵛ"] =getElements(nodes, entities["Ω"],   integrationOrder_1)
+    # elements["Γᵍᵖ"] = getElements(nodes_p, entities["Γᵍ"], type,  integrationOrder_Γ, sp)
+    push!(elements["Ωᵛ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    # push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+
+    # gmsh.finalize()
+    return elements, nodes, nodes_p
 end
 
 function import_cantilever_mix_HR(filename1::String,filename2::String)
@@ -512,6 +554,42 @@ prescribeForPenalty = quote
     prescribe!(elements["Γᵍ"],:n₁₁=>(x,y,z)->1.0)
     prescribe!(elements["Γᵍ"],:n₁₂=>(x,y,z)->0.0)
     prescribe!(elements["Γᵍ"],:n₂₂=>(x,y,z)->1.0)
+
+    
+end
+prescribeForDisplacement = quote
+    prescribe!(elements["Γᵗ"],:g₁=>(x,y,z)->-P*y/6/EI*((6*L-3x)*x + (2+ν)*(y^2-D^2/4)))
+    prescribe!(elements["Γᵗ"],:g₂=>(x,y,z)->P/6/EI*(3*ν*y^2*(L-x) + (4+5*ν)*D^2*x/4 + (3*L-x)*x^2)) 
+    prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->-P*y/6/EI*((6*L-3x)*x + (2+ν)*(y^2-D^2/4)))
+    prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->P/6/EI*(3*ν*y^2*(L-x) + (4+5*ν)*D^2*x/4 + (3*L-x)*x^2))
+    prescribe!(elements["Γ₁"],:g₁=>(x,y,z)->-P*y/6/EI*((6*L-3x)*x + (2+ν)*(y^2-D^2/4)))
+    prescribe!(elements["Γ₁"],:g₂=>(x,y,z)->P/6/EI*(3*ν*y^2*(L-x) + (4+5*ν)*D^2*x/4 + (3*L-x)*x^2)) 
+    prescribe!(elements["Γ₃"],:g₁=>(x,y,z)->-P*y/6/EI*((6*L-3x)*x + (2+ν)*(y^2-D^2/4)))
+    prescribe!(elements["Γ₃"],:g₂=>(x,y,z)->P/6/EI*(3*ν*y^2*(L-x) + (4+5*ν)*D^2*x/4 + (3*L-x)*x^2))
+    # prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->0.0)
+    # prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->0.0)
+    # prescribe!(elements["Γᵍᵖ"],:p₁=>(x,y,z)->-P/EI*(L-x)*y/2)
+    # prescribe!(elements["Γᵍᵖ"],:p₂=>(x,y,z)->-P/EI*(L-x)*y/2)
+    # prescribe!(elements["Γᵍᵖ"],:n₁=>(x,y,z)->1.0)
+    # prescribe!(elements["Γᵍᵖ"],:n₂=>(x,y,z)->1.0)
+    prescribe!(elements["Γᵍ"],:n₁₁=>(x,y,z)->1.0)
+    prescribe!(elements["Γᵍ"],:n₁₂=>(x,y,z)->0.0)
+    prescribe!(elements["Γᵍ"],:n₂₂=>(x,y,z)->1.0)
+
+    prescribe!(elements["Γ₁"],:n₁₁=>(x,y,z)->1.0)
+    prescribe!(elements["Γ₁"],:n₁₂=>(x,y,z)->0.0)
+    prescribe!(elements["Γ₁"],:n₂₂=>(x,y,z)->1.0)
+
+    prescribe!(elements["Γᵗ"],:n₁₁=>(x,y,z)->1.0)
+    prescribe!(elements["Γᵗ"],:n₁₂=>(x,y,z)->0.0)
+    prescribe!(elements["Γᵗ"],:n₂₂=>(x,y,z)->1.0)
+
+    prescribe!(elements["Γ₃"],:n₁₁=>(x,y,z)->1.0)
+    prescribe!(elements["Γ₃"],:n₁₂=>(x,y,z)->0.0)
+    prescribe!(elements["Γ₃"],:n₂₂=>(x,y,z)->1.0)
+
+
+
 
     
 end

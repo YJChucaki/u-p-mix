@@ -116,7 +116,7 @@ VTK_mix_pressure_u = quote
    end
 VTK_displacement = quote
   #number of an elemnt nodes
-  nₑₙ=3
+  nₑₙ=6
   fo = open("./vtk/cantilever_tri3_mix_displacement_"*string(ndiv)*".vtk","w")
   @printf fo "# vtk DataFile Version 2.0\n"
   @printf fo "cantilever_tri3_mix\n"
