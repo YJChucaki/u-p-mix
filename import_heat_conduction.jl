@@ -110,9 +110,9 @@ function import_patchtest_mix(filename1::String, filename2::String)
     # s = 1.5/10*ones(length(nodes_p))
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
-    integrationOrder_Ω = 6
+    integrationOrder_Ω = 10
     integrationOrder_Ωᵍ = 10
-    integrationOrder_Γ = 6
+    integrationOrder_Γ = 10
     gmsh.open(filename1)
     entities = getPhysicalGroups()
     nodes = get𝑿ᵢ()
@@ -129,8 +129,9 @@ function import_patchtest_mix(filename1::String, filename2::String)
     # push!(elements["Γ²"], :𝝭=>:𝑠)
     # push!(elements["Γ³"], :𝝭=>:𝑠)
     # push!(elements["Γ⁴"], :𝝭=>:𝑠)
+
     type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
-    # type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
+    type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
     sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)
     elements["Ωᵖ"] = getElements(nodes_p, entities["Ω"], type, integrationOrder_Ω, sp)
     elements["Ωᵍᵖ"] = getElements(nodes_p, entities["Ω"], type,  integrationOrder_Ωᵍ, sp)
@@ -139,6 +140,8 @@ function import_patchtest_mix(filename1::String, filename2::String)
     elements["Γ³"] = getElements(nodes_p, entities["Γ³"],type,  integrationOrder_Γ, sp)
     elements["Γ⁴"] = getElements(nodes_p, entities["Γ⁴"], type, integrationOrder_Γ, sp)
     elements["Γ"] = elements["Γ¹"]∪elements["Γ²"]∪elements["Γ³"]∪elements["Γ⁴"]
+
+   
     nₘ = 21
     𝗠 = (0,zeros(nₘ))
     ∂𝗠∂x = (0,zeros(nₘ))

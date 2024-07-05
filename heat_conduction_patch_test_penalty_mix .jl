@@ -4,8 +4,8 @@ include("import_heat_conduction.jl")
 include("wirteVTK.jl")
 # for i=2:10
    
-ndiv =3
-nₚ = 5
+ndiv =11
+nₚ = 40
 # println(nₚ)
 elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 
@@ -21,7 +21,7 @@ set∇𝝭!(elements["Γ"])
 D=1   #thermal conductivity coefficient
 t=1 #thickness
 
-n = 3
+n =1
 T(x,y) = (x+y)^n
 ∂T∂x(x,y) = n*(x+y)^abs(n-1)
 ∂T∂y(x,y) = n*(x+y)^abs(n-1)
@@ -55,21 +55,22 @@ f = zeros(nₚ)
 opsᵈ[1](elements["Ω"],kᵤᵤ)
 opsᵛ[1](elements["Ω"],elements["Ωᵖ"],kₚᵤ)
 ops[3](elements["Ωᵖ"],f)
-kₚᵤ⁻=kₚᵤ'*inv(kₚᵤ*kₚᵤ')
-kₐ=-kᵤᵤ*kₚᵤ⁻
-k=(kₐ'*inv(kₐ*kₐ'))*(kₚᵤ')
-ops[2](elements["Γ"],kᵅ,f)
- q = (k+kᵅ)\f #temperatures
+# kₚᵤ⁻=kₚᵤ'*inv(kₚᵤ*kₚᵤ')
+# kₐ=-kᵤᵤ*kₚᵤ⁻
+# k=(kₐ'*inv(kₐ*kₐ'))*(kₚᵤ')
+ops[2](elements["Γ"],kᵅ,fᵅ)
+#  q = (k+kᵅ)\(f+fᵅ) #temperatures
+
 
 # k = [kᵤᵤ (kₚᵤ+kᵅ)';kₚᵤ+kᵅ kₚₚ]
-# k = [kᵤᵤ kₚᵤ';kₚᵤ kₚₚ+kᵅ]
-# f = [zeros(2*nᵤ);f+fᵅ]
-# d = k\f
-# d₁ = d[1:2:2*nᵤ] ##heat flux
-# d₂ = d[2:2:2*nᵤ]
-# q  = d[2*nᵤ+1:end]
+k = [kᵤᵤ kₚᵤ';kₚᵤ kₚₚ+kᵅ]
+f = [zeros(2*nᵤ);f+fᵅ]
+d = k\f
+d₁ = d[1:2:2*nᵤ] ##heat flux
+d₂ = d[2:2:2*nᵤ]
+q  = d[2*nᵤ+1:end]
 
-# push!(nodes,:d₁=>d₁,:d₂=>d₂)
+push!(nodes,:d₁=>d₁,:d₂=>d₂)
 push!(nodes_p,:T=>q)
 
 

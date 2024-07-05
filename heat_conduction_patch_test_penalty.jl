@@ -17,7 +17,7 @@ set𝝭!(elements["Γ"])
 D=1   #thermal conductivity coefficient
 t=1 #thickness
 
-n = 2
+n = 1
 T(x,y) = (x+y)^n
 ∂T∂x(x,y) = n*(x+y)^abs(n-1)
 ∂T∂y(x,y) = n*(x+y)^abs(n-1)

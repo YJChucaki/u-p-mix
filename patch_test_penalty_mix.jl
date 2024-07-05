@@ -4,7 +4,7 @@ include("import_patchtest.jl")
 include("wirteVTK.jl")
 # for i=2:10
    
-ndiv=21
+ndiv=11
 nₚ = 20
 # println(nₚ)
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_bubble_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
@@ -30,15 +30,15 @@ set∇𝝭!(elements["Ω"])
 set𝝭!(elements["Ωᵖ"])
 set𝝭!(elements["Γ"])
 E = 1.0
-# ν̄ = 0.4999999
+# ν = 0.4999999
 # ν = 0.4999999999
 ν = 0.3
 # E = Ē/(1.0-ν̄^2)
 # ν = ν̄/(1.0-ν̄)
 
-n = 2
+n = 1
 u(x,y) = (x+y)^n
-v(x,y) = -(x+y)^n
+v(x,y) = (x+y)^n
 ∂u∂x(x,y) = n*(x+y)^abs(n-1)
 ∂u∂y(x,y) = n*(x+y)^abs(n-1)
 ∂v∂x(x,y) = n*(x+y)^abs(n-1)
@@ -133,15 +133,16 @@ push!(nodes_p,:q=>p)
 
 set∇𝝭!(elements["Ωᵍ"])
 set𝝭!(elements["Ωᵍᵖ"])
-h1,l2= ops[6](elements["Ωᵍ"])
-# h1,l2,h1_dil,h1_dev= ops[5](elements["Ωᵍ"],elements["Ωᵍᵖ"])
+# h1,l2= ops[6](elements["Ωᵍ"])
+h1,l2,h1_dil,h1_dev,p_error= ops[5](elements["Ωᵍ"],elements["Ωᵍᵖ"])
 L2 = log10(l2)
 H1 = log10(h1)
-# H1_dil = log10(h1_dil)
-# H1_dev = log10(h1_dev)
-           
+H1_dil = log10(h1_dil)
+H1_dev = log10(h1_dev)
+P_error = log10(p_error)        
 println(L2,H1)
-# println(H1_dil,H1_dev)
+println(H1_dil,H1_dev)
+println(P_error)
 # eval(VTK_mix_pressure)
 # println(l2,h1)
 # println(log10(sqrt(γ[1])))
