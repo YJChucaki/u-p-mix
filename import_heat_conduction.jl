@@ -116,50 +116,51 @@ function import_patchtest_mix(filename1::String, filename2::String)
     gmsh.open(filename1)
     entities = getPhysicalGroups()
     nodes = get𝑿ᵢ()
-    elements["Ωᵖ"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
-    elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
-    push!(elements["Ωᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
-    push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
-    elements["Γ¹ᵖ"] = getElements(nodes, entities["Γ¹"], integrationOrder_Γ)
-    elements["Γ²ᵖ"] = getElements(nodes, entities["Γ²"], integrationOrder_Γ)
-    elements["Γ³ᵖ"] = getElements(nodes, entities["Γ³"], integrationOrder_Γ)
-    elements["Γ⁴ᵖ"] = getElements(nodes, entities["Γ⁴"], integrationOrder_Γ)
-    elements["Γᵖ"] = elements["Γ¹ᵖ"]∪elements["Γ²ᵖ"]∪elements["Γ³ᵖ"]∪elements["Γ⁴ᵖ"]
-    push!(elements["Γ¹ᵖ"], :𝝭=>:𝑠)
-    push!(elements["Γ²ᵖ"], :𝝭=>:𝑠)
-    push!(elements["Γ³ᵖ"], :𝝭=>:𝑠)
-    push!(elements["Γ⁴ᵖ"], :𝝭=>:𝑠)
+    elements["Ωᵘ"] = getElements(nodes, entities["Ω"],  integrationOrder_Ω)
+    elements["Ωᵍᵘ"] = getElements(nodes, entities["Ω"],   integrationOrder_Ωᵍ)
+    elements["Γ¹ᵘ"] = getElements(nodes, entities["Γ¹"],  integrationOrder_Γ)
+    elements["Γ²ᵘ"] = getElements(nodes, entities["Γ²"],  integrationOrder_Γ)
+    elements["Γ³ᵘ"] = getElements(nodes, entities["Γ³"],  integrationOrder_Γ)
+    elements["Γ⁴ᵘ"] = getElements(nodes, entities["Γ⁴"],  integrationOrder_Γ)
+    elements["Γᵘ"] = elements["Γ¹ᵘ"]∪elements["Γ²ᵘ"]∪elements["Γ³ᵘ"]∪elements["Γ⁴ᵘ"]
+    push!(elements["Ωᵘ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍᵘ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γ¹ᵘ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γ²ᵘ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γ³ᵘ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γ⁴ᵘ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+
 
     type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
     # type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
     sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)
-    elements["Ωᵘ"] = getElements(nodes_p, entities["Ω"], type, integrationOrder_Ω, sp)
-    elements["Ωᵍᵘ"] = getElements(nodes_p, entities["Ω"], type,  integrationOrder_Ωᵍ, sp)
-    elements["Γ¹"] = getElements(nodes_p, entities["Γ¹"],type,  integrationOrder_Γ, sp)
-    elements["Γ²"] = getElements(nodes_p, entities["Γ²"],type,  integrationOrder_Γ, sp)
-    elements["Γ³"] = getElements(nodes_p, entities["Γ³"],type,  integrationOrder_Γ, sp)
-    elements["Γ⁴"] = getElements(nodes_p, entities["Γ⁴"], type, integrationOrder_Γ, sp)
-    elements["Γᵘ"] = elements["Γ¹"]∪elements["Γ²"]∪elements["Γ³"]∪elements["Γ⁴"]
+    elements["Ωᵖ"] = getElements(nodes_p, entities["Ω"], type, integrationOrder_Ω, sp)
+    elements["Ωᵍᵖ"] = getElements(nodes_p, entities["Ω"], type,  integrationOrder_Ωᵍ, sp)
+    elements["Γ¹ᵖ"] = getElements(nodes_p, entities["Γ¹"],type,  integrationOrder_Γ, sp)
+    elements["Γ²ᵖ"] = getElements(nodes_p, entities["Γ²"],type,  integrationOrder_Γ, sp)
+    elements["Γ³ᵖ"] = getElements(nodes_p, entities["Γ³"],type,  integrationOrder_Γ, sp)
+    elements["Γ⁴ᵖ"] = getElements(nodes_p, entities["Γ⁴"], type, integrationOrder_Γ, sp)
+    elements["Γᵖ"] = elements["Γ¹ᵖ"]∪elements["Γ²ᵖ"]∪elements["Γ³ᵖ"]∪elements["Γ⁴ᵖ"]
 
    
     nₘ = 21
     𝗠 = (0,zeros(nₘ))
     ∂𝗠∂x = (0,zeros(nₘ))
     ∂𝗠∂y = (0,zeros(nₘ))
-    push!(elements["Γ¹"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
-    push!(elements["Γ¹"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
-    push!(elements["Γ²"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
-    push!(elements["Γ²"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
-    push!(elements["Γ³"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
-    push!(elements["Γ³"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
-    push!(elements["Γ⁴"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
-    push!(elements["Γ⁴"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+    push!(elements["Γ¹ᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γ¹ᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+    push!(elements["Γ²ᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γ²ᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+    push!(elements["Γ³ᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γ³ᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+    push!(elements["Γ⁴ᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γ⁴ᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
 
    
-    push!(elements["Ωᵘ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
-    push!(elements["Ωᵘ"],  :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
-    push!(elements["Ωᵍᵘ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
-    push!(elements["Ωᵍᵘ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+    push!(elements["Ωᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵖ"],  :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+    push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
     # gmsh.finalize()
     return elements, nodes, nodes_p , Ω
 end
@@ -692,17 +693,17 @@ end
 
 prescribe = quote
     
-    prescribe!(elements["Ωᵘ"],:s=>(x,y,z)->s(x,y))
-    prescribe!(elements["Ωᵖ"],:s=>(x,y,z)->s(x,y))
+    prescribe!(elements["Ωᵘ"],:b=>(x,y,z)->b(x,y))
+    prescribe!(elements["Ωᵖ"],:b=>(x,y,z)->b(x,y))
 
-    prescribe!(elements["Γ¹"],:g=>(x,y,z)->T(x,y))
-    prescribe!(elements["Γ²"],:g=>(x,y,z)->T(x,y))
-    prescribe!(elements["Γ³"],:g=>(x,y,z)->T(x,y))
-    prescribe!(elements["Γ⁴"],:g=>(x,y,z)->T(x,y))
+    prescribe!(elements["Γ¹ᵘ"],:g=>(x,y,z)->T(x,y))
+    prescribe!(elements["Γ²ᵘ"],:g=>(x,y,z)->T(x,y))
+    prescribe!(elements["Γ³ᵘ"],:g=>(x,y,z)->T(x,y))
+    prescribe!(elements["Γ⁴ᵘ"],:g=>(x,y,z)->T(x,y))
    
 
-    prescribe!(elements["Ωᵍᵘ"],:T=>(x,y,z)->T(x,y))
-    prescribe!(elements["Ωᵍ"],:T=>(x,y,z)->T(x,y))
+    prescribe!(elements["Ωᵍᵘ"],:u=>(x,y,z)->T(x,y))
+    prescribe!(elements["Ωᵍᵖ"],:u=>(x,y,z)->T(x,y))
 
 end
 prescribeForFem = quote
@@ -716,7 +717,7 @@ prescribeForFem = quote
    
 
     
-    prescribe!(elements["Ωᵍ"],:T=>(x,y,z)->T(x,y))
+    prescribe!(elements["Ωᵍ"],:u=>(x,y,z)->T(x,y))
 
 end
 

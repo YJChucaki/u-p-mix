@@ -4,13 +4,13 @@ include("import_heat_conduction.jl")
 include("wirteVTK.jl")
 # for i=2:10
    
-ndiv =5
-nₚ = 15
+ndiv = 3
+nₚ = 5
 # println(nₚ)
 elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 
-nₚ = length(nodes)
-nᵤ = length(nodes_p)
+nₚ = length(nodes_p)
+nᵤ = length(nodes)
 # nₑ = length(elements["Ω"])
 # nₑₚ = length(Ω)
 
@@ -28,22 +28,22 @@ T(x,y) = (x+y)^n
 ∂T∂y(x,y) = n*(x+y)^abs(n-1)
 ∂²T∂x²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
 ∂²T∂y²(x,y) = n*(n-1)*(x+y)^abs(n-2)
-s(x,y) = -D*(∂²T∂x²(x,y)+∂²T∂y²(x,y))
+b(x,y) = -D*(∂²T∂x²(x,y)+∂²T∂y²(x,y))
 
 eval(prescribe)
 
 ops = [
        Operator{:∫Tᵢhᵢds}(:t=>t),
        Operator{:∫Tᵢgᵢds}(:α=>1e12*D,:t=>t),
-       Operator{:∫∫Tᵢsᵢdxdy}(:t=>t),
-       Operator{:T_error}(:D=>D,:t=>t),
+       Operator{:∫vbdΩ}(),
+       Operator{:L₂}(:D=>D,:t=>t),
 ]
 opsᵛ = [
-    Operator{:∫∫qᵢ∇Tⱼdxdy}(:t=>t),
-    Operator{:∫qᵢnᵢgⱼds}(:t=>t),
+    Operator{:∫∫pᵢ∇uⱼdxdy}(),
+    Operator{:∫pᵢnᵢgⱼds}(),
 ]
 opsᵈ = [
-    Operator{:∫∫qᵢD⁻¹qⱼdxdy}(:D=>D,:t=>t),
+    Operator{:∫∫pᵢD⁻¹pⱼdxdy}(:D=>D,:t=>t),
 ]
 
 kᵅ = zeros(nᵤ,nᵤ)
@@ -52,41 +52,33 @@ kₚₚ = zeros(2*nₚ,2*nₚ)
 kₚₙ = zeros(2*nₚ,nᵤ)
 kₚᵤ = zeros(nᵤ,2*nₚ)
 kᵤᵤ = zeros(nᵤ,nᵤ)
-f = zeros(nᵤ)
+fᵤ = zeros(nᵤ)
 fₚ = zeros(2*nₚ)
 
 
 opsᵈ[1](elements["Ωᵖ"],kₚₚ)
 opsᵛ[1](elements["Ωᵖ"],elements["Ωᵘ"],kₚᵤ)
 opsᵛ[2](elements["Γᵖ"],elements["Γᵘ"],kₚₙ,fₚ)
-
-ops[3](elements["Ωᵘ"],f)
-# kₚᵤ⁻=kₚᵤ'*inv(kₚᵤ*kₚᵤ')
-# kₐ=-kᵤᵤ*kₚᵤ⁻
-# k=(kₐ'*inv(kₐ*kₐ'))*(kₚᵤ')
-# ops[2](elements["Γᵘ"],kᵅ,fᵅ)
-#  q = (k+kᵅ)\(f+fᵅ) #temperatures
+ops[3](elements["Ωᵘ"],fᵤ)
 
 
-# k = [kᵤᵤ (kₚᵤ+kᵅ)';kₚᵤ+kᵅ kₚₚ]
-# k = [kᵤᵤ -kₚᵤ'-kₚₙ;-kₚᵤ-kₚₙ' kₚₚ]
-# f = [-fₚ;-f]
+
+
+# k = [kₚₚ -kₚᵤ'-kₚₙ;-kₚᵤ+kₚₙ' kᵤᵤ]
+# f = [fₚ;fᵤ]
 # d = k\f
-# p₁ = d[1:2:2*nₚ] ##heat flux
+# p₁ = d[1:2:2*nₚ] 
 # p₂ = d[2:2:2*nₚ]
 # u  = d[2*nₚ+1:end]
 
-# push!(nodes,:d₁=>p₁,:d₂=>p₂)
-# push!(nodes_p,:T=>u)
+# push!(nodes_p,:d₁=>p₁,:d₂=>p₂)
+# push!(nodes,:d=>u)
 
 
 # set𝝭!(elements["Ωᵍᵘ"])
 # l2= ops[4](elements["Ωᵍᵘ"])
-# h1,l2,h1_dil,h1_dev= ops[5](elements["Ωᵍ"],elements["Ωᵍᵖ"])
 # L2 = log10(l2)
-# H1 = log10(h1)
-# H1_dil = log10(h1_dil)
-# H1_dev = log10(h1_dev)
+
            
 # println(L2)
 
@@ -95,7 +87,7 @@ ops[3](elements["Ωᵘ"],f)
 d = zeros(2*nₚ + nᵤ)
 dₚ = zeros(2*nₚ)
 dᵤ = zeros(nᵤ)
-for (i,node) in enumerate(nodes)
+for (i,node) in enumerate(nodes_p)
     x = node.x
     y = node.y
     d[2*i-1] = - ∂T∂x(x,y)
@@ -103,7 +95,7 @@ for (i,node) in enumerate(nodes)
     dₚ[2*i-1] = - ∂T∂x(x,y)
     dₚ[2*i]   = - ∂T∂y(x,y)
 end
-for (i,node) in enumerate(nodes_p)
+for (i,node) in enumerate(nodes)
     x = node.x
     y = node.y
     d[2*nₚ+i] = T(x,y)
@@ -112,4 +104,4 @@ end
 
 err1 = kₚₚ*dₚ - kₚᵤ'*dᵤ
 err2 = kₚₙ*dᵤ - fₚ
-err3 = (-kₚᵤ+kₚₙ')*dₚ + f
+err3 = (-kₚᵤ+kₚₙ')*dₚ - fᵤ
