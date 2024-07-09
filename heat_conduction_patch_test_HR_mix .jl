@@ -48,15 +48,15 @@ opsᵈ = [
 
 kᵅ = zeros(nᵤ,nᵤ)
 fᵅ = zeros(nᵤ)
-kᵤᵤ = zeros(2*nₚ,2*nₚ)
+kₚₚ = zeros(2*nₚ,2*nₚ)
 kₚₙ = zeros(2*nₚ,nᵤ)
 kₚᵤ = zeros(nᵤ,2*nₚ)
-kₚₚ = zeros(nᵤ,nᵤ)
+kᵤᵤ = zeros(nᵤ,nᵤ)
 f = zeros(nᵤ)
 fₚ = zeros(2*nₚ)
 
 
-opsᵈ[1](elements["Ωᵖ"],kᵤᵤ)
+opsᵈ[1](elements["Ωᵖ"],kₚₚ)
 opsᵛ[1](elements["Ωᵖ"],elements["Ωᵘ"],kₚᵤ)
 opsᵛ[2](elements["Γᵖ"],elements["Γᵘ"],kₚₙ,fₚ)
 
@@ -69,27 +69,47 @@ ops[3](elements["Ωᵘ"],f)
 
 
 # k = [kᵤᵤ (kₚᵤ+kᵅ)';kₚᵤ+kᵅ kₚₚ]
-k = [kᵤᵤ -kₚᵤ'+kₚₙ;-kₚᵤ-kₚₙ' kₚₚ]
-f = [fₚ;f]
-d = k\f
-p₁ = d[1:2:2*nₚ] ##heat flux
-p₂ = d[2:2:2*nₚ]
-u  = d[2*nₚ+1:end]
+# k = [kᵤᵤ -kₚᵤ'-kₚₙ;-kₚᵤ-kₚₙ' kₚₚ]
+# f = [-fₚ;-f]
+# d = k\f
+# p₁ = d[1:2:2*nₚ] ##heat flux
+# p₂ = d[2:2:2*nₚ]
+# u  = d[2*nₚ+1:end]
 
-push!(nodes,:d₁=>p₁,:d₂=>p₂)
-push!(nodes_p,:T=>u)
+# push!(nodes,:d₁=>p₁,:d₂=>p₂)
+# push!(nodes_p,:T=>u)
 
 
-set𝝭!(elements["Ωᵍᵘ"])
-l2= ops[4](elements["Ωᵍᵘ"])
+# set𝝭!(elements["Ωᵍᵘ"])
+# l2= ops[4](elements["Ωᵍᵘ"])
 # h1,l2,h1_dil,h1_dev= ops[5](elements["Ωᵍ"],elements["Ωᵍᵖ"])
-L2 = log10(l2)
+# L2 = log10(l2)
 # H1 = log10(h1)
 # H1_dil = log10(h1_dil)
 # H1_dev = log10(h1_dev)
            
-println(L2)
+# println(L2)
 
 # eval(VTK_mix_pressure)
 
+d = zeros(2*nₚ + nᵤ)
+dₚ = zeros(2*nₚ)
+dᵤ = zeros(nᵤ)
+for (i,node) in enumerate(nodes)
+    x = node.x
+    y = node.y
+    d[2*i-1] = - ∂T∂x(x,y)
+    d[2*i]   = - ∂T∂y(x,y)
+    dₚ[2*i-1] = - ∂T∂x(x,y)
+    dₚ[2*i]   = - ∂T∂y(x,y)
+end
+for (i,node) in enumerate(nodes_p)
+    x = node.x
+    y = node.y
+    d[2*nₚ+i] = T(x,y)
+    dᵤ[i] = T(x,y)
+end
 
+err1 = kₚₚ*dₚ - kₚᵤ'*dᵤ
+err2 = kₚₙ*dᵤ - fₚ
+err3 = (-kₚᵤ+kₚₙ')*dₚ + f
