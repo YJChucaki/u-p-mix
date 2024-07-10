@@ -123,6 +123,8 @@ function import_patchtest_mix(filename1::String, filename2::String)
     elements["Γ³ᵘ"] = getElements(nodes, entities["Γ³"],  integrationOrder_Γ)
     elements["Γ⁴ᵘ"] = getElements(nodes, entities["Γ⁴"],  integrationOrder_Γ)
     elements["Γᵘ"] = elements["Γ¹ᵘ"]∪elements["Γ²ᵘ"]∪elements["Γ³ᵘ"]∪elements["Γ⁴ᵘ"]
+
+    
     push!(elements["Ωᵘ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Ωᵍᵘ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Γ¹ᵘ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
@@ -700,7 +702,22 @@ prescribe = quote
     prescribe!(elements["Γ²ᵘ"],:g=>(x,y,z)->T(x,y))
     prescribe!(elements["Γ³ᵘ"],:g=>(x,y,z)->T(x,y))
     prescribe!(elements["Γ⁴ᵘ"],:g=>(x,y,z)->T(x,y))
-   
+
+    prescribe!(elements["Γ¹ᵖ"],:n₁₁=>(x,y,z)->1.0)
+    prescribe!(elements["Γ¹ᵖ"],:n₁₂=>(x,y,z)->0.0)
+    prescribe!(elements["Γ¹ᵖ"],:n₂₂=>(x,y,z)->1.0)
+
+    prescribe!(elements["Γ²ᵖ"],:n₁₁=>(x,y,z)->1.0)
+    prescribe!(elements["Γ²ᵖ"],:n₁₂=>(x,y,z)->0.0)
+    prescribe!(elements["Γ²ᵖ"],:n₂₂=>(x,y,z)->1.0)
+
+    prescribe!(elements["Γ³ᵖ"],:n₁₁=>(x,y,z)->1.0)
+    prescribe!(elements["Γ³ᵖ"],:n₁₂=>(x,y,z)->0.0)
+    prescribe!(elements["Γ³ᵖ"],:n₂₂=>(x,y,z)->1.0)
+
+    prescribe!(elements["Γ⁴ᵖ"],:n₁₁=>(x,y,z)->1.0)
+    prescribe!(elements["Γ⁴ᵖ"],:n₁₂=>(x,y,z)->0.0)
+    prescribe!(elements["Γ⁴ᵖ"],:n₂₂=>(x,y,z)->1.0)
 
     prescribe!(elements["Ωᵍᵘ"],:u=>(x,y,z)->T(x,y))
     prescribe!(elements["Ωᵍᵖ"],:u=>(x,y,z)->T(x,y))

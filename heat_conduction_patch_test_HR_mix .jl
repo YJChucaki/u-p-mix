@@ -35,8 +35,9 @@ eval(prescribe)
 ops = [
        Operator{:∫Tᵢhᵢds}(:t=>t),
        Operator{:∫Tᵢgᵢds}(:α=>1e12*D,:t=>t),
+       Operator{:∫∫∇TᵢD∇Tⱼdxdy}(:D=>D,:t=>t),
        Operator{:∫vbdΩ}(),
-       Operator{:L₂}(:D=>D,:t=>t),
+       Operator{:L₂}(),
 ]
 opsᵛ = [
     Operator{:∫∫pᵢ∇uⱼdxdy}(),
@@ -59,28 +60,29 @@ fₚ = zeros(2*nₚ)
 opsᵈ[1](elements["Ωᵖ"],kₚₚ)
 opsᵛ[1](elements["Ωᵖ"],elements["Ωᵘ"],kₚᵤ)
 opsᵛ[2](elements["Γᵖ"],elements["Γᵘ"],kₚₙ,fₚ)
-ops[3](elements["Ωᵘ"],fᵤ)
+# ops[3](elements["Ωᵘ"],kᵤᵤ)
+ops[4](elements["Ωᵘ"],fᵤ)
 
 
 
 
-# k = [kₚₚ -kₚᵤ'-kₚₙ;-kₚᵤ+kₚₙ' kᵤᵤ]
-# f = [fₚ;fᵤ]
-# d = k\f
-# p₁ = d[1:2:2*nₚ] 
-# p₂ = d[2:2:2*nₚ]
-# u  = d[2*nₚ+1:end]
+k = [kₚₚ -kₚᵤ'+kₚₙ;-kₚᵤ+kₚₙ' kᵤᵤ]
+f = [fₚ;fᵤ]
+d = k\f
+p₁ = d[1:2:2*nₚ] 
+p₂ = d[2:2:2*nₚ]
+u  = d[2*nₚ+1:end]
 
-# push!(nodes_p,:d₁=>p₁,:d₂=>p₂)
-# push!(nodes,:d=>u)
+push!(nodes_p,:d₁=>p₁,:d₂=>p₂)
+push!(nodes,:d=>u)
 
 
-# set𝝭!(elements["Ωᵍᵘ"])
-# l2= ops[4](elements["Ωᵍᵘ"])
-# L2 = log10(l2)
+set𝝭!(elements["Ωᵍᵘ"])
+l2= ops[5](elements["Ωᵍᵘ"])
+L2 = log10(l2)
 
            
-# println(L2)
+println(L2)
 
 # eval(VTK_mix_pressure)
 
@@ -103,5 +105,6 @@ for (i,node) in enumerate(nodes)
 end
 
 err1 = kₚₚ*dₚ - kₚᵤ'*dᵤ
+err4 = kₚₚ*dₚ -(kₚᵤ'-kₚₙ)*dᵤ- fₚ
 err2 = kₚₙ*dᵤ - fₚ
-err3 = (-kₚᵤ+kₚₙ')*dₚ - fᵤ
+err3 = (kₚᵤ+kₚₙ')*dₚ-fᵤ
