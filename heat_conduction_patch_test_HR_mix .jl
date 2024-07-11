@@ -92,10 +92,10 @@ dᵤ = zeros(nᵤ)
 for (i,node) in enumerate(nodes_p)
     x = node.x
     y = node.y
-    d[2*i-1] = - ∂T∂x(x,y)
-    d[2*i]   = - ∂T∂y(x,y)
-    dₚ[2*i-1] = - ∂T∂x(x,y)
-    dₚ[2*i]   = - ∂T∂y(x,y)
+    d[2*i-1] = ∂T∂x(x,y)
+    d[2*i]   = ∂T∂y(x,y)
+    dₚ[2*i-1] = ∂T∂x(x,y)
+    dₚ[2*i]   = ∂T∂y(x,y)
 end
 for (i,node) in enumerate(nodes)
     x = node.x
@@ -104,7 +104,9 @@ for (i,node) in enumerate(nodes)
     dᵤ[i] = T(x,y)
 end
 
-err1 = kₚₚ*dₚ - kₚᵤ'*dᵤ
-err4 = kₚₚ*dₚ -(kₚᵤ'-kₚₙ)*dᵤ- fₚ
+err1 = kₚₚ*dₚ + kₚᵤ'*dᵤ
+# err4 = kₚₚ*dₚ -(kₚᵤ'-kₚₙ)*dᵤ- fₚ
 err2 = kₚₙ*dᵤ - fₚ
-err3 = (kₚᵤ+kₚₙ')*dₚ-fᵤ
+err3 = (kₚᵤ+kₚₙ')*dₚ+fᵤ
+# err3 = kₚᵤ*dₚ
+# err3 = kₚₙ'*dₚ
