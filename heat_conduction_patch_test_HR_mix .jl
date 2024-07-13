@@ -35,7 +35,6 @@ eval(prescribe)
 ops = [
        Operator{:∫Tᵢhᵢds}(:t=>t),
        Operator{:∫Tᵢgᵢds}(:α=>1e12*D,:t=>t),
-       Operator{:∫∫∇TᵢD∇Tⱼdxdy}(:D=>D,:t=>t),
        Operator{:∫vbdΩ}(),
        Operator{:L₂}(),
 ]
@@ -60,13 +59,12 @@ fₚ = zeros(2*nₚ)
 opsᵈ[1](elements["Ωᵖ"],kₚₚ)
 opsᵛ[1](elements["Ωᵖ"],elements["Ωᵘ"],kₚᵤ)
 opsᵛ[2](elements["Γᵖ"],elements["Γᵘ"],kₚₙ,fₚ)
-# ops[3](elements["Ωᵘ"],kᵤᵤ)
-ops[4](elements["Ωᵘ"],fᵤ)
+ops[3](elements["Ωᵘ"],fᵤ)
 
 
 
 
-k = [kₚₚ -kₚᵤ'+kₚₙ;-kₚᵤ-kₚₙ' kᵤᵤ]
+k = [kₚₚ -(kₚᵤ'-kₚₙ);-(kₚᵤ+kₚₙ') kᵤᵤ]
 f = [fₚ;fᵤ]
 d = k\f
 p₁ = d[1:2:2*nₚ] 
@@ -78,7 +76,7 @@ push!(nodes,:d=>u)
 
 
 set𝝭!(elements["Ωᵍᵘ"])
-l2= ops[5](elements["Ωᵍᵘ"])
+l2= ops[4](elements["Ωᵍᵘ"])
 L2 = log10(l2)
 
            
@@ -86,25 +84,27 @@ println(L2)
 
 # eval(VTK_mix_pressure)
 
-d = zeros(2*nₚ + nᵤ)
+dₚᵤ = zeros(2*nₚ + nᵤ)
 dₚ = zeros(2*nₚ)
 dᵤ = zeros(nᵤ)
 for (i,node) in enumerate(nodes_p)
     x = node.x
     y = node.y
-    d[2*i-1] = - ∂T∂x(x,y)
-    d[2*i]   = - ∂T∂y(x,y)
+    dₚᵤ[2*i-1] = - ∂T∂x(x,y)
+    dₚᵤ[2*i]   = - ∂T∂y(x,y)
     dₚ[2*i-1] = - ∂T∂x(x,y)
     dₚ[2*i]   = - ∂T∂y(x,y)
 end
 for (i,node) in enumerate(nodes)
     x = node.x
     y = node.y
-    d[2*nₚ+i] = T(x,y)
+    dₚᵤ[2*nₚ+i] = T(x,y)
     dᵤ[i] = T(x,y)
 end
 
 err1 = kₚₚ*dₚ - kₚᵤ'*dᵤ
-err4 = kₚₚ*dₚ -(kₚᵤ'-kₚₙ)*dᵤ- fₚ
 err2 = kₚₙ*dᵤ - fₚ
-err3 = (-kₚᵤ-kₚₙ')*dₚ-fᵤ
+err3 = -(kₚᵤ+kₚₙ')*dₚ-fᵤ
+err4 = kₚₚ*dₚ -(kₚᵤ'-kₚₙ)*dᵤ- fₚ
+err5 = k*dₚᵤ-f
+err6 = k*d-f
