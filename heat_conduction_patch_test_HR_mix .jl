@@ -5,9 +5,11 @@ include("wirteVTK.jl")
 # for i=2:10
    
 ndiv = 3
-nₚ = 5
+ndiv2 = 11
+# nₚ = 15
 # println(nₚ)
-elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
+# elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
+elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_"*string(ndiv2)*".msh")
 
 nₚ = length(nodes_p)
 nᵤ = length(nodes)
@@ -64,8 +66,8 @@ ops[3](elements["Ωᵘ"],fᵤ)
 
 
 
-k = [kₚₚ -(kₚᵤ'-kₚₙ);-(kₚᵤ+kₚₙ') kᵤᵤ]
-f = [fₚ;fᵤ]
+k = [kₚₚ -kₚᵤ'-kₚₙ;-kₚᵤ-kₚₙ' kᵤᵤ]
+f = [-fₚ;fᵤ]
 d = k\f
 p₁ = d[1:2:2*nₚ] 
 p₂ = d[2:2:2*nₚ]
@@ -105,6 +107,6 @@ end
 err1 = kₚₚ*dₚ - kₚᵤ'*dᵤ
 err2 = kₚₙ*dᵤ - fₚ
 err3 = -(kₚᵤ+kₚₙ')*dₚ-fᵤ
-err4 = kₚₚ*dₚ -(kₚᵤ'-kₚₙ)*dᵤ- fₚ
+err4 = kₚₚ*dₚ -(kₚᵤ'+kₚₙ)*dᵤ + fₚ
 err5 = k*dₚᵤ-f
 err6 = k*d-f
