@@ -2,9 +2,9 @@
 using BenchmarkExample
 import Gmsh: gmsh
 
-n = 30
-# filename = "patchtest_"
-# BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
+n = 3
+filename = "heat_diffusion_patchtest_"
+BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
 
 # filename = "patchtest_tri6_"
 # BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, order = 2)
@@ -37,5 +37,5 @@ n = 30
 
 # filename = "cook_membrane_tri6_"
 # BenchmarkExample.Cook_membrane.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, order = 2)
-filename = "cook_membrane_quad8_"
-BenchmarkExample.Cook_membrane.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true, order = 2)
+# filename = "cook_membrane_quad8_"
+# BenchmarkExample.Cook_membrane.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true, order = 2)

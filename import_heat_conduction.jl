@@ -100,6 +100,83 @@ function import_patchtest_mix(filename1::String, filename2::String)
 
     gmsh.open(filename2)
     entities = getPhysicalGroups()
+    nodes_u = get𝑿ᵢ()
+    xᵘ = nodes_u.x
+    yᵘ = nodes_u.y
+    zᵘ = nodes_u.z
+    Ω = getElements(nodes_u, entities["Ω"])
+    s, var𝐴 = cal_area_support(Ω)
+    s = 2.5*s*ones(length(nodes_u))
+    push!(nodes_u,:s₁=>s,:s₂=>s,:s₃=>s)
+
+    integrationOrder_Ω = 2
+    integrationOrder_Ωᵍ = 10
+    integrationOrder_Γ = 2
+
+    gmsh.open(filename1)
+    entities = getPhysicalGroups()
+    nodes = get𝑿ᵢ()
+    elements["Ωᵖ"] = getElements(nodes, entities["Ω"],  integrationOrder_Ω)
+    elements["Ωᵍᵖ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
+    elements["∂Ωᵖ"] = getElements(nodes, entities["Γ"],   integrationOrder_Γ, normal = true)
+    elements["Γ¹ᵖ"] = getElements(nodes, entities["Γ¹"],  integrationOrder_Γ, normal = true)
+    elements["Γ²ᵖ"] = getElements(nodes, entities["Γ²"],  integrationOrder_Γ, normal = true)
+    elements["Γ³ᵖ"] = getElements(nodes, entities["Γ³"],  integrationOrder_Γ, normal = true)
+    elements["Γ⁴ᵖ"] = getElements(nodes, entities["Γ⁴"],  integrationOrder_Γ, normal = true)
+    elements["Γᵖ"] = elements["Γ¹ᵖ"]∪elements["Γ²ᵖ"]∪elements["Γ³ᵖ"]∪elements["Γ⁴ᵖ"]
+    
+    push!(elements["Ωᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["∂Ωᵖ"], :𝝭=>:𝑠)
+    push!(elements["Γ¹ᵖ"], :𝝭=>:𝑠)
+    push!(elements["Γ²ᵖ"], :𝝭=>:𝑠)
+    push!(elements["Γ³ᵖ"], :𝝭=>:𝑠)
+    push!(elements["Γ⁴ᵖ"], :𝝭=>:𝑠)
+
+
+    type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
+    # type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
+    sp = RegularGrid(xᵘ,yᵘ,zᵘ,n = 3,γ = 5)
+    elements["Ωᵘ"] = getElements(nodes_u, entities["Ω"], type, integrationOrder_Ω, sp)
+    elements["∂Ωᵘ"] = getElements(nodes_u, entities["Γ"], type, integrationOrder_Γ, sp)
+    elements["Ωᵍᵘ"] = getElements(nodes_u, entities["Ω"], type,  integrationOrder_Ωᵍ, sp)
+    elements["Γ¹ᵘ"] = getElements(nodes_u, entities["Γ¹"],type,  integrationOrder_Γ, sp, normal = true)
+    elements["Γ²ᵘ"] = getElements(nodes_u, entities["Γ²"],type,  integrationOrder_Γ, sp, normal = true)
+    elements["Γ³ᵘ"] = getElements(nodes_u, entities["Γ³"],type,  integrationOrder_Γ, sp, normal = true)
+    elements["Γ⁴ᵘ"] = getElements(nodes_u, entities["Γ⁴"], type, integrationOrder_Γ, sp, normal = true)
+    elements["Γᵘ"] = elements["Γ¹ᵘ"]∪elements["Γ²ᵘ"]∪elements["Γ³ᵘ"]∪elements["Γ⁴ᵘ"]
+
+   
+    nₘ = 21
+    𝗠 = (0,zeros(nₘ))
+    ∂𝗠∂x = (0,zeros(nₘ))
+    ∂𝗠∂y = (0,zeros(nₘ))
+    push!(elements["∂Ωᵘ"], :𝝭=>:𝑠)
+    push!(elements["Γ¹ᵘ"], :𝝭=>:𝑠)
+    push!(elements["Γ²ᵘ"], :𝝭=>:𝑠)
+    push!(elements["Γ³ᵘ"], :𝝭=>:𝑠)
+    push!(elements["Γ⁴ᵘ"], :𝝭=>:𝑠)
+    push!(elements["∂Ωᵘ"], :𝗠=>𝗠)
+    push!(elements["Γ¹ᵘ"], :𝗠=>𝗠)
+    push!(elements["Γ²ᵘ"], :𝗠=>𝗠)
+    push!(elements["Γ³ᵘ"], :𝗠=>𝗠)
+    push!(elements["Γ⁴ᵘ"], :𝗠=>𝗠)
+
+   
+    push!(elements["Ωᵘ"], :𝝭=>:𝑠)
+    push!(elements["Ωᵘ"],  :𝗠=>𝗠)
+    push!(elements["Ωᵍᵘ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍᵘ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+    gmsh.finalize()
+    return elements, nodes, nodes_u
+end
+
+function import_patchtest_mix_old(filename1::String, filename2::String)
+    elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
+    gmsh.initialize()
+
+    gmsh.open(filename2)
+    entities = getPhysicalGroups()
     nodes_p = get𝑿ᵢ()
     xᵖ = nodes_p.x
     yᵖ = nodes_p.y
