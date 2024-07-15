@@ -117,11 +117,11 @@ function import_patchtest_mix(filename1::String, filename2::String)
     entities = getPhysicalGroups()
     nodes = get𝑿ᵢ()
     elements["Ωᵘ"] = getElements(nodes, entities["Ω"],  integrationOrder_Ω)
-    elements["Ωᵍᵘ"] = getElements(nodes, entities["Ω"],   integrationOrder_Ωᵍ)
-    elements["Γ¹ᵘ"] = getElements(nodes, entities["Γ¹"],  integrationOrder_Γ)
-    elements["Γ²ᵘ"] = getElements(nodes, entities["Γ²"],  integrationOrder_Γ)
-    elements["Γ³ᵘ"] = getElements(nodes, entities["Γ³"],  integrationOrder_Γ)
-    elements["Γ⁴ᵘ"] = getElements(nodes, entities["Γ⁴"],  integrationOrder_Γ)
+    elements["Ωᵍᵘ"] = getElements(nodes, entities["Ω"],   integrationOrder_Ωᵍ, normal = true)
+    elements["Γ¹ᵘ"] = getElements(nodes, entities["Γ¹"],  integrationOrder_Γ, normal = true)
+    elements["Γ²ᵘ"] = getElements(nodes, entities["Γ²"],  integrationOrder_Γ, normal = true)
+    elements["Γ³ᵘ"] = getElements(nodes, entities["Γ³"],  integrationOrder_Γ, normal = true)
+    elements["Γ⁴ᵘ"] = getElements(nodes, entities["Γ⁴"],  integrationOrder_Γ, normal = true)
     elements["Γᵘ"] = elements["Γ¹ᵘ"]∪elements["Γ²ᵘ"]∪elements["Γ³ᵘ"]∪elements["Γ⁴ᵘ"]
 
     
@@ -136,8 +136,8 @@ function import_patchtest_mix(filename1::String, filename2::String)
     type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
     # type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
     sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)
-    elements["Ωᵖ"] = getElements(nodes_p, entities["Ω"], type, integrationOrder_Ω, sp)
-    elements["Ωᵍᵖ"] = getElements(nodes_p, entities["Ω"], type,  integrationOrder_Ωᵍ, sp)
+    elements["Ωᵖ"] = getElements(nodes_p, entities["Ω"], type, integrationOrder_Ω, sp, normal = true)
+    elements["Ωᵍᵖ"] = getElements(nodes_p, entities["Ω"], type,  integrationOrder_Ωᵍ, sp, normal = true)
     elements["Γ¹ᵖ"] = getElements(nodes_p, entities["Γ¹"],type,  integrationOrder_Γ, sp, normal = true)
     elements["Γ²ᵖ"] = getElements(nodes_p, entities["Γ²"],type,  integrationOrder_Γ, sp, normal = true)
     elements["Γ³ᵖ"] = getElements(nodes_p, entities["Γ³"],type,  integrationOrder_Γ, sp, normal = true)
