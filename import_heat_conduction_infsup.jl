@@ -679,33 +679,18 @@ end
 
 prescribe = quote
     
-    prescribe!(elements["Ωᵘ"],:b=>(x,y,z)->b(x,y))
-    prescribe!(elements["Ωᵖ"],:b=>(x,y,z)->b(x,y))
+    # prescribe!(elements["Ωᵘ"],:b=>(x,y,z)->b(x,y))
+    # prescribe!(elements["Ωᵖ"],:b=>(x,y,z)->b(x,y))
 
-    prescribe!(elements["Γ¹ᵘ"],:g=>(x,y,z)->T(x,y))
-    prescribe!(elements["Γ²ᵘ"],:g=>(x,y,z)->T(x,y))
-    prescribe!(elements["Γ³ᵘ"],:g=>(x,y,z)->T(x,y))
-    prescribe!(elements["Γ⁴ᵘ"],:g=>(x,y,z)->T(x,y))
+    # prescribe!(elements["Γ¹ᵘ"],:g=>(x,y,z)->T(x,y))
+    # prescribe!(elements["Γ²ᵘ"],:g=>(x,y,z)->T(x,y))
+    # prescribe!(elements["Γ³ᵘ"],:g=>(x,y,z)->T(x,y))
+    prescribe!(elements["Γ⁴ᵘ"],:g=>(x,y,z)->0.0)
 
-    prescribe!(elements["Γ¹ᵖ"],:n₁₁=>(x,y,z)->1.0)
-    prescribe!(elements["Γ¹ᵖ"],:n₁₂=>(x,y,z)->0.0)
-    prescribe!(elements["Γ¹ᵖ"],:n₂₂=>(x,y,z)->1.0)
 
-    prescribe!(elements["Γ²ᵖ"],:n₁₁=>(x,y,z)->1.0)
-    prescribe!(elements["Γ²ᵖ"],:n₁₂=>(x,y,z)->0.0)
-    prescribe!(elements["Γ²ᵖ"],:n₂₂=>(x,y,z)->1.0)
-
-    prescribe!(elements["Γ³ᵖ"],:n₁₁=>(x,y,z)->1.0)
-    prescribe!(elements["Γ³ᵖ"],:n₁₂=>(x,y,z)->0.0)
-    prescribe!(elements["Γ³ᵖ"],:n₂₂=>(x,y,z)->1.0)
-
-    prescribe!(elements["Γ⁴ᵖ"],:n₁₁=>(x,y,z)->1.0)
-    prescribe!(elements["Γ⁴ᵖ"],:n₁₂=>(x,y,z)->0.0)
-    prescribe!(elements["Γ⁴ᵖ"],:n₂₂=>(x,y,z)->1.0)
-
-    prescribe!(elements["Ωᵍᵘ"],:u=>(x,y,z)->T(x,y))
-    prescribe!(elements["Ωᵍᵖ"],:u=>(x,y,z)->P₁(x,y))
-    prescribe!(elements["Ωᵍᵖ"],:v=>(x,y,z)->P₂(x,y))
+    # prescribe!(elements["Ωᵍᵘ"],:u=>(x,y,z)->T(x,y))
+    # prescribe!(elements["Ωᵍᵖ"],:u=>(x,y,z)->P₁(x,y))
+    # prescribe!(elements["Ωᵍᵖ"],:v=>(x,y,z)->P₂(x,y))
 
 end
 prescribeForFem = quote

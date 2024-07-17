@@ -5,12 +5,12 @@ include("wirteVTK.jl")
 # for i=2:10
    
 ndiv = 11
-nₚ = 100
-i = 100
+nₚ = 20
+i = 20
 # println(nₚ)
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_bubble_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
-elements,nodes,nodes_p,Ω = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
-# elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
+# elements,nodes,nodes_p,Ω = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
+elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes,nodes_p ,Ω = import_patchtest_mix("./msh/patchtest_tri6_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_quad8_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes = import_patchtest_Q4P1("./msh/patchtest_quad_"*string(ndiv)*".msh")
@@ -21,7 +21,7 @@ elements,nodes,nodes_p,Ω = import_patchtest_mix("./msh/patchtest_"*string(ndiv)
 nᵤ = length(nodes)
 nₚ = length(nodes_p)
 nₑ = length(elements["Ω"])
-nₑₚ = length(Ω)
+# nₑₚ = length(Ω)
 ## for Q4P1 or Q4R1
 # nₚ = length(elements["Ωᵖ"])
 # for Q8P3
@@ -37,7 +37,7 @@ Ē = 1.0
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
 
-n = 2
+n = 1
 u(x,y) = (x+y)^n
 v(x,y) = -(x+y)^n
 ∂u∂x(x,y) = n*(x+y)^abs(n-1)
@@ -157,7 +157,7 @@ P_error = log10(p_error)
 println(L2,H1)
 println(H1_dil,H1_dev)
 println(P_error)
-eval(VTK_mix_pressure)
+# eval(VTK_mix_pressure)
 # println(l2,h1)
 # println(log10(sqrt(γ[1])))
 # println(h1_dil,h1_dev)

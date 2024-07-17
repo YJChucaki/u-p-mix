@@ -5,7 +5,7 @@ include("import_patchtest.jl")
 include("import_prescrible_ops.jl")
 # elements, nodes = import_patchtest_fem("./msh/patchtest.msh")
 # elements, nodes = import_patchtest_fem("./msh/patchtest_"*string(ndiv)*".msh")
-elements, nodes = import_patchtest_fem("./msh/patchtest_quad8_"*string(ndiv)*".msh")
+elements, nodes = import_patchtest_fem("./msh/patchtest_quad_"*string(ndiv)*".msh")
 # elements, nodes = import_patchtest_fem("./msh/patchtest_tri6_"*string(ndiv)*".msh")
 # elements, nodes = import_patchtest_stripe("./msh/patchtest_"*string(ndiv)*".msh")
 # elements, nodes = import_patchtest_cross("./msh/patchtest_"*string(ndiv)*".msh")
@@ -14,8 +14,8 @@ nᵤ = length(nodes)
 
 E = 1.0
 # ν̄ = 0.4999999
-ν = 0.4999999
-# ν̄ = 0.3
+# ν = 0.4999999
+ν̄ = 0.3
 # E = Ē/(1.0-ν̄^2)
 # ν = ν̄/(1.0-ν̄)
 
@@ -68,7 +68,7 @@ E = 1.0
 # ∂σ₁₂∂y(x,y) = E/(1+ν)*∂ε₁₂∂y(x,y)
 # b₁(x,y) = -∂σ₁₁∂x(x,y) - ∂σ₁₂∂y(x,y)
 # b₂(x,y) = -∂σ₁₂∂x(x,y) - ∂σ₂₂∂y(x,y)
-n = 2
+n = 1
 u(x,y) = (1+2*x+3*y)^n
 v(x,y) = (4+5*x+6*y)^n
 ∂u∂x(x,y) = 2*n*(1+2*x+3*y)^abs(n-1)
