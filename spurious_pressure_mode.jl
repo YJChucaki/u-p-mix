@@ -1,5 +1,5 @@
 
-using ApproxOperator, LinearAlgebra
+using ApproxOperator, LinearAlgebra, DynamicPolynomials
 
 include("import_spurious_pressure_mode.jl")
 
@@ -20,16 +20,28 @@ set𝝭!(elements["Ωₚ"])
 # ∂𝒑∂y(x,y) = [0.0,0.0,1.0,0.0,  x,2*y,  0.0,  x^2,2*x*y,3*y^2]
 
 # Quartic
-𝒑(x,y)    = [1.0,  x,  y,x^2,x*y,y^2,  x^3,x^2*y,x*y^2,  y^3,  x^4,  x^3*y,x^2*y^2, x*y^3, y^4]
-∂𝒑∂x(x,y) = [0.0,1.0,0.0,2*x,  y,0.0,3*x^2,2*x*y,  y^2,  0.0,4*x^3,3*x^2*y,2*x*y^2, y^3,  0.0]
-∂𝒑∂y(x,y) = [0.0,0.0,1.0,0.0,  x,2*y,  0.0,  x^2,2*x*y,3*y^2,  0.0,    x^3,2*x^2*y, 3*x*y^2, 4*y^3]
+# 𝒑(x,y)    = [1.0,  x,  y,x^2,x*y,y^2,  x^3,x^2*y,x*y^2,  y^3,  x^4,  x^3*y,x^2*y^2, x*y^3, y^4]
+# ∂𝒑∂x(x,y) = [0.0,1.0,0.0,2*x,  y,0.0,3*x^2,2*x*y,  y^2,  0.0,4*x^3,3*x^2*y,2*x*y^2, y^3,  0.0]
+# ∂𝒑∂y(x,y) = [0.0,0.0,1.0,0.0,  x,2*y,  0.0,  x^2,2*x*y,3*y^2,  0.0,    x^3,2*x^2*y, 3*x*y^2, 4*y^3]
+
+order = 4
+@polyvar x̄ ȳ
+𝒑̄ = monomials([x̄,ȳ],0:order)
+∂𝒑̄∂x = differentiate.(𝒑̄,x̄)
+∂𝒑̄∂y = differentiate.(𝒑̄,ȳ)
+𝒑(x,y) = subs(𝒑̄, x̄=>x, ȳ=>y)
+∂𝒑∂x(x,y) = subs(∂𝒑̄∂x, x̄=>x, ȳ=>y)
+∂𝒑∂y(x,y) = subs(∂𝒑̄∂y, x̄=>x, ȳ=>y)
 
 nᵤ = length(𝒑(0.,0.))
+
+∂p∂x = zeros(nᵤ)
+∂p∂y = zeros(nᵤ)
 
 # k₁: Vₙ\ker𝒫ℐₕ
 # k₂: Vₙ\ker𝒫
 # k₃: Vₙ\kerℐₕ𝒫
-# k₄: Vₙ\ker𝒫ₕ
+# k₄: Vₙ\ker𝒫ₕ = Vₙ\kerℐₕ-projection𝒫
 
 k₁ = zeros(2*nᵤ,2*nᵤ)
 k₂ = zeros(2*nᵤ,2*nᵤ)
@@ -51,19 +63,6 @@ for elm in elements["Ω"]
             ∂p∂x .+= B₁[i].*𝒑(xᵢ.x,xᵢ.y)
             ∂p∂y .+= B₂[i].*𝒑(xᵢ.x,xᵢ.y)
         end
-        # check
-        e11 = abs(∂pₕ∂x[1] - ∂𝒑∂x(x,y)[1])
-        e12 = abs(∂pₕ∂x[2] - ∂𝒑∂x(x,y)[2])
-        e13 = abs(∂pₕ∂x[3] - ∂𝒑∂x(x,y)[3])
-        e21 = abs(∂pₕ∂y[1] - ∂𝒑∂y(x,y)[1])
-        e22 = abs(∂pₕ∂y[2] - ∂𝒑∂y(x,y)[2])
-        e23 = abs(∂pₕ∂y[3] - ∂𝒑∂y(x,y)[3])
-        if e11 > 1e-13 println("E11: $e11") end
-        if e12 > 1e-13 println("E12: $e12") end
-        if e13 > 1e-13 println("E13: $e13") end
-        if e21 > 1e-13 println("E21: $e21") end
-        if e22 > 1e-13 println("E22: $e22") end
-        if e23 > 1e-13 println("E23: $e23") end
         for (i,(∂pᵢ∂x,∂pᵢ∂y)) in enumerate(zip(∂p∂x,∂p∂y))
             for (j,(∂pⱼ∂x,∂pⱼ∂y)) in enumerate(zip(∂p∂x,∂p∂y))
                 k₁[2*i-1,2*j-1] += ∂pᵢ∂x*∂pⱼ∂x*𝑤
@@ -103,7 +102,7 @@ for elm in elements["Ω"]
 end
 
 n₁ = rank(k₁)
-nc = rank(k₂)
+n₂ = rank(k₂)
 n₃ = rank(k₃)
 
 
