@@ -4,7 +4,7 @@ using ApproxOperator, LinearAlgebra, DynamicPolynomials
 include("import_spurious_pressure_mode.jl")
 
 # elements, nodes = import_test("msh/patchtest_11.msh")
-elements, nodes, nodes_p = import_test_2("msh/patchtest_3.msh","msh/patchtest_bubble_5.msh")
+elements, nodes, nodes_p = import_test_2("msh/patchtest_6.msh","msh/patchtest_bubble_5.msh")
 
 set∇𝝭!(elements["Ω"])
 set𝝭!(elements["Ωₚ"])
@@ -24,7 +24,7 @@ set𝝭!(elements["Ωₚ"])
 # ∂𝒑∂x(x,y) = [0.0,1.0,0.0,2*x,  y,0.0,3*x^2,2*x*y,  y^2,  0.0,4*x^3,3*x^2*y,2*x*y^2, y^3,  0.0]
 # ∂𝒑∂y(x,y) = [0.0,0.0,1.0,0.0,  x,2*y,  0.0,  x^2,2*x*y,3*y^2,  0.0,    x^3,2*x^2*y, 3*x*y^2, 4*y^3]
 
-order = 4
+order = 7
 @polyvar x̄ ȳ
 𝒑̄ = monomials([x̄,ȳ],0:order)
 ∂𝒑̄∂x = differentiate.(𝒑̄,x̄)

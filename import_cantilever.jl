@@ -1,5 +1,5 @@
 
-using Statistics 
+using Statistics , DelimitedFiles
 import Gmsh: gmsh
 
 function import_cantilever_Q4P1(filename::String)
@@ -63,22 +63,22 @@ function import_cantilever_mix(filename1::String,filename2::String)
     x = nodes.x
     y = nodes.y
     z = nodes.z
-    integrationOrder_Ω = 4
-    integrationOrder_Γ = 4
+    integrationOrder_Ω = 6
+    integrationOrder_Γ = 6
     integrationOrder_Ωᵍ =10
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
     elements["Ω"] = getElements(nodes, entities["Ω"],   integrationOrder_Ω)
     elements["Γᵍ"] = getElements(nodes, entities["Γᵍ"],   integrationOrder_Γ)
     elements["Γᵗ"] = getElements(nodes, entities["Γᵗ"],   integrationOrder_Γ)
-    elements["Γ₁"] = getElements(nodes, entities["Γ₁"],   integrationOrder_Γ)
-    elements["Γ₃"] = getElements(nodes, entities["Γ₃"],   integrationOrder_Γ)
+    # elements["Γ₁"] = getElements(nodes, entities["Γ₁"],   integrationOrder_Γ)
+    # elements["Γ₃"] = getElements(nodes, entities["Γ₃"],   integrationOrder_Γ)
     elements["Ωᵍ"] = getElements(nodes, entities["Ω"],   integrationOrder_Ωᵍ)
     push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Γᵗ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Γᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
-    push!(elements["Γ₁"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
-    push!(elements["Γ₃"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    # push!(elements["Γ₁"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    # push!(elements["Γ₃"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     
     gmsh.open(filename2)
     entities = getPhysicalGroups()
@@ -88,7 +88,7 @@ function import_cantilever_mix(filename1::String,filename2::String)
     zᵖ = nodes_p.z
     Ω = getElements(nodes_p, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 2.5*s*ones(length(nodes_p))
+    s = 1.5*s*ones(length(nodes_p))
     # s =1.8*12/ndiv_p*ones(length(nodes_p))
     # s = 1.3/10*ones(length(nodes_p))
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
@@ -96,7 +96,6 @@ function import_cantilever_mix(filename1::String,filename2::String)
     type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
     sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)
     gmsh.open(filename1)
- 
     entities = getPhysicalGroups()
     elements["Ωᵖ"] = getElements(nodes_p, entities["Ω"], type,  integrationOrder_Ω, sp)
     # elements["Γᵍᵖ"] = getElements(nodes_p, entities["Γᵍ"], type,  integrationOrder_Γ, sp)
@@ -167,7 +166,7 @@ function import_cantilever_mix_HR(filename1::String,filename2::String)
     zᵖ = nodes_p.z
     Ω = getElements(nodes_p, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 1.5*s*ones(length(nodes_p))
+    s = 2.5*s*ones(length(nodes_p))
     # s = 2.5*s*ones(length(nodes_p))
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
@@ -231,7 +230,7 @@ function import_cantilever_mix_bubble(filename1::String,filename2::String)
     zᵖ = nodes_p.z
     Ω = getElements(nodes_p, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 1.5*s*ones(length(nodes_p))
+    s = 1.2*s*ones(length(nodes_p))
     # s = 2.5*s*ones(length(nodes_p))
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
@@ -472,8 +471,8 @@ function import_cantilever_T6P3(filename1::String,filename2::String)
     y = nodes.y
     z = nodes.z
     # sp = RegularGrid(x,y,z,n = 1,γ = 5)
-    integrationOrder_Ω = 4
-    integrationOrder_Γ = 4
+    integrationOrder_Ω = 5
+    integrationOrder_Γ = 5
     integrationOrder_Ωᵍ =10
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
     elements["Ω"] = getElements(nodes, entities["Ω"],   integrationOrder_Ω)
@@ -541,6 +540,9 @@ end
     
 
 prescribeForPenalty = quote
+
+
+ 
     prescribe!(elements["Γᵗ"],:t₁=>(x,y,z)->0.0)
     prescribe!(elements["Γᵗ"],:t₂=>(x,y,z)->P/2/I*(D^2/4-y^2)) 
     prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->-P*y/6/EI*((6*L-3x)*x + (2+ν)*(y^2-D^2/4)))
@@ -555,8 +557,37 @@ prescribeForPenalty = quote
     prescribe!(elements["Γᵍ"],:n₁₂=>(x,y,z)->0.0)
     prescribe!(elements["Γᵍ"],:n₂₂=>(x,y,z)->1.0)
 
+end
+
+prescribeForSquare = quote
+
+    prescribe!(elements["Ωᵍ"],:u=>(x,y,z)->-P*(y-L/2)/6/EI*((6*L-3x)*x + (2+ν)*((y-L/2)^2-D^2/4)))
+    prescribe!(elements["Ωᵍ"],:v=>(x,y,z)->P/6/EI*(3*ν*(y-L/2)^2*(L-x) + (4+5*ν)*D^2*x/4 + (3*L-x)*x^2))
+    prescribe!(elements["Ωᵍ"],:∂u∂x=>(x,y,z)->-P/EI*(L-x)*(y-L/2))
+    prescribe!(elements["Ωᵍ"],:∂u∂y=>(x,y,z)->-P/6/EI*((6*L-3*x)*x + (2+ν)*(3*(y-L/2)^2-D^2/4)))
+    prescribe!(elements["Ωᵍ"],:∂v∂x=>(x,y,z)->P/6/EI*((6*L-3*x)*x - 3*ν*(y-L/2)^2 + (4+5*ν)*D^2/4))
+    prescribe!(elements["Ωᵍ"],:∂v∂y=>(x,y,z)->P/EI*(L-x)*(y-L/2)*ν)
+
+
+    prescribe!(elements["Γᵗ"],:t₁=>(x,y,z)->0.0)
+    prescribe!(elements["Γᵗ"],:t₂=>(x,y,z)->P/2/I*(D^2/4-(y-L/2)^2)) 
+    prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->-P*(y-L/2)/6/EI*((6*L-3x)*x + (2+ν)*((y-L/2)^2-D^2/4)))
+    prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->P/6/EI*(3*ν*(y-L/2)^2*(L-x) + (4+5*ν)*D^2*x/4 + (3*L-x)*x^2))
+    # prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->0.0)
+    # prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->0.0)
+    # prescribe!(elements["Γᵍᵖ"],:p₁=>(x,y,z)->-P/EI*(L-x)*y/2)
+    # prescribe!(elements["Γᵍᵖ"],:p₂=>(x,y,z)->-P/EI*(L-x)*y/2)
+    # prescribe!(elements["Γᵍᵖ"],:n₁=>(x,y,z)->1.0)
+    # prescribe!(elements["Γᵍᵖ"],:n₂=>(x,y,z)->1.0)
+    prescribe!(elements["Γᵍ"],:n₁₁=>(x,y,z)->1.0)
+    prescribe!(elements["Γᵍ"],:n₁₂=>(x,y,z)->0.0)
+    prescribe!(elements["Γᵍ"],:n₂₂=>(x,y,z)->1.0)
+
     
 end
+
+
+
 prescribeForDisplacement = quote
     prescribe!(elements["Γᵗ"],:g₁=>(x,y,z)->-P*y/6/EI*((6*L-3x)*x + (2+ν)*(y^2-D^2/4)))
     prescribe!(elements["Γᵗ"],:g₂=>(x,y,z)->P/6/EI*(3*ν*y^2*(L-x) + (4+5*ν)*D^2*x/4 + (3*L-x)*x^2)) 

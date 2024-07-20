@@ -1,13 +1,14 @@
+
 VTK_mix_pressure = quote
  #number of an elemnt nodes
  nₑₙ=3
 #  fo = open("./vtk/patchtest_tri3_mix_BB_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
 #  fo = open("./vtk/patchtest_tri6_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
-#  fo = open("./vtk/cantilever_tri3_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
+ fo = open("./vtk/cantilever_tri3_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
 #  fo = open("./vtk/cantilever_quad4_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
 #  fo = open("./vtk/cantilever_quad8_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
 #  fo = open("./vtk/cantilever_tri6_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
- fo = open("./vtk/cook_membrane_tri3_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
+#  fo = open("./vtk/cook_membrane_tri3_mix_pressure_"*string(ndiv)*"_"*string(i)*".vtk","w")
  @printf fo "# vtk DataFile Version 2.0\n"
 #  @printf fo "cantilever_quad4_mix\n"
 #  @printf fo "cantilever_quad8_mix\n"

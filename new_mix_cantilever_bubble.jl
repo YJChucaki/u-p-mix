@@ -1,14 +1,14 @@
 using ApproxOperator, JLD,LinearAlgebra, Printf ,Pardiso
 
-ndiv=5
-i=72
+ndiv=9
+i=200
 # ndiv_p=4
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
 include("wirteVTK.jl")
 
 # elements, nodes, Ω  = import_cantilever_mix_HR("./msh/cantilever.msh","./msh/cantilever_bubble_"*string(i)*".msh")
-# elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")   
     nₒ = length(elements["Ω"])
