@@ -4,7 +4,7 @@ using ApproxOperator, LinearAlgebra, DynamicPolynomials
 include("import_spurious_pressure_mode.jl")
 
 # elements, nodes = import_test("msh/patchtest_11.msh")
-elements, nodes, nodes_p = import_test_2("msh/patchtest_3.msh","msh/patchtest_bubble_5.msh")
+elements, nodes, nodes_p = import_test_2("msh/patchtest_6.msh","msh/patchtest_bubble_28.msh")
 
 set∇𝝭!(elements["Ω"])
 set𝝭!(elements["Ωₚ"])
@@ -24,7 +24,8 @@ set𝝭!(elements["Ωₚ"])
 # ∂𝒑∂x(x,y) = [0.0,1.0,0.0,2*x,  y,0.0,3*x^2,2*x*y,  y^2,  0.0,4*x^3,3*x^2*y,2*x*y^2, y^3,  0.0]
 # ∂𝒑∂y(x,y) = [0.0,0.0,1.0,0.0,  x,2*y,  0.0,  x^2,2*x*y,3*y^2,  0.0,    x^3,2*x^2*y, 3*x*y^2, 4*y^3]
 
-order = 4
+α = 1e7
+order = 7
 @polyvar x̄ ȳ
 𝒑̄ = monomials([x̄,ȳ],0:order)
 ∂𝒑̄∂x = differentiate.(𝒑̄,x̄)
@@ -65,10 +66,10 @@ for elm in elements["Ω"]
         end
         for (i,(∂pᵢ∂x,∂pᵢ∂y)) in enumerate(zip(∂p∂x,∂p∂y))
             for (j,(∂pⱼ∂x,∂pⱼ∂y)) in enumerate(zip(∂p∂x,∂p∂y))
-                k₁[2*i-1,2*j-1] += ∂pᵢ∂x*∂pⱼ∂x*𝑤
-                k₁[2*i-1,2*j]   += ∂pᵢ∂x*∂pⱼ∂y*𝑤
-                k₁[2*i,2*j-1]   += ∂pᵢ∂y*∂pⱼ∂x*𝑤
-                k₁[2*i,2*j]     += ∂pᵢ∂y*∂pⱼ∂y*𝑤
+                k₁[2*i-1,2*j-1] += α*∂pᵢ∂x*∂pⱼ∂x*𝑤
+                k₁[2*i-1,2*j]   += α*∂pᵢ∂x*∂pⱼ∂y*𝑤
+                k₁[2*i,2*j-1]   += α*∂pᵢ∂y*∂pⱼ∂x*𝑤
+                k₁[2*i,2*j]     += α*∂pᵢ∂y*∂pⱼ∂y*𝑤
             end
         end
 
@@ -76,10 +77,10 @@ for elm in elements["Ω"]
         ∂p∂y .= ∂𝒑∂y(x,y)
         for (i,(∂pᵢ∂x,∂pᵢ∂y)) in enumerate(zip(∂p∂x,∂p∂y))
             for (j,(∂pⱼ∂x,∂pⱼ∂y)) in enumerate(zip(∂p∂x,∂p∂y))
-                k₂[2*i-1,2*j-1] += ∂pᵢ∂x*∂pⱼ∂x*𝑤
-                k₂[2*i-1,2*j]   += ∂pᵢ∂x*∂pⱼ∂y*𝑤
-                k₂[2*i,2*j-1]   += ∂pᵢ∂y*∂pⱼ∂x*𝑤
-                k₂[2*i,2*j]     += ∂pᵢ∂y*∂pⱼ∂y*𝑤
+                k₂[2*i-1,2*j-1] += α*∂pᵢ∂x*∂pⱼ∂x*𝑤
+                k₂[2*i-1,2*j]   += α*∂pᵢ∂x*∂pⱼ∂y*𝑤
+                k₂[2*i,2*j-1]   += α*∂pᵢ∂y*∂pⱼ∂x*𝑤
+                k₂[2*i,2*j]     += α*∂pᵢ∂y*∂pⱼ∂y*𝑤
             end
         end
 
@@ -92,10 +93,10 @@ for elm in elements["Ω"]
         end
         for (i,(∂pᵢ∂x,∂pᵢ∂y)) in enumerate(zip(∂p∂x,∂p∂y))
             for (j,(∂pⱼ∂x,∂pⱼ∂y)) in enumerate(zip(∂p∂x,∂p∂y))
-                k₃[2*i-1,2*j-1] += ∂pᵢ∂x*∂pⱼ∂x*𝑤
-                k₃[2*i-1,2*j]   += ∂pᵢ∂x*∂pⱼ∂y*𝑤
-                k₃[2*i,2*j-1]   += ∂pᵢ∂y*∂pⱼ∂x*𝑤
-                k₃[2*i,2*j]     += ∂pᵢ∂y*∂pⱼ∂y*𝑤
+                k₃[2*i-1,2*j-1] += α*∂pᵢ∂x*∂pⱼ∂x*𝑤
+                k₃[2*i-1,2*j]   += α*∂pᵢ∂x*∂pⱼ∂y*𝑤
+                k₃[2*i,2*j-1]   += α*∂pᵢ∂y*∂pⱼ∂x*𝑤
+                k₃[2*i,2*j]     += α*∂pᵢ∂y*∂pⱼ∂y*𝑤
             end
         end
     end
@@ -126,7 +127,7 @@ for elm in elements["Ωₚ"]
             I = xᵢ.𝐼
             for (j,xⱼ) in enumerate(𝓒)
                 J = xⱼ.𝐼
-                kₚₚ[I,J] += N[i]*N[j]*𝑤
+                kₚₚ[I,J] += N[i]*N[j]*𝑤/α
             end
             for (j,(∂pⱼ∂x,∂pⱼ∂y)) in enumerate(zip(∂p∂x,∂p∂y))
                 kₚᵤ[I,2*j-1] += N[i]*∂pⱼ∂x*𝑤
@@ -138,3 +139,8 @@ end
 
 k₄ = kₚᵤ'*(kₚₚ\kₚᵤ)
 n₄ = rank(k₄)
+
+λ₁ = eigvals(k₁)
+λ₂ = eigvals(k₂)
+λ₃ = eigvals(k₃)
+λ₄ = eigvals(k₄)
