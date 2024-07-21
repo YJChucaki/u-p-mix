@@ -1,9 +1,9 @@
 using ApproxOperator,CairoMakie,Tensors, BenchmarkExample, Statistics
 import Gmsh: gmsh
 lwb = 1.5;lwm =1.5;mso =10;msx =10;ppu = 2.5;α = 0.7;
-filename1 = "./msh/cantilever_8.msh"
+filename1 = "./msh/cantilever_tri6_4.msh"
 filename2 = "./msh/cantilever_bubble_273.msh"
-savename = "./png/8.png"
+savename = "./png/7.png"
 
 gmsh.initialize()
 gmsh.open(filename1)

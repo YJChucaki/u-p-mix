@@ -1,7 +1,7 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf,Pardiso
 
 ndiv=6
-i=25
+i=22
 # ndiv_p=4 
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")

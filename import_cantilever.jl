@@ -173,7 +173,6 @@ function import_cantilever_mix_HR(filename1::String,filename2::String)
     gmsh.open(filename1)
     entities = getPhysicalGroups()
     nodes = get𝑿ᵢ()
-
     elements["Ω"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
     elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
     elements["Γᵗ"] = getElements(nodes, entities["Γᵗ"], integrationOrder_Γ, normal = true)

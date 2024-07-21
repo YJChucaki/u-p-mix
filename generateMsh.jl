@@ -6,9 +6,9 @@ n = 6
 # filename = "heat_diffusion_patchtest_"
 # BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
 
-filename = "cantilever_square_"
-BenchmarkExample.Cantilever.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
-
+filename = "cantilever_square_quad_"
+# BenchmarkExample.Cantilever.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
+BenchmarkExample.Cantilever.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true)
 
 # filename = "patchtest_"
 # BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)

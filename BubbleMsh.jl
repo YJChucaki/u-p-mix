@@ -8,7 +8,7 @@ using BubbleMsh
  path = "./msh/cantilever_square.msh"
 
  #square
- bubblemsh(path,[0.5,0.0,0.0],[0.48,0.48,0.0],25,0.112,0.01)
+ bubblemsh(path,[0.5,0.0,0.0],[0.48,0.48,0.0],4,0.18,0.01)
 
 
 #cantilever
