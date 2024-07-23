@@ -2,13 +2,13 @@
 using BenchmarkExample
 import Gmsh: gmsh
 
-n = 6
+n = 40
 # filename = "heat_diffusion_patchtest_"
 # BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
 
-filename = "cantilever_square_quad_"
+# filename = "cantilever_square_quad_"
 # BenchmarkExample.Cantilever.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
-BenchmarkExample.Cantilever.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true)
+# BenchmarkExample.Cantilever.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true)
 
 # filename = "patchtest_"
 # BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
@@ -32,8 +32,8 @@ BenchmarkExample.Cantilever.generateMsh("./msh/"*filename*string(n)*".msh", tran
 
 
 
-# filename = "square_"
-# BenchmarkExample.Square.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
+filename = "square_"
+BenchmarkExample.Square.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
 # filename = "square_quad_"
 # BenchmarkExample.Square.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true)
 # filename = "square_tri6_"

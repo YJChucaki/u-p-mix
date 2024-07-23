@@ -1,12 +1,12 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf,Pardiso
 
-ndiv=8
-i=200
+ndiv=6
+i=16
 # ndiv_p=4 
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
 include("wirteVTK.jl")
-elements, nodes ,nodes_p,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p,Ω = import_cantilever_mix_internal("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*"_internal.msh","./msh/cantilever_"*string(ndiv)*"_internal.msh")
 # elements, nodes ,nodes_p ,Ω= import_cantilever_mix("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
@@ -37,6 +37,7 @@ elements, nodes ,nodes_p,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./m
     I = D^3/12
     EI = E*I
     K=Ē/3/(1-2ν̄ )
+
     eval(prescribeForGauss)
     eval(prescribeForPenalty)
     set𝝭!(elements["Ω"])

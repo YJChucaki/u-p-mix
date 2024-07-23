@@ -1,7 +1,7 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf, Pardiso
 
 ndiv=6
-i=26
+i= 16
 # ndiv_p=4
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
@@ -9,7 +9,7 @@ include("wirteVTK.jl")
 
 # elements, nodes, nodes_p, Ω  = import_cantilever_mix_HR("./msh/cantilever_HR_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes, Ω  = import_cantilever_mix_HR("./msh/cantilever.msh","./msh/cantilever_bubble_"*string(i)*".msh")
-elements, nodes ,nodes_p,Ω = import_cantilever_mix_HR("./msh/cantilever_square_quad_"*string(ndiv)*".msh","./msh/cantilever_square_bubble_"*string(i)*".msh")
+elements, nodes ,nodes_p,Ω = import_cantilever_mix_HR("./msh/cantilever_square_"*string(ndiv)*".msh","./msh/cantilever_square_bubble_"*string(i)*".msh")
     nₑ = length(elements["Ω"])
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
@@ -22,8 +22,8 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix_HR("./msh/cantilever_square_
     P = 1000
     Ē = 3e6
     # Ē = 1.0
-    # ν̄ = 0.499999999
-    ν̄ = 0.3
+    ν̄ = 0.499999999
+    # ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
     L = 1

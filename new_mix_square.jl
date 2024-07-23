@@ -1,20 +1,20 @@
-using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf,Pardiso
+ using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf,Pardiso
 # NP=[40,80,120,140]
 # for n=1:4
     # i=NP[n]
-ndiv= 6
-#  ndiv_p=8
-i= 20
+ndiv= 17
+#  ndiv_p=40
+i= 441
 # 40,60-3
 # 80-4
 # 100,120-5
 # 160,200-7
-
 include("import_prescrible_ops.jl")
 include("import_cantilever.jl")
 include("wirteVTK.jl")
 # elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_quad8_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p ,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/square_"*string(ndiv)*".msh","./msh//square_"*string(ndiv_p)*".msh")
 elements, nodes ,nodes_p ,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/square_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_tri6_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
 # elements, nodes = import_cantilever_Q4P1("./msh/square_quad_"*string(ndiv)*".msh")
@@ -31,18 +31,19 @@ nₑₚ = length(Ω)
     ##for Q8P3 
     # nₚ = 3*length(elements["Ωᵖ"])
     nₘ=21
-    P = 1000
+    P = 0
     Ē = 3e6
     # Ē = 1.0
     # ν̄ = 0.4999999
     ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
-    L = 10
-    D = 10
+    L = 1
+    D = 1
     I = D^3/12
     EI = E*I
     K=Ē/3/(1-2ν̄ )
+
     eval(prescribeForSquare)
     set𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ω"])
@@ -53,9 +54,6 @@ nₑₚ = length(Ω)
     set𝝭!(elements["Γᵗ"])
     # set𝝭!(elements["Γᵍᵖ"])
    
-
-    
-
     eval(opsupmix)
     kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
     kₚᵤ = zeros(nₚ,2*nᵤ)
@@ -84,23 +82,23 @@ nₑₚ = length(Ω)
     push!(nodes,:d₁=>d₁,:d₂=>d₂)
     push!(nodes_p,:q=>q)
 
-    # kᵈ = kᵤᵤ
-    # kᵛ = -kₚᵤ'*(kₚₚ\kₚᵤ)
-    # vᵈ = eigvals(kᵈ)
-    # vᵛ = eigvals(kᵛ)
-    # γ = eigvals(kᵛ,kᵈ)
-    # println(γ[2*nᵤ-nₚ+1])
+    kᵈ = kᵤᵤ
+    kᵛ = -kₚᵤ'*(kₚₚ\kₚᵤ)
+    vᵈ = eigvals(kᵈ)
+    vᵛ = eigvals(kᵛ)
+    γ = eigvals(kᵛ,kᵈ)
+    println(γ[2*nᵤ-nₚ+1])
 
-    h1,l2,h1_dil,h1_dev = opsup[8](elements["Ωᵍ"],elements["Ωᵍᵖ"])
+    # h1,l2,h1_dil,h1_dev = opsup[8](elements["Ωᵍ"],elements["Ωᵍᵖ"])
     # h1,l2 = opsup[8](elements["Ω"],elements["Ωᵖ"])
-    L2 = log10(l2)
-    H1 = log10(h1)
+    # L2 = log10(l2)
+    # H1 = log10(h1)
     # H1_dil = log10(h1_dil)
     # H1_dev = log10(h1_dev)
    
-    println(L2,H1)
+    # println(L2,H1)
     # println(H1_dil,H1_dev)
     # println(l2,h1)
     # println(h1_dil,h1_dev)
     # h = log10(10.0/ndiv)
-    eval(VTK_mix_pressure)
+    # eval(VTK_mix_pressure)

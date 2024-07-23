@@ -1,14 +1,14 @@
 using ApproxOperator, JLD,LinearAlgebra, Printf ,Pardiso
 
 ndiv=9
-i=200
+i= 5
 # ndiv_p=4
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
 include("wirteVTK.jl")
 
 # elements, nodes, Ω  = import_cantilever_mix_HR("./msh/cantilever.msh","./msh/cantilever_bubble_"*string(i)*".msh")
-elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/square_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
 # elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")   
     nₒ = length(elements["Ω"])
@@ -25,17 +25,19 @@ elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_H
     P = 1000
     Ē = 3e6
     # Ē = 1.0
-    ν̄ = 0.499999999
-    # ν̄ = 0.3
+    # ν̄ = 0.499999999
+    ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
-    L = 48
-    D = 12
+    L = 1
+    D = 1
     I = D^3/12
     EI = E*I
     K=Ē/3/(1-2ν̄ )
-    eval(prescribeForGauss)
-    eval(prescribeForPenalty)
+    # eval(prescribeForGauss)
+    # eval(prescribeForPenalty)
+
+    eval(prescribeForSquare)
     set𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ωᵍ"])
@@ -116,31 +118,37 @@ k = [kᵤᵤ kₚᵤ' kₒᵤ';
 # f = [fᵤ;fₚ;fₛ;fₒ]
 f = [fᵤ;fₚ;fₒ]
     d = k\f
-    
-d₁ = d[1:2:2*nᵤ]
-d₂ = d[2:2:2*nᵤ]
-q  = d[2*nᵤ+1:2*nᵤ+nₚ]
-push!(nodes,:d₁=>d₁,:d₂=>d₂)
-push!(nodes_p,:q=>q)
+ 
+    kᵈ = kᵤᵤ
+    kᵛ = -kₚᵤ'*(kₚₚ\kₚᵤ)
+    vᵈ = eigvals(kᵈ)
+    vᵛ = eigvals(kᵛ)
+    γ = eigvals(kᵛ,kᵈ)
+    println(γ[2*nᵤ-nₚ+1])   
+# d₁ = d[1:2:2*nᵤ]
+# d₂ = d[2:2:2*nᵤ]
+# q  = d[2*nᵤ+1:2*nᵤ+nₚ]
+# push!(nodes,:d₁=>d₁,:d₂=>d₂)
+# push!(nodes_p,:q=>q)
 
     # push!(nodes_p,:q=>q)
 
     # h1,l2,h1_dil,h1_dev = opsup[8](elements["Ωᵍ"],elements["Ωᵍᵖ"])
-    h1,l2 = ops[6](elements["Ωᵍ"],elements["Ωᵍᵖ"])
+    # h1,l2 = ops[6](elements["Ωᵍ"],elements["Ωᵍᵖ"])
     # h1,l2 = ops[9](elements["Ωᵍ"])
-    L2 = log10(l2)
-    H1 = log10(h1)
+    # L2 = log10(l2)
+    # H1 = log10(h1)
     # H1_dil = log10(h1_dil)
     # H1_dev = log10(h1_dev)
    
-    println(L2,H1)
+    # println(L2,H1)
     # println(H1_dil,H1_dev)
     # println(l2,h1)
     # println(h1_dil,h1_dev)
     # h = log10(10.0/ndiv)
 
     
-    eval(VTK_mix_pressure)
+    # eval(VTK_mix_pressure)
     # eval(VTK_mix_pressure_u)
     # eval(VTK_mix_displacement)
     # eval(VTK_Q4P1_displacement_pressure)

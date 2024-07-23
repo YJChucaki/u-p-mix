@@ -1,7 +1,7 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf,Pardiso
 
 ndiv=6
-i=22
+i=27
 # ndiv_p=4 
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
@@ -32,8 +32,8 @@ elements, nodes ,nodes_p,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./m
     # ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
-    L = 48
-    D = 12
+    L = 1
+    D = 1
     I = D^3/12
     EI = E*I
     K=Ē/3/(1-2ν̄ )
