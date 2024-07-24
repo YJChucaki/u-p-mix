@@ -1,7 +1,7 @@
-using ApproxOperator, JLD,LinearAlgebra, Printf ,Pardiso
+using ApproxOperator, JLD,LinearAlgebra, Printf ,Pardiso, Tensors
 
-ndiv=9
-i= 5
+ndiv= 33
+i= 1042
 # ndiv_p=4
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
@@ -119,19 +119,48 @@ k = [kᵤᵤ kₚᵤ' kₒᵤ';
 f = [fᵤ;fₚ;fₒ]
     d = k\f
  
-    kᵈ = kᵤᵤ
-    kᵛ = -kₚᵤ'*(kₚₚ\kₚᵤ)
-    vᵈ = eigvals(kᵈ)
-    vᵛ = eigvals(kᵛ)
-    γ = eigvals(kᵛ,kᵈ)
-    println(γ[2*nᵤ-nₚ+1])   
-# d₁ = d[1:2:2*nᵤ]
-# d₂ = d[2:2:2*nᵤ]
-# q  = d[2*nᵤ+1:2*nᵤ+nₚ]
+
+d₁ = d[1:2:2*nᵤ]
+d₂ = d[2:2:2*nᵤ]
+q  = d[2*nᵤ+1:2*nᵤ+nₚ]
 # push!(nodes,:d₁=>d₁,:d₂=>d₂)
 # push!(nodes_p,:q=>q)
+# u = d[1:2*nᵤ]
+# d = [u;q]
+# f = [fᵤ;fₚ]
+# kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
+# kᵤₚ = zeros(2*nᵤ,nₚ)
+# kₚₚ = zeros(nₚ,nₚ)
 
-    # push!(nodes_p,:q=>q)
+# d⁻=d'*inv(d*d')
+# kₑ = f*d⁻
+# kₑ = f/d
+# for I in 1:2*nᵤ
+#     for J in 1:2*nᵤ
+#         kᵤᵤ[I,J] =kₑ[I,J]
+#     end
+# end 
+
+# for I in 1:2*nᵤ
+#     for J in  2*nᵤ+1:2*nᵤ+nₚ
+#         kᵤₚ[I,J-2*nᵤ] = kₑ[I,J]
+#     end
+# end 
+
+# for I in 2*nᵤ+1:2*nᵤ+nₚ
+#     for J in 2*nᵤ+1:2*nᵤ+nₚ
+#         kₚₚ[I-2*nᵤ,J-2*nᵤ] = kₑ[I,J]
+#     end
+# end 
+
+kᵈ = kᵤᵤ- kₒᵤ'*(kₒₒ\kₒᵤ)
+kᵛ =-(kₚᵤ'+kₒᵤ'*(kₒₒ\kₚₒ'))*((kₚₚ+kₚₒ*(kₒₒ\kₚₒ'))\(kₚᵤ-kₚₒ*(kₒₒ\kₒᵤ)))
+vᵈ = eigvals(kᵈ)
+vᵛ = eigvals(kᵛ)
+γ = eigvals(kᵛ,kᵈ)
+println(γ[2*nᵤ-nₚ+1])   
+
+
 
     # h1,l2,h1_dil,h1_dev = opsup[8](elements["Ωᵍ"],elements["Ωᵍᵖ"])
     # h1,l2 = ops[6](elements["Ωᵍ"],elements["Ωᵍᵖ"])
