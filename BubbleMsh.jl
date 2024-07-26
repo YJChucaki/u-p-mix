@@ -5,7 +5,7 @@ using BubbleMsh
 # path = "./msh/cantilever_new_bubble.msh"
 # path = "./msh/cook_membrane.msh"
 path = "./msh/patchtest.msh"
-#  path = "./msh/cantilever_square.msh"
+#  path = "./msh/square.msh"
 
  #square
 #  bubblemsh(path,[0.5,0.0,0.0],[0.48,0.48,0.0],4,0.18,0.01)
@@ -28,4 +28,4 @@ path = "./msh/patchtest.msh"
 # 127:10,80,0.6
 # 420：,344,0.0285,0.05
 # 54:26,0.13,0.01
-bubblemsh(path,[0.5,0.5,0.0],[0.48,0.48,0.0],242,0.033,0.01)
+bubblemsh(path,[0.5,0.5,0.0],[0.48,0.48,0.0],17,0.12,0.01)

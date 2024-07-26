@@ -50,10 +50,9 @@ Transfinite Curve{1,2,4,7,9,10,11,12,15} = n+1;
 Transfinite Curve{3,5,6,8,13,14} = 2*n+1;
 
 
-
-Physical Curve("Γᵗ₁") = {4,5};
-Physical Curve("Γᵗ₂") = {6,7};
-Physical Curve("Γᵗ₃") = {1,10};
+Physical Curve("Γᵍ₃") = {4,5};
+Physical Curve("Γᵗ₁") = {6,7};
+Physical Curve("Γᵗ₂") = {1,10};
 Physical Curve("Γᵍ₁") = {2,3};
 Physical Curve("Γᵍ₂") = {8,9};
 Physical Curve("Γ") = {11,12,13,14,15};

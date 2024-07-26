@@ -2,9 +2,12 @@
 using BenchmarkExample
 import Gmsh: gmsh
 
-n = 40
+n = 23
 # filename = "heat_diffusion_patchtest_"
 # BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
+
+# filename = "plate_with_hole_"
+# BenchmarkExample.Plate_with_hole.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
 
 # filename = "cantilever_square_quad_"
 # BenchmarkExample.Cantilever.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
