@@ -1,4 +1,4 @@
- using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf,Pardiso
+ using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf
 # NP=[40,80,120,140]
 # for n=1:4
     # i=NP[n]
