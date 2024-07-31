@@ -88,7 +88,7 @@ function import_cantilever_mix(filename1::String,filename2::String)
     zᵖ = nodes_p.z
     Ω = getElements(nodes_p, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 2.5*s*ones(length(nodes_p))
+    s = 1.5*s*ones(length(nodes_p))
     # s =1.8*12/ndiv_p*ones(length(nodes_p))
     # s = 1.3/10*ones(length(nodes_p))
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
@@ -215,8 +215,8 @@ end
 
 function import_cantilever_mix_bubble(filename1::String,filename2::String)
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
-    integrationOrder_Ω = 3
-    integrationOrder_Γ = 2
+    integrationOrder_Ω = 8
+    integrationOrder_Γ = 8
     integrationOrder_Ωᵍ = 10
 
     gmsh.initialize()
@@ -257,8 +257,8 @@ function import_cantilever_mix_bubble(filename1::String,filename2::String)
     # push!(elements["∂Ωˢ"], :𝝭=>:𝑠)
 
     
-    type = PiecewiseParametric{:Bubble,:Tri3}
-    #   type = PiecewiseParametric{:Bubble,:Quad}
+    # type = PiecewiseParametric{:Bubble,:Tri3}
+      type = PiecewiseParametric{:Bubble,:Quad}
     elements["Ωᵇ"] = getPiecewiseElements(entities["Ω"], type, integrationOrder_Ω)
     push!(elements["Ωᵇ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
 
@@ -509,8 +509,8 @@ function import_cantilever_fem(filename::String)
     x = nodes.x
     y = nodes.y
     z = nodes.z
-    integrationOrder_Ω = 4
-    integrationOrder_Γ = 4
+    integrationOrder_Ω = 10
+    integrationOrder_Γ = 10
     integrationOrder_Ωᵍ =10
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
     elements["Ω"] = getElements(nodes, entities["Ω"],   integrationOrder_Ω)
@@ -521,6 +521,11 @@ function import_cantilever_fem(filename::String)
     push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Γᵗ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Γᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    
+    # type = PiecewiseParametric{:Bubble,:Tri3}
+      type = PiecewiseParametric{:Bubble,:Quad}
+    elements["Ωᵇ"] = getPiecewiseElements(entities["Ω"], type, integrationOrder_Ω)
+    push!(elements["Ωᵇ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     # gmsh.finalize()
     return elements, nodes
 end

@@ -4,7 +4,7 @@
     # i=NP[n]
 ndiv= 33
  ndiv_p= 40
-# i= 13
+# i= 1042
 # 40,60-3
 # 80-4
 # 100,120-5
@@ -14,8 +14,8 @@ include("import_cantilever.jl")
 include("wirteVTK.jl")
 # elements, nodes ,nodes_p,Ω, xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_quad8_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
-elements, nodes ,nodes_p ,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/square_"*string(ndiv)*".msh","./msh//square_"*string(ndiv_p)*".msh")
-# elements, nodes ,nodes_p ,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/square_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
+elements, nodes ,nodes_p ,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/square_quad_"*string(ndiv)*".msh","./msh//square_quad_"*string(ndiv_p)*".msh")
+# elements, nodes ,nodes_p ,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/square_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_tri6_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
 # elements, nodes = import_cantilever_Q4P1("./msh/square_quad_"*string(ndiv)*".msh")
 # elements, nodes = import_cantilever_Q8P3("./msh/square_quad8_"*string(ndiv)*".msh")
@@ -34,7 +34,7 @@ nₑₚ = length(Ω)
     P = 0
     Ē = 3e6
     # Ē = 1.0
-    # ν̄ = 0.4999999
+    # ν̄ = 0.49
     ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)

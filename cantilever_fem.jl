@@ -3,16 +3,16 @@ include("import_prescrible_ops.jl")
 include("import_cantilever.jl")
 
 # for i in 40:50
-    ndiv= 8
+    ndiv= 4
   
     # elements,nodes= import_cantilever_fem("./msh/cantilever_tri6_"*string(ndiv)*".msh")
-    #  elements,nodes= import_cantilever_fem("./msh/cantilever_"*string(ndiv)*".msh")
-    elements,nodes= import_cantilever_fem("./msh/cantilever_quad_"*string(ndiv)*".msh")
+     elements,nodes= import_cantilever_fem("./msh/cantilever_"*string(ndiv)*".msh")
+    # elements,nodes= import_cantilever_fem("./msh/cantilever_quad_"*string(ndiv)*".msh")
     # elements,nodes= import_cantilever_fem("./msh/cantilever_quad8_"*string(ndiv)*".msh")
     P = 1000
     Ē = 3e6
-    ν̄ = 0.4
-    # ν̄ = 0.3
+    # ν̄ =  0.4999999
+    ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
     L = 48

@@ -1,17 +1,21 @@
 using ApproxOperator, JLD,LinearAlgebra, Printf ,Pardiso, Tensors
 
-ndiv= 33
-i= 1042
+ndiv= 32
+# ndiv2= 4
+i= 4000
 # ndiv_p=4
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
 include("wirteVTK.jl")
 
 # elements, nodes, Ω  = import_cantilever_mix_HR("./msh/cantilever.msh","./msh/cantilever_bubble_"*string(i)*".msh")
-elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/square_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
-# elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/square_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
+# elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/square_quad_"*string(ndiv)*".msh","./msh/square_quad_"*string(ndiv2)*".msh")
+# elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")   
-    nₒ = length(elements["Ω"])
+#  elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh") 
+nₒ = length(elements["Ω"])
     nₑ = length(elements["Ω"])
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
@@ -25,19 +29,19 @@ elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/square_"*str
     P = 1000
     Ē = 3e6
     # Ē = 1.0
-    # ν̄ = 0.499999999
+    # ν̄ = 0.4999999
     ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
-    L = 1
-    D = 1
+    L = 48
+    D = 12
     I = D^3/12
     EI = E*I
     K=Ē/3/(1-2ν̄ )
-    # eval(prescribeForGauss)
-    # eval(prescribeForPenalty)
+    eval(prescribeForGauss)
+    eval(prescribeForPenalty)
 
-    eval(prescribeForSquare)
+    # eval(prescribeForSquare)
     set𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ωᵍ"])
@@ -92,8 +96,8 @@ dₛ = zeros(4*nₛ)
 opsᵖ[1](elements["Ωᵖ"],kₚₚ)
 opsᵖ[2](elements["Ω"],elements["Ωᵖ"],kₚᵤ)
 opsᵖ[2](elements["Ωᵇ"],elements["Ωᵖ"],kₚₒ)
-# opsᵖ[3](elements["Γᵍ"],elements["Γᵖ"],kₚᵤ,fₚ)
 
+# opsᵖ[3](elements["Γᵍ"],elements["Γᵖ"],kₚᵤ,fₚ)
 # opsˢ[1](elements["Ωˢ"],kₛₛ)
 # opsˢ[2](elements["Ω"],elements["Ωˢ"],kₛᵤ)
 # opsˢ[3](elements["Γᵍ"],elements["Γˢ"],kₛᵤ,fₛ)
@@ -123,8 +127,8 @@ f = [fᵤ;fₚ;fₒ]
 d₁ = d[1:2:2*nᵤ]
 d₂ = d[2:2:2*nᵤ]
 q  = d[2*nᵤ+1:2*nᵤ+nₚ]
-# push!(nodes,:d₁=>d₁,:d₂=>d₂)
-# push!(nodes_p,:q=>q)
+push!(nodes,:d₁=>d₁,:d₂=>d₂)
+push!(nodes_p,:q=>q)
 # u = d[1:2*nᵤ]
 # d = [u;q]
 # f = [fᵤ;fₚ]
@@ -162,15 +166,16 @@ println(γ[2*nᵤ-nₚ+1])
 
 
 
-    # h1,l2,h1_dil,h1_dev = opsup[8](elements["Ωᵍ"],elements["Ωᵍᵖ"])
-    # h1,l2 = ops[6](elements["Ωᵍ"],elements["Ωᵍᵖ"])
+h1,l2,h1_dil,h1_dev,l2_p = ops[6](elements["Ωᵍ"],elements["Ωᵍᵖ"])
     # h1,l2 = ops[9](elements["Ωᵍ"])
-    # L2 = log10(l2)
-    # H1 = log10(h1)
+    L2 = log10(l2)
+    H1 = log10(h1)
+    L2_p = log10(l2_p)
     # H1_dil = log10(h1_dil)
     # H1_dev = log10(h1_dev)
    
-    # println(L2,H1)
+    println(L2,H1)
+    println(L2_p)
     # println(H1_dil,H1_dev)
     # println(l2,h1)
     # println(h1_dil,h1_dev)
