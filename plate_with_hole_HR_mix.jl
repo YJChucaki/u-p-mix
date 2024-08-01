@@ -4,13 +4,13 @@ include("import_plate_with_hole.jl")
 include("wirteVTK.jl")
 # for i=2:10
    
-ndiv = 4
-# ndiv2 = 20
-nₚ = 80
+ndiv = 8
+# ndiv2 = 1137
+nₚ =8
 # println(nₚ)
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes, nodes_u= import_patchtest_mix("./msh/plate_with_hole_new_"*string(ndiv)*".msh","./msh/plate_with_hole_new_"*string(ndiv2)*".msh")
-elements,nodes, nodes_u= import_patchtest_mix("./msh/plate_with_hole_new_"*string(ndiv)*".msh","./msh/plate_with_hole_new_bubble_"*string(nₚ)*".msh")
+# elements,nodes, nodes_u= import_patchtest_mix("./msh/plate_with_hole_new_"*string(ndiv)*".msh","./msh/plate_with_hole_new_bubble_"*string(nₚ)*".msh")
 nₚ = length(nodes)
 nᵤ = length(nodes_u)
 # nₑ = length(elements["Ω"])
@@ -50,8 +50,8 @@ P₁(x,y) = -∂T∂x(x,y)
 P₂(x,y) = -∂T∂y(x,y)
 ∂²T∂x²(x,y)  = a₁*(-x^2/(x^2+y^2)^1.5+1/(x^2+y^2)^0.5+3*x^2/(x^2+y^2)^2.5-1/(x^2+y^2)^1.5)/(1+y^2/x^2)^0.5 + 2*a₁*(x/(x^2+y^2)^0.5-x/(x^2+y^2)^1.5)*y^2/(1+y^2/x^2)^1.5/x^3+3*a₁*((x^2+y^2)^0.5+1/(x^2+y^2)^0.5)*y^4/(1+y^2/x^2)^2.5/x^6-3*a₁*((x^2+y^2)^0.5+1/(x^2+y^2)^0.5)*y^2/(1+y^2/x^2)^1.5/x^4
 ∂²T∂y²(x,y)  = a₁*(-y^2/(x^2+y^2)^1.5+1/(x^2+y^2)^0.5+3*y^2/(x^2+y^2)^2.5-1/(x^2+y^2)^1.5)/(1+y^2/x^2)^0.5 - 2*a₁*(y/(x^2+y^2)^0.5-y/(x^2+y^2)^1.5)*y/(1+y^2/x^2)^1.5/x^2+3*a₁*((x^2+y^2)^0.5+1/(x^2+y^2)^0.5)*y^2/(1+y^2/x^2)^2.5/x^4-a₁*((x^2+y^2)^0.5+1/(x^2+y^2)^0.5)/(1+y^2/x^2)^1.5/x^2
-b(x,y) = -D*(∂²T∂x²(x,y)+∂²T∂y²(x,y))
-# b(x,y) = 0.0 
+# b(x,y) = -D*(∂²T∂x²(x,y)+∂²T∂y²(x,y))
+b(x,y) = 0.0 
 
 # T(x,y) = (x+y)^n
 # ∂T∂x(x,y) = n*(x+y)^abs(n-1)
@@ -95,7 +95,7 @@ opsᵛ[2](elements["∂Ωᵖ"],elements["∂Ωᵘ"],kₚᵤ)
 opsᵛ[3](elements["Γ¹ᵍᵖ"],elements["Γ¹ᵍᵘ"],kₚₙ,fₚ)
 opsᵛ[3](elements["Γ²ᵍᵖ"],elements["Γ²ᵍᵘ"],kₚₙ,fₚ)
 opsᵛ[3](elements["Γ³ᵍᵖ"],elements["Γ³ᵍᵘ"],kₚₙ,fₚ)
-# ops[1](elements["Γ²ᵗᵘ"],fᵤ)
+ops[1](elements["Γ²ᵗᵘ"],fᵤ)
 ops[1](elements["Γ¹ᵗᵘ"],fᵤ)
 # ops[1](elements["Γ²ᵍᵘ"],fᵤ) 
 ops[3](elements["Ωᵘ"],fᵤ)

@@ -1,8 +1,8 @@
 using ApproxOperator, JLD,LinearAlgebra, Printf ,Pardiso, Tensors
 
-ndiv= 32
+ndiv= 4
 # ndiv2= 4
-i= 4000
+i= 72
 # ndiv_p=4
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
@@ -12,7 +12,7 @@ include("wirteVTK.jl")
 # elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/square_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
 # elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/square_quad_"*string(ndiv)*".msh","./msh/square_quad_"*string(ndiv2)*".msh")
 # elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
-elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_quad8_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")   
 #  elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh") 
 nₒ = length(elements["Ω"])
@@ -29,8 +29,8 @@ nₒ = length(elements["Ω"])
     P = 1000
     Ē = 3e6
     # Ē = 1.0
-    # ν̄ = 0.4999999
-    ν̄ = 0.3
+    ν̄ = 0.4999999
+    # ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
     L = 48
@@ -157,12 +157,12 @@ push!(nodes_p,:q=>q)
 #     end
 # end 
 
-kᵈ = kᵤᵤ-kₒᵤ'*(kₒₒ\kₒᵤ)
-kᵛ =-(kₚᵤ'+kₒᵤ'*(kₒₒ\kₚₒ'))*((kₚₚ+kₚₒ*(kₒₒ\kₚₒ'))\(kₚᵤ-kₚₒ*(kₒₒ\kₒᵤ)))
-vᵈ = eigvals(kᵈ)
-vᵛ = eigvals(kᵛ)
-γ = eigvals(kᵛ,kᵈ)
-println(γ[2*nᵤ-nₚ+1])   
+# kᵈ = kᵤᵤ-kₒᵤ'*(kₒₒ\kₒᵤ)
+# kᵛ =-(kₚᵤ'+kₒᵤ'*(kₒₒ\kₚₒ'))*((kₚₚ+kₚₒ*(kₒₒ\kₚₒ'))\(kₚᵤ-kₚₒ*(kₒₒ\kₒᵤ)))
+# vᵈ = eigvals(kᵈ)
+# vᵛ = eigvals(kᵛ)
+# γ = eigvals(kᵛ,kᵈ)
+# println(γ[2*nᵤ-nₚ+1])   
 
 
 

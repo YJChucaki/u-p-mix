@@ -12,12 +12,12 @@ function import_patchtest_mix(filename1::String, filename2::String)
     zᵘ = nodes_u.z
     Ω = getElements(nodes_u, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 1.5*s*ones(length(nodes_u))
+    s = 2.2*s*ones(length(nodes_u))
     push!(nodes_u,:s₁=>s,:s₂=>s,:s₃=>s)
 
-    integrationOrder_Ω = 5
+    integrationOrder_Ω = 8
     integrationOrder_Ωᵍ = 10
-    integrationOrder_Γ = 5
+    integrationOrder_Γ = 8
 
     gmsh.open(filename1)
     entities = getPhysicalGroups()
