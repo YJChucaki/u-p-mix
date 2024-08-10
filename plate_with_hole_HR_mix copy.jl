@@ -4,12 +4,12 @@ include("import_plate_with_hole.jl")
 include("wirteVTK.jl")
 # for i=2:10
    
-ndiv = 6
-ndiv2 =3
+ndiv = 2
+ndiv2 =2
 # nₚ = 15
 # println(nₚ)
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
-elements,nodes,nodes_p= import_patchtest_mix_old("./msh/plate_with_hole_"*string(ndiv)*".msh","./msh/plate_with_hole_"*string(ndiv2)*".msh")
+elements,nodes,nodes_p= import_patchtest_mix_old("./msh/plate_with_hole_new_"*string(ndiv)*".msh","./msh/plate_with_hole_new_"*string(ndiv2)*".msh")
 
 nₚ = length(nodes_p)
 nᵤ = length(nodes)

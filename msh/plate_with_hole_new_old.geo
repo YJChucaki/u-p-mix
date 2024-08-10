@@ -1,7 +1,7 @@
 
 a = 1.0;
 b = 5.0;
-n = 8;
+n = 1;
 
 Point(1) = {0.0, 0.0, 0.0};
 Point(2) = {  a, 0.0, 0.0};
@@ -20,13 +20,9 @@ Line(5) = {5,6};
 
 Curve Loop(1) = {1,2,3,4,5};
 
-Plane Surface(1) = {16};
-Plane Surface(2) = {17};
-Plane Surface(3) = {18};
-Plane Surface(4) = {19};
-Plane Surface(5) = {20};
 
-//Plane Surface(1) = {1};
+
+Plane Surface(1) = {1};
 Transfinite Curve{3,4} = 4*n+1;
 Transfinite Curve{2,5} = 3*n+1;
 Transfinite Curve{1} = n+1;
@@ -37,11 +33,12 @@ Physical Curve("Γᵗ₂") = {1};
 Physical Curve("Γᵍ₁") = {2};
 Physical Curve("Γᵍ₂") = {3};
 Physical Curve("Γᵍ₃") = {5};
-//Physical Surface("Ω") = {1,2,3,4,5};
+Physical Curve("Γ") = {1,2,3,4,5};
+Physical Surface("Ω") = {1,2,3,4,5};
 
-//Transfinite Surface{1};
+Transfinite Surface{1};
 
 Mesh.Algorithm = 1;
 Mesh.MshFileVersion = 2;
 Mesh 2;
-//RecombineMesh;
+RecombineMesh;

@@ -2,14 +2,26 @@
 using BenchmarkExample
 import Gmsh: gmsh
 
-n = 40
+n = 16
 # filename = "heat_diffusion_patchtest_"
 # BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
 
+# filename = "plate_with_hole_quad_"
+# BenchmarkExample.Plate_with_hole.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true)
 # filename = "plate_with_hole_"
 # BenchmarkExample.Plate_with_hole.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
 # filename = "plate_with_hole_new_"
 # BenchmarkExample.Plate_with_hole_new.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
+
+# filename = "plate_with_hole_new_quad_"
+# BenchmarkExample.Plate_with_hole_new.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true)
+
+# filename = "plate_with_hole_new_"
+# BenchmarkExample.Plate_with_hole_new.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
+filename = "plate_with_hole_new_quad_"
+BenchmarkExample.Plate_with_hole_new.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true)
+# filename = "plate_with_hole_new_tri6_"
+# BenchmarkExample.Plate_with_hole_new.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, order = 2)
 # filename = "plate_with_hole_bubble_"
 # BenchmarkExample.Plate_with_hole_bubble.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
 # filename = "cantilever_square_quad_"
@@ -40,8 +52,8 @@ n = 40
 
 # filename = "square_"
 # BenchmarkExample.Square.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
-filename = "square_quad_"
-BenchmarkExample.Square.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true)
+# filename = "square_quad_"
+# BenchmarkExample.Square.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true)
 # filename = "square_tri6_"
 # BenchmarkExample.Square.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, order = 2)
 # filename = "Square_quad8_"

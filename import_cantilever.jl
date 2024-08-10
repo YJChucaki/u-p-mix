@@ -11,6 +11,7 @@ function import_cantilever_Q4P1(filename::String)
     gmsh.open(filename)
     entities = getPhysicalGroups()
     nodes = get𝑿ᵢ()
+    Ωᵘ = getElements(nodes, entities["Ω"])
     elements["Ω"] = getElements(nodes, entities["Ω"], integrationOrder_Ω)
     elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
     elements["Γᵍ"] = getElements(nodes, entities["Γᵍ"],   integrationOrder_Γ)
@@ -26,7 +27,7 @@ function import_cantilever_Q4P1(filename::String)
     push!(elements["Ωᵖ"], :𝝭=>:𝑠)
     push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠)
     
-    return elements, nodes
+    return elements, nodes,Ωᵘ
 end
 function import_cantilever_Q8P3(filename::String)
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
@@ -63,9 +64,10 @@ function import_cantilever_mix(filename1::String,filename2::String)
     x = nodes.x
     y = nodes.y
     z = nodes.z
-    integrationOrder_Ω = 6
-    integrationOrder_Γ = 6
+    integrationOrder_Ω = 9
+    integrationOrder_Γ = 9
     integrationOrder_Ωᵍ =10
+    Ωᵘ = getElements(nodes, entities["Ω"])
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
     elements["Ω"] = getElements(nodes, entities["Ω"],   integrationOrder_Ω)
     elements["Γᵍ"] = getElements(nodes, entities["Γᵍ"],   integrationOrder_Γ)
@@ -88,12 +90,12 @@ function import_cantilever_mix(filename1::String,filename2::String)
     zᵖ = nodes_p.z
     Ω = getElements(nodes_p, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 2.0*s*ones(length(nodes_p))
+    s = 1.5*s*ones(length(nodes_p))
     # s =1.8*12/ndiv_p*ones(length(nodes_p))
     # s = 1.3/10*ones(length(nodes_p))
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
-    type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
-    # type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
+    # type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
+    type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
     sp = RegularGrid(xᵖ,yᵖ,zᵖ,n = 3,γ = 5)
     gmsh.open(filename1)
     entities = getPhysicalGroups()
@@ -109,7 +111,7 @@ function import_cantilever_mix(filename1::String,filename2::String)
     push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Ωᵍᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
     # gmsh.finalize()
-    return elements, nodes, nodes_p,Ω,xᵖ,yᵖ,zᵖ, sp,type
+    return elements, nodes, nodes_p,Ω,xᵖ,yᵖ,zᵖ, sp,type,Ωᵘ
 end
 function import_cantilever_reduce(filename1::String)
     gmsh.initialize()
@@ -229,7 +231,7 @@ function import_cantilever_mix_bubble(filename1::String,filename2::String)
     zᵖ = nodes_p.z
     Ω = getElements(nodes_p, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 2.5*s*ones(length(nodes_p))
+    s = 1.5*s*ones(length(nodes_p))
     # s = 2.5*s*ones(length(nodes_p))
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 

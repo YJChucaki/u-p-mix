@@ -23,7 +23,8 @@ path = "./msh/plate_with_hole_new.msh"
 #cook_membrane
 # bubblemsh(path,[25.0,30.0,0.0],[20.0,9.0,0.0],55,2.9,0.1)
 # plate_with_hole
-bubblemsh(path,[2.5,2.5,0.0],[1.9,1.9,0.0],1017,0.11,0.02)
+# 1017,0.11
+bubblemsh(path,[2.6,2.6,0.0],[1.9,1.9,0.0],25,0.5,0.2)
 #square
 # 127:10,80,0.6
 # 420：,344,0.0285,0.05

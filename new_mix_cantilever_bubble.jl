@@ -1,8 +1,8 @@
 using ApproxOperator, JLD,LinearAlgebra, Printf ,Pardiso, Tensors
 
-ndiv= 4
-# ndiv2= 4
-i= 72
+ndiv= 8
+# ndiv2= 5
+i= 40
 # ndiv_p=4
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
@@ -10,9 +10,9 @@ include("wirteVTK.jl")
 
 # elements, nodes, Ω  = import_cantilever_mix_HR("./msh/cantilever.msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/square_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
-# elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/square_quad_"*string(ndiv)*".msh","./msh/square_quad_"*string(ndiv2)*".msh")
-# elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
-elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_quad8_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/square_"*string(ndiv)*".msh","./msh/square_"*string(ndiv2)*".msh")
+elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_tri6_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")   
 #  elements, nodes, nodes_p, Ω  = import_cantilever_mix_bubble("./msh/cantilever_HR_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh") 
 nₒ = length(elements["Ω"])
@@ -129,6 +129,12 @@ d₂ = d[2:2:2*nᵤ]
 q  = d[2*nᵤ+1:2*nᵤ+nₚ]
 push!(nodes,:d₁=>d₁,:d₂=>d₂)
 push!(nodes_p,:q=>q)
+h1,l2,h1_dil,h1_dev,l2_p = ops[6](elements["Ωᵍ"],elements["Ωᵍᵖ"])
+L2 = log10(l2)
+H1 = log10(h1)
+L2_p = log10(l2_p)
+println(L2,H1)
+println(L2_p)
 # u = d[1:2*nᵤ]
 # d = [u;q]
 # f = [fᵤ;fₚ]
@@ -166,17 +172,6 @@ push!(nodes_p,:q=>q)
 
 
 
-h1,l2,h1_dil,h1_dev,l2_p = ops[6](elements["Ωᵍ"],elements["Ωᵍᵖ"])
-    # h1,l2 = ops[9](elements["Ωᵍ"])
-    L2 = log10(l2)
-    H1 = log10(h1)
-    L2_p = log10(l2_p)
-    # H1_dil = log10(h1_dil)
-    # H1_dev = log10(h1_dev)
-   
-    println(L2,H1)
-    println(L2_p)
-    # println(H1_dil,H1_dev)
     # println(l2,h1)
     # println(h1_dil,h1_dev)
     # h = log10(10.0/ndiv)

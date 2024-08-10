@@ -2,9 +2,9 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf
 include("input.jl")
 # for i in 2:10
-ndiv= 30
+ndiv= 5
 # ndiv_p=9
-i=10
+i=2
 
 
 include("import_prescrible_ops.jl")
@@ -12,17 +12,18 @@ include("import_cook_membrane.jl")
 # include("wirteVTK.jl")
 # elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
 # elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_tri6_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
-# elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_quad8_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
+elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_quad_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
 # elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_quad_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
 # elements, nodes = import_cook_membrane_Q4P1("./msh/cook_membrane_quad_"*string(ndiv)*".msh")
 # elements, nodes ,nodes_p = import_cook_membrane_T6P3("./msh/cook_membrane_tri6_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(ndiv)*".msh")
-elements, nodes = import_cook_membrane_Q8P3("./msh/cook_membrane_quad8_"*string(ndiv)*".msh")
+# elements, nodes = import_cook_membrane_Q8P3("./msh/cook_membrane_quad8_"*string(ndiv)*".msh")
 nᵤ = length(nodes)
-# nₚ = length(nodes_p)
-# nₑₚ = length(Ω)
-# nₚ = length(elements["Ωᵖ"])
-nₚ = 3*length(elements["Ωᵖ"])
-nₑ = length(elements["Ω"])
+nₚ = length(nodes_p)
+nₑₚ = length(Ω)
+nₚ = length(elements["Ωᵖ"])
+
+# nₚ = 3*length(elements["Ωᵖ"])
+# nₑ = length(elements["Ω"])
 # κ = 400942
 # μ = 80.1938
 # E = 9*κ*μ/(3*κ+μ)
@@ -69,7 +70,7 @@ q  = d[2*nᵤ+1:end]
 push!(nodes,:d₁=>d₁,:d₂=>d₂)
 # push!(nodes_p,:q=>q)
 
-# eval(VTK_mix_pressure)
+eval(VTK_mix_pressure)
 # eval(VTK_Q4P1_displacement_pressure)
 
 

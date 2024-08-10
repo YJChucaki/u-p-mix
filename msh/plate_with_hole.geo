@@ -55,7 +55,8 @@ Physical Curve("Γᵗ₁") = {6,7};
 Physical Curve("Γᵗ₂") = {1,10};
 Physical Curve("Γᵍ₁") = {2,3};
 Physical Curve("Γᵍ₂") = {8,9};
-Physical Curve("Γ") = {11,12,13,14,15};
+\\Physical Curve("Γ") = {11,12,13,14,15};
+Physical Curve("Γ") = {1,2,3,4,5};
 Physical Surface("Ω") = {1,2,3,4,5};
 
 Transfinite Surface{1,2,3,4,5};
@@ -63,4 +64,4 @@ Transfinite Surface{1,2,3,4,5};
 Mesh.Algorithm = 8;
 Mesh.MshFileVersion = 2;
 Mesh 2;
-//RecombineMesh;
+\\RecombineMesh;

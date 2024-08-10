@@ -2,6 +2,7 @@ using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf, P
 
 ndiv=6
 i= 16
+
 # ndiv_p=4
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")

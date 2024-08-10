@@ -1,15 +1,15 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf,Pardiso
 
-ndiv=16
-i =1500
+ndiv = 8
+i = 40
 # ndiv_p=4 
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
 include("wirteVTK.jl")
 # elements, nodes ,nodes_p,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p,Ω = import_cantilever_mix_internal("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*"_internal.msh","./msh/cantilever_"*string(ndiv)*"_internal.msh")
-elements, nodes ,nodes_p ,Ω= import_cantilever_mix("./msh/cantilever_quad8_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
-# elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p ,Ω= import_cantilever_mix("./msh/cantilever_quad8_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
+elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_HR_"*string(ndiv)*".msh","./msh/cantilever_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p = import_cantilever_T6P3("./msh/cantilever_tri6_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv)*".msh")
 # elements, nodes  = import_cantilever_Q4P1("./msh/cantilever_quad_"*string(ndiv)*".msh")
@@ -20,7 +20,7 @@ elements, nodes ,nodes_p ,Ω= import_cantilever_mix("./msh/cantilever_quad8_"*st
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
     nₑ = length(elements["Ω"])
-    nₑₚ = length(Ω)
+    # nₑₚ = length(Ω)
     ##for Q4P1 
     # nₚ = length(elements["Ωᵖ"])
     ##for Q8P3
@@ -28,8 +28,8 @@ elements, nodes ,nodes_p ,Ω= import_cantilever_mix("./msh/cantilever_quad8_"*st
     P = 1000
     Ē = 3e6
     # Ē = 1.0
-    ν̄ = 0.4999999
-    # ν̄ = 0.3
+    # ν̄ = 0.4999999
+    ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
     L = 48
@@ -95,7 +95,7 @@ elements, nodes ,nodes_p ,Ω= import_cantilever_mix("./msh/cantilever_quad8_"*st
 # end
 # push!(nodes_p,:q=>p̄)
 
-    h1,l2,h1_dil,h1_dev,l2_p = opsup[8](elements["Ωᵍ"],elements["Ωᵍᵖ"])
+h1,l2,h1_dil,h1_dev,l2_p = opsup[8](elements["Ωᵍ"],elements["Ωᵍᵖ"])
     # h1,l2 = opsup[9](elements["Ωᵍ"])
     L2 = log10(l2)
     H1 = log10(h1)
@@ -106,7 +106,7 @@ elements, nodes ,nodes_p ,Ω= import_cantilever_mix("./msh/cantilever_quad8_"*st
     println(L2_p)
     # println(H1_dil,H1_dev)
    
-    eval(VTK_mix_pressure)
+    # eval(VTK_mix_pressure)
     # eval(VTK_mix_pressure_exact_solution)
     # eval(VTK_mix_displacement)
     # eval(VTK_Q4P1_displacement_pressure)

@@ -80,6 +80,7 @@ opsupmix = quote
         Operator{:Locking_ratio_mix}(:E=>Ē,:ν=>ν̄),
         Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄),
         Operator{:Hₑ_Incompressible}(:E=>Ē,:ν=>ν̄),
+        # Operator{:Hₑ_up_mix_Q4P1}(:E=>Ē,:ν=>ν̄,:q=>q),
     ]
 end
 

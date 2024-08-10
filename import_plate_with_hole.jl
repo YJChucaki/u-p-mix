@@ -12,12 +12,12 @@ function import_patchtest_mix(filename1::String, filename2::String)
     zᵘ = nodes_u.z
     Ω = getElements(nodes_u, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 2.2*s*ones(length(nodes_u))
+    s = 2.5*s*ones(length(nodes_u))
     push!(nodes_u,:s₁=>s,:s₂=>s,:s₃=>s)
 
-    integrationOrder_Ω = 8
+    integrationOrder_Ω = 10
     integrationOrder_Ωᵍ = 10
-    integrationOrder_Γ = 8
+    integrationOrder_Γ = 10
 
     gmsh.open(filename1)
     entities = getPhysicalGroups()
@@ -163,7 +163,42 @@ function import_patchtest_mix_old(filename1::String, filename2::String)
     push!(elements["Ωᵍᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
     return elements, nodes, nodes_p , Ω
 end
+function import_patchtest_fem(filename::String)
+    gmsh.initialize()
+    gmsh.open(filename)
 
+    entities = getPhysicalGroups()
+    nodes = get𝑿ᵢ()
+    x = nodes.x
+    y = nodes.y
+    z = nodes.z
+    integrationOrder_Ω = 10
+    integrationOrder_Γ = 10
+    integrationOrder_Ωᵍ =10
+    elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
+    elements["Ω"] = getElements(nodes, entities["Ω"],  integrationOrder_Ω)
+    elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
+    elements["Ωᵍᵖ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
+    elements["Γ¹ᵗ"] = getElements(nodes, entities["Γᵗ₁"],  integrationOrder_Γ, normal = true)
+    elements["Γ²ᵗ"] = getElements(nodes, entities["Γᵗ₂"],  integrationOrder_Γ, normal = true)
+    elements["Γ¹ᵍ"] = getElements(nodes, entities["Γᵍ₁"],  integrationOrder_Γ, normal = true)
+    elements["Γ²ᵍ"] = getElements(nodes, entities["Γᵍ₂"],  integrationOrder_Γ, normal = true)
+    elements["Γ³ᵍ"] = getElements(nodes, entities["Γᵍ₃"],  integrationOrder_Γ, normal = true)
+    # elements["Γᵖ"] = elements["Γ¹ᵖ"]∪elements["Γ²ᵖ"]∪elements["Γ³ᵖ"]∪elements["Γ⁴ᵖ"]
+    
+    push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+
+    push!(elements["Γ¹ᵗ"], :𝝭=>:𝑠)
+    push!(elements["Γ²ᵗ"], :𝝭=>:𝑠)
+    push!(elements["Γ¹ᵍ"], :𝝭=>:𝑠)
+    push!(elements["Γ²ᵍ"], :𝝭=>:𝑠)
+    push!(elements["Γ³ᵍ"], :𝝭=>:𝑠)
+    
+    # gmsh.finalize()
+    return elements, nodes
+end
 
 function resetx!(a::ApproxOperator.AbstractElement)
     𝓒 = a.𝓒
@@ -215,7 +250,17 @@ function cal_area_support(elms::Vector{ApproxOperator.AbstractElement})
     s = (4/3^0.5*avg𝐴)^0.5
     return s, var𝐴
 end
-
+prescribeForFem = quote
+    prescribe!(elements["Ω"],:b=>(x,y,z)->b(x,y))
+    prescribe!(elements["Γ¹ᵍ"],:g=>(x,y,z)->T(x,y))
+    prescribe!(elements["Γ²ᵍ"],:g=>(x,y,z)->T(x,y))
+    prescribe!(elements["Γ³ᵍ"],:g=>(x,y,z)->0.5*a₀)
+    prescribe!(elements["Γ¹ᵗ"],:g=>(x,y,z)->T(x,y))
+    prescribe!(elements["Γ²ᵗ"],:g=>(x,y,z)->T(x,y))
+    prescribe!(elements["Ωᵍ"],:u=>(x,y,z)->T(x,y))
+    prescribe!(elements["Ωᵍᵖ"],:u=>(x,y,z)->P₁(x,y))
+    prescribe!(elements["Ωᵍᵖ"],:v=>(x,y,z)->P₂(x,y))
+end
 prescribe = quote
     
     prescribe!(elements["Ωᵘ"],:b=>(x,y,z)->b(x,y))
@@ -256,20 +301,6 @@ prescribe = quote
     prescribe!(elements["Ωᵍᵘ"],:u=>(x,y,z)->T(x,y))
     prescribe!(elements["Ωᵍᵖ"],:u=>(x,y,z)->P₁(x,y))
     prescribe!(elements["Ωᵍᵖ"],:v=>(x,y,z)->P₂(x,y))
-
-end
-prescribeForFem = quote
-    
-    prescribe!(elements["Ω"],:s=>(x,y,z)->s(x,y))
-
-    prescribe!(elements["Γ¹"],:g=>(x,y,z)->T(x,y))
-    prescribe!(elements["Γ²"],:g=>(x,y,z)->T(x,y))
-    prescribe!(elements["Γ³"],:g=>(x,y,z)->T(x,y))
-    prescribe!(elements["Γ⁴"],:g=>(x,y,z)->T(x,y))
-   
-
-    
-    prescribe!(elements["Ωᵍ"],:u=>(x,y,z)->T(x,y))
 
 end
 

@@ -127,7 +127,7 @@ function import_cook_membrane_mix(filename1::String,filename2::String)
     zᵖ = nodes_p.z
     Ω = getElements(nodes_p, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 5.5*s*ones(length(nodes_p))
+    s = 1.5*s*ones(length(nodes_p))
     # s = 1.5/10*ones(length(nodes_p))
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
     # type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
