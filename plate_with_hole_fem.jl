@@ -4,13 +4,13 @@ include("import_plate_with_hole.jl")
 include("wirteVTK.jl")
 # for i=2:10
    
-ndiv = 16
+ndiv = 8
 # ndiv2 =4
 # nₚ =140
 # println(nₚ)
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
-# elements,nodes= import_patchtest_fem("./msh/plate_with_hole_new_"*string(ndiv)*".msh")
-elements,nodes= import_patchtest_fem("./msh/plate_with_hole_new_quad_"*string(ndiv)*".msh")
+elements,nodes= import_patchtest_fem("./msh/plate_with_hole_quad_"*string(ndiv)*".msh")
+# elements,nodes= import_patchtest_fem("./msh/plate_with_hole_new_quad_"*string(ndiv)*".msh")
 # elements,nodes= import_patchtest_fem("./msh/plate_with_hole.msh")
 nᵤ = length(nodes)
 # nₑ = length(elements["Ω"])
@@ -45,7 +45,7 @@ P₂(x,y) = -∂T∂y(x,y)
 ∂²T∂y²(x,y)  = a₁*(-y^2/(x^2+y^2)^1.5+1/(x^2+y^2)^0.5+3*y^2/(x^2+y^2)^2.5-1/(x^2+y^2)^1.5)/(1+y^2/x^2)^0.5 - 2*a₁*(y/(x^2+y^2)^0.5-y/(x^2+y^2)^1.5)*y/(1+y^2/x^2)^1.5/x^2+3*a₁*((x^2+y^2)^0.5+1/(x^2+y^2)^0.5)*y^2/(1+y^2/x^2)^2.5/x^4-a₁*((x^2+y^2)^0.5+1/(x^2+y^2)^0.5)/(1+y^2/x^2)^1.5/x^2
 b(x,y) = -D*(∂²T∂x²(x,y)+∂²T∂y²(x,y))
 # b(x,y) = 0.0 
-
+# n = 1
 # T(x,y) = (x+y)^n
 # ∂T∂x(x,y) = n*(x+y)^abs(n-1)
 # ∂T∂y(x,y) = n*(x+y)^abs(n-1)
@@ -80,8 +80,8 @@ ops[2](elements["Γ¹ᵍ"],kᵅ,f)
 ops[2](elements["Γ²ᵍ"],kᵅ,f)
 ops[2](elements["Γ³ᵍ"],kᵅ,f)
 ops[2](elements["Γ¹ᵗ"],kᵅ,f)
-ops[2](elements["Γ²ᵗ"],kᵅ,f)
-
+# ops[2](elements["Γ²ᵗ"],kᵅ,f)
+# ops[1](elements["Γ²ᵍ"],f)
 d = (k+kᵅ)\f #temperatures
 push!(nodes,:d=>d)
 p₁ = zeros(nᵤ)

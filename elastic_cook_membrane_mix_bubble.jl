@@ -2,22 +2,24 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf
 include("input.jl")
 # for i in 2:10
-ndiv= 15
+ndiv= 30
 # ndiv_p=9
-i=10
+i=15
 
 
 include("import_prescrible_ops.jl")
 include("import_cook_membrane.jl")
 include("wirteVTK.jl")
+# elements, nodes ,nodes_p,Ω = import_cook_membrane_mix_bubble("./msh/cook_membrane_"*string(ndiv)*".msh","./msh/cook_membrane_bubble_"*string(i)*".msh")
 elements, nodes ,nodes_p,Ω = import_cook_membrane_mix_bubble("./msh/cook_membrane_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
-# elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_quad_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
+#  elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_quad_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
 # elements, nodes = import_cook_membrane_Q4P1("./msh/cook_membrane_quad_"*string(ndiv)*".msh")
 nᵤ = length(nodes)
 nₒ = length(elements["Ω"])
-# nₚ = length(nodes_p)
-# nₑₚ = length(Ω)
-nₚ = length(elements["Ωᵖ"])
+nₚ = length(nodes_p)
+nₑₚ = length(Ω)
+
+# nₚ = length(elements["Ωᵖ"])
 nₑ = length(elements["Ω"])
 # κ = 400942
 # μ = 80.1938
@@ -117,8 +119,8 @@ set𝝭!(elements["Ω"])
     push!(nodes,:d₁=>d₁,:d₂=>d₂)
     push!(nodes_p,:q=>q)
     
-# push!(nodes_p,:q=>q)
-# eval(VTK_mix_pressure)
+
+eval(VTK_mix_pressure)
 # eval(VTK_Q4P1_displacement_pressure)
 
 

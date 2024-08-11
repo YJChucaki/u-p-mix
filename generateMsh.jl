@@ -2,7 +2,7 @@
 using BenchmarkExample
 import Gmsh: gmsh
 
-n = 16
+n = 6
 # filename = "heat_diffusion_patchtest_"
 # BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
 
@@ -10,6 +10,10 @@ n = 16
 # BenchmarkExample.Plate_with_hole.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true)
 # filename = "plate_with_hole_"
 # BenchmarkExample.Plate_with_hole.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
+filename = "plate_with_hole_tri6_"
+BenchmarkExample.Plate_with_hole.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, order = 2)
+# filename = "plate_with_hole_quad8_"
+# BenchmarkExample.Plate_with_hole.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true, order = 2)
 # filename = "plate_with_hole_new_"
 # BenchmarkExample.Plate_with_hole_new.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
 
@@ -18,12 +22,12 @@ n = 16
 
 # filename = "plate_with_hole_new_"
 # BenchmarkExample.Plate_with_hole_new.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
-filename = "plate_with_hole_new_quad_"
-BenchmarkExample.Plate_with_hole_new.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true)
+# filename = "plate_with_hole_new_quad_"
+# BenchmarkExample.Plate_with_hole_new.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true)
 # filename = "plate_with_hole_new_tri6_"
 # BenchmarkExample.Plate_with_hole_new.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, order = 2)
-# filename = "plate_with_hole_bubble_"
-# BenchmarkExample.Plate_with_hole_bubble.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
+# filename = "plate_with_hole_new_quad8_"
+# BenchmarkExample.Plate_with_hole_new.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true, order = 2)
 # filename = "cantilever_square_quad_"
 # BenchmarkExample.Cantilever.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
 # BenchmarkExample.Cantilever.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true)

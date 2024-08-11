@@ -15,9 +15,9 @@ function import_patchtest_mix(filename1::String, filename2::String)
     s = 2.5*s*ones(length(nodes_u))
     push!(nodes_u,:s₁=>s,:s₂=>s,:s₃=>s)
 
-    integrationOrder_Ω = 10
+    integrationOrder_Ω = 6
     integrationOrder_Ωᵍ = 10
-    integrationOrder_Γ = 10
+    integrationOrder_Γ = 6
 
     gmsh.open(filename1)
     entities = getPhysicalGroups()
@@ -30,7 +30,7 @@ function import_patchtest_mix(filename1::String, filename2::String)
     elements["Γ¹ᵍᵖ"] = getElements(nodes, entities["Γᵍ₁"],  integrationOrder_Γ, normal = true)
     elements["Γ²ᵍᵖ"] = getElements(nodes, entities["Γᵍ₂"],  integrationOrder_Γ, normal = true)
     elements["Γ³ᵍᵖ"] = getElements(nodes, entities["Γᵍ₃"],  integrationOrder_Γ, normal = true)
-    # elements["Γᵖ"] = elements["Γ¹ᵖ"]∪elements["Γ²ᵖ"]∪elements["Γ³ᵖ"]∪elements["Γ⁴ᵖ"]
+    elements["Γᵖ"] = elements["Γ¹ᵗᵖ"]∪elements["Γ²ᵗᵖ"]∪elements["Γ¹ᵍᵖ"]∪elements["Γ²ᵍᵖ"]∪elements["Γ³ᵍᵖ"]
     
     push!(elements["Ωᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
@@ -54,7 +54,7 @@ function import_patchtest_mix(filename1::String, filename2::String)
     elements["Γ²ᵍᵘ"] = getElements(nodes_u, entities["Γᵍ₂"], type, integrationOrder_Γ, sp, normal = true)
     elements["Γ³ᵍᵘ"] = getElements(nodes_u, entities["Γᵍ₃"], type, integrationOrder_Γ, sp, normal = true)
     # elements["Γᵘ"] = elements["Γ¹ᵘ"]∪elements["Γ²ᵘ"]∪elements["Γ³ᵘ"]∪elements["Γ⁴ᵘ"]
-
+    elements["Γᵘ"] = elements["Γ¹ᵗᵘ"]∪elements["Γ²ᵗᵘ"]∪elements["Γ¹ᵍᵘ"]∪elements["Γ²ᵍᵘ"]∪elements["Γ³ᵍᵘ"]
    
     nₘ = 21
     𝗠 = (0,zeros(nₘ))
@@ -254,12 +254,15 @@ prescribeForFem = quote
     prescribe!(elements["Ω"],:b=>(x,y,z)->b(x,y))
     prescribe!(elements["Γ¹ᵍ"],:g=>(x,y,z)->T(x,y))
     prescribe!(elements["Γ²ᵍ"],:g=>(x,y,z)->T(x,y))
-    prescribe!(elements["Γ³ᵍ"],:g=>(x,y,z)->0.5*a₀)
+    prescribe!(elements["Γ³ᵍ"],:g=>(x,y,z)->T(x,y))
     prescribe!(elements["Γ¹ᵗ"],:g=>(x,y,z)->T(x,y))
     prescribe!(elements["Γ²ᵗ"],:g=>(x,y,z)->T(x,y))
     prescribe!(elements["Ωᵍ"],:u=>(x,y,z)->T(x,y))
     prescribe!(elements["Ωᵍᵖ"],:u=>(x,y,z)->P₁(x,y))
     prescribe!(elements["Ωᵍᵖ"],:v=>(x,y,z)->P₂(x,y))
+
+    prescribe!(elements["Γ¹ᵗ"],:t=>(x,y,z)->P₂(x,y))
+    prescribe!(elements["Γ²ᵍ"],:t=>(x,y,z)->P₁(x,y))
 end
 prescribe = quote
     
@@ -269,18 +272,18 @@ prescribe = quote
     prescribe!(elements["Γ¹ᵍᵘ"],:g=>(x,y,z)->T(x,y))
     prescribe!(elements["Γ²ᵍᵘ"],:g=>(x,y,z)->T(x,y))
 
-    prescribe!(elements["Γ³ᵍᵘ"],:g=>(x,y,z)->0.5*a₀)
+    prescribe!(elements["Γ³ᵍᵘ"],:g=>(x,y,z)->T(x,y))
     
     prescribe!(elements["Γ¹ᵗᵘ"],:g=>(x,y,z)->T(x,y))
     prescribe!(elements["Γ²ᵗᵘ"],:g=>(x,y,z)->T(x,y))
 
     # prescribe!(elements["Γ¹ᵗᵘ"],:t=>(x,y,z)->P₁(x,y))
     # prescribe!(elements["Γ²ᵗᵘ"],:g=>(x,y,z)->P₁(x,y))
-    prescribe!(elements["Γ¹ᵗᵘ"],:t=>(x,y,z)->P₂(x,y))
+    # prescribe!(elements["Γ¹ᵗᵘ"],:t=>(x,y,z)->P₂(x,y))
     # prescribe!(elements["Γ²ᵗᵘ"],:t₁=>(x,y,z)->P₁(x,y))
     # prescribe!(elements["Γ²ᵗᵘ"],:t₂=>(x,y,z)->P₂(x,y))
     
-    prescribe!(elements["Γ²ᵍᵘ"],:t=>(x,y,z)->P₁(x,y))
+    # prescribe!(elements["Γ²ᵍᵘ"],:t=>(x,y,z)->P₁(x,y))
     # prescribe!(elements["Γ²ᵍᵘ"],:t=>(x,y,z)->P₂(x,y))
     # prescribe!(elements["Γ¹ᵖ"],:n₁₁=>(x,y,z)->1.0)
     # prescribe!(elements["Γ¹ᵖ"],:n₁₂=>(x,y,z)->0.0)

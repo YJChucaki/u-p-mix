@@ -4,12 +4,12 @@ include("import_heat_conduction.jl")
 include("wirteVTK.jl")
 # for i=2:10
    
-ndiv = 3
+ndiv = 5
 ndiv_u = 3
 # nᵤ = 5
 
 # elements, nodes, nodes_u = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nᵤ)*".msh")
-elements, nodes, nodes_u = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_"*string(ndiv_u)*".msh")
+elements, nodes, nodes_u = import_patchtest_mix("./msh/patchtest_quad_"*string(ndiv)*".msh","./msh/patchtest_quad_"*string(ndiv_u)*".msh")
 nₚ = length(nodes)
 nᵤ = length(nodes_u)
 
@@ -63,6 +63,7 @@ fₚ = zeros(2*nₚ)
 opsᵈ[1](elements["Ωᵖ"],kₚₚ)
 opsᵛ[1](elements["Ωᵖ"],elements["Ωᵘ"],kₚᵤ)
 opsᵛ[2](elements["∂Ωᵖ"],elements["∂Ωᵘ"],kₚᵤ)
+# opsᵛ[2](elements["Γᵖ"],elements["Γᵘ"],kₚᵤ)
 opsᵛ[3](elements["Γᵖ"],elements["Γᵘ"],kₚₙ,fₚ)
 ops[3](elements["Ωᵘ"],fᵤ)
 

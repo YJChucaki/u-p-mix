@@ -1,13 +1,11 @@
-
 a = 1.0;
 b = 1.0;
-n = 6;
+n = 40;
 
 Point(1) = {0.0, 0.0, 0.0};
 Point(2) = {  a, 0.0, 0.0};
-Point(3) = {  a,   b, 0.0};
-Point(4) = {0.0,   b, 0.0};
-
+Point(3) = {  a,  b, 0.0};
+Point(4) = {0.0,  b, 0.0};
 Line(1) = {1,2};
 Line(2) = {2,3};
 Line(3) = {3,4};
@@ -17,13 +15,15 @@ Curve Loop(1) = {1,2,3,4};
 
 Plane Surface(1) = {1};
 
+
 Transfinite Curve{1,2,3,4} = n;
-//Transfinite Surface{1};
-Physical Curve("Γ₁") = {1};
-Physical Curve("Γ₂") = {2};
-Physical Curve("Γ₃") = {3};
-Physical Curve("Γ₄") = {4};
+
+Physical Curve("Γᵗ") = {2};
+Physical Curve("Γᵍ") = {4};
+Physical Curve("Γ") = {1,3};
 //Physical Surface("Ω") = {1};
+
+//Transfinite Surface{1};
 
 Mesh.Algorithm = 8;
 Mesh.MshFileVersion = 2;

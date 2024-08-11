@@ -4,14 +4,15 @@ include("import_plate_with_hole.jl")
 include("wirteVTK.jl")
 # for i=2:10
    
-ndiv = 4
-# ndiv2 = 2
-nₚ = 340
+ndiv = 2
+ndiv2 = 2
+# nₚ = 340
 
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 # elements,nodes, nodes_u= import_patchtest_mix("./msh/plate_with_hole.msh","./msh/plate_with_hole.msh")
-# elements,nodes, nodes_u= import_patchtest_mix("./msh/plate_with_hole_new_quad_"*string(ndiv)*".msh","./msh/plate_with_hole_new_"*string(ndiv2)*".msh")
-elements,nodes, nodes_u= import_patchtest_mix("./msh/plate_with_hole_new_quad_"*string(ndiv)*".msh","./msh/plate_with_hole_new_bubble_"*string(nₚ)*".msh")
+# elements,nodes, nodes_u= import_patchtest_mix("./msh/plate_with_hole_new_quad8_"*string(ndiv)*".msh","./msh/plate_with_hole_new_quad8_"*string(ndiv2)*".msh")
+# elements,nodes, nodes_u= import_patchtest_mix("./msh/plate_with_hole_new_quad_"*string(ndiv)*".msh","./msh/plate_with_hole_new_bubble_"*string(nₚ)*".msh")
+elements,nodes, nodes_u= import_patchtest_mix("./msh/plate_with_hole_quad_"*string(ndiv)*".msh","./msh/plate_with_hole_quad_"*string(ndiv2)*".msh")
 nₚ = length(nodes)
 nᵤ = length(nodes_u)
 # nₑ = length(elements["Ω"])
@@ -32,6 +33,8 @@ set𝝭!(elements["Γ²ᵗᵖ"])
 set𝝭!(elements["Γ¹ᵍᵖ"])
 set𝝭!(elements["Γ²ᵍᵖ"])
 set𝝭!(elements["Γ³ᵍᵖ"])
+set𝝭!(elements["Γᵘ"])
+set𝝭!(elements["Γᵖ"])
 D=1   #thermal conductivity coefficient
 t=1 #thickness
 R = 1.0
@@ -51,8 +54,8 @@ P₁(x,y) = -∂T∂x(x,y)
 P₂(x,y) = -∂T∂y(x,y)
 ∂²T∂x²(x,y)  = a₁*(-x^2/(x^2+y^2)^1.5+1/(x^2+y^2)^0.5+3*x^2/(x^2+y^2)^2.5-1/(x^2+y^2)^1.5)/(1+y^2/x^2)^0.5 + 2*a₁*(x/(x^2+y^2)^0.5-x/(x^2+y^2)^1.5)*y^2/(1+y^2/x^2)^1.5/x^3+3*a₁*((x^2+y^2)^0.5+1/(x^2+y^2)^0.5)*y^4/(1+y^2/x^2)^2.5/x^6-3*a₁*((x^2+y^2)^0.5+1/(x^2+y^2)^0.5)*y^2/(1+y^2/x^2)^1.5/x^4
 ∂²T∂y²(x,y)  = a₁*(-y^2/(x^2+y^2)^1.5+1/(x^2+y^2)^0.5+3*y^2/(x^2+y^2)^2.5-1/(x^2+y^2)^1.5)/(1+y^2/x^2)^0.5 - 2*a₁*(y/(x^2+y^2)^0.5-y/(x^2+y^2)^1.5)*y/(1+y^2/x^2)^1.5/x^2+3*a₁*((x^2+y^2)^0.5+1/(x^2+y^2)^0.5)*y^2/(1+y^2/x^2)^2.5/x^4-a₁*((x^2+y^2)^0.5+1/(x^2+y^2)^0.5)/(1+y^2/x^2)^1.5/x^2
-# b(x,y) = -D*(∂²T∂x²(x,y)+∂²T∂y²(x,y))
-b(x,y) = 0.0 
+b(x,y) = -D*(∂²T∂x²(x,y)+∂²T∂y²(x,y))
+# b(x,y) = 0.0 
 
 # n =1
 # T(x,y) = (x+y)^n
@@ -64,18 +67,10 @@ b(x,y) = 0.0
 # ∂²T∂y²(x,y) = n*(n-1)*(x+y)^abs(n-2)
 # b(x,y) = -D*(∂²T∂x²(x,y)+∂²T∂y²(x,y))       
 
-# T(x,y) = (x+y)^n
-# ∂T∂x(x,y) = n*(x+y)^abs(n-1)
-# ∂T∂y(x,y) = n*(x+y)^abs(n-1)
-# P₁(x,y) = -∂T∂x(x,y)
-# P₂(x,y) = -∂T∂y(x,y)
-# ∂²T∂x²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
-# ∂²T∂y²(x,y) = n*(n-1)*(x+y)^abs(n-2)
-# b(x,y) = -D*(∂²T∂x²(x,y)+∂²T∂y²(x,y))
-
 
 eval(prescribe)
-prescribe!(elements["∂Ωᵘ"],:g=>(x,y,z)->T(x,y))
+prescribe!(elements["∂Ωᵘ"],:g=>(x,y,z)->0.0)
+
 ops = [
        Operator{:∫vtdΓ}(),
        Operator{:∫Tᵢgᵢds}(:α=>1e12*D,:t=>t),
@@ -102,21 +97,15 @@ fₚ = zeros(2*nₚ)
 
 opsᵈ[1](elements["Ωᵖ"],kₚₚ)
 opsᵛ[1](elements["Ωᵖ"],elements["Ωᵘ"],kₚᵤ)
-opsᵛ[2](elements["∂Ωᵖ"],elements["∂Ωᵘ"],kₚᵤ)
-# opsᵛ[2](elements["Γ¹ᵍᵖ"],elements["Γ¹ᵍᵘ"],kₚᵤ)
-# opsᵛ[2](elements["Γ²ᵍᵖ"],elements["Γ²ᵍᵘ"],kₚᵤ)
-# opsᵛ[2](elements["Γ³ᵍᵖ"],elements["Γ³ᵍᵘ"],kₚᵤ)
-# opsᵛ[2](elements["Γ²ᵗᵖ"],elements["Γ²ᵗᵘ"],kₚᵤ)
-# opsᵛ[2](elements["Γ¹ᵗᵖ"],elements["Γ¹ᵗᵘ"],kₚᵤ)
-
-
+# opsᵛ[2](elements["∂Ωᵖ"],elements["∂Ωᵘ"],kₚᵤ)
+opsᵛ[2](elements["Γᵖ"],elements["Γᵘ"],kₚᵤ)
 opsᵛ[3](elements["Γ¹ᵍᵖ"],elements["Γ¹ᵍᵘ"],kₚₙ,fₚ)
 opsᵛ[3](elements["Γ²ᵍᵖ"],elements["Γ²ᵍᵘ"],kₚₙ,fₚ)
 opsᵛ[3](elements["Γ³ᵍᵖ"],elements["Γ³ᵍᵘ"],kₚₙ,fₚ)
-opsᵛ[3](elements["Γ²ᵗᵖ"],elements["Γ²ᵗᵘ"],kₚₙ,fₚ)
-# opsᵛ[3](elements["Γ¹ᵗᵖ"],elements["Γ¹ᵗᵘ"],kₚₙ,fₚ)
+# opsᵛ[3](elements["Γ²ᵗᵖ"],elements["Γ²ᵗᵘ"],kₚₙ,fₚ)
+opsᵛ[3](elements["Γ¹ᵗᵖ"],elements["Γ¹ᵗᵘ"],kₚₙ,fₚ)
 # ops[1](elements["Γ²ᵗᵘ"],fᵤ)
-ops[1](elements["Γ¹ᵗᵘ"],fᵤ)
+# ops[1](elements["Γ¹ᵗᵘ"],fᵤ)
 # ops[1](elements["Γ²ᵍᵘ"],fᵤ) 
 ops[3](elements["Ωᵘ"],fᵤ)
 
@@ -149,27 +138,27 @@ println(L2_p)
 
 # eval(VTK_mix_pressure)
 
-dₚᵤ = zeros(2*nₚ + nᵤ)
-dₚ = zeros(2*nₚ)
-dᵤ = zeros(nᵤ)
-for (i,node) in enumerate(nodes)
-    x = node.x
-    y = node.y
-    dₚᵤ[2*i-1] = -∂T∂x(x,y)
-    dₚᵤ[2*i]   = -∂T∂y(x,y)
-    dₚ[2*i-1] = -∂T∂x(x,y)
-    dₚ[2*i]   = -∂T∂y(x,y)
-end
-for (i,node) in enumerate(nodes_u)
-    x = node.x
-    y = node.y
-    dₚᵤ[2*nₚ+i] = T(x,y)
-    dᵤ[i] = T(x,y)
-end
+# dₚᵤ = zeros(2*nₚ + nᵤ)
+# dₚ = zeros(2*nₚ)
+# dᵤ = zeros(nᵤ)
+# for (i,node) in enumerate(nodes)
+#     x = node.x
+#     y = node.y
+#     dₚᵤ[2*i-1] = -∂T∂x(x,y)
+#     dₚᵤ[2*i]   = -∂T∂y(x,y)
+#     dₚ[2*i-1] = -∂T∂x(x,y)
+#     dₚ[2*i]   = -∂T∂y(x,y)
+# end
+# for (i,node) in enumerate(nodes_u)
+#     x = node.x
+#     y = node.y
+#     dₚᵤ[2*nₚ+i] = T(x,y)
+#     dᵤ[i] = T(x,y)
+# end
 
-err1 = kₚₚ*dₚ - kₚᵤ*dᵤ
-err2 = kₚₙ*dᵤ + fₚ
-err3 = (kₚᵤ+kₚₙ)'*dₚ-fᵤ
-err4 = kₚₚ*dₚ - (kₚᵤ+kₚₙ)*dᵤ + fₚ
-err5 = k*dₚᵤ-f
-err6 = k*d-f
+# err1 = kₚₚ*dₚ - kₚᵤ*dᵤ
+# err2 = kₚₙ*dᵤ + fₚ
+# err3 = (kₚᵤ+kₚₙ)'*dₚ-fᵤ
+# err4 = kₚₚ*dₚ - (kₚᵤ+kₚₙ)*dᵤ + fₚ
+# err5 = k*dₚᵤ-f
+# err6 = k*d-f

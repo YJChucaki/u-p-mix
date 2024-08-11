@@ -2,34 +2,37 @@
 using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf
 include("input.jl")
 # for i in 2:10
-ndiv= 5
+ndiv= 20
 # ndiv_p=9
-i=2
+i=5
 
 
 include("import_prescrible_ops.jl")
 include("import_cook_membrane.jl")
-# include("wirteVTK.jl")
+include("wirteVTK.jl")
 # elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
 # elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_tri6_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
+# elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
 elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_quad_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
-# elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_quad_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
 # elements, nodes = import_cook_membrane_Q4P1("./msh/cook_membrane_quad_"*string(ndiv)*".msh")
 # elements, nodes ,nodes_p = import_cook_membrane_T6P3("./msh/cook_membrane_tri6_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(ndiv)*".msh")
 # elements, nodes = import_cook_membrane_Q8P3("./msh/cook_membrane_quad8_"*string(ndiv)*".msh")
 nᵤ = length(nodes)
 nₚ = length(nodes_p)
 nₑₚ = length(Ω)
-nₚ = length(elements["Ωᵖ"])
-
+# Q4P1
+# nₚ = length(elements["Ωᵖ"])
+# Q8P3
 # nₚ = 3*length(elements["Ωᵖ"])
-# nₑ = length(elements["Ω"])
+
+nₑ = length(elements["Ω"])
 # κ = 400942
 # μ = 80.1938
 # E = 9*κ*μ/(3*κ+μ)
 # ν = (3*κ-2*μ)/2/(3*κ+μ)
 Ē = 70.0
-# ν = 0.3333
+# ν = 0.3
+# ν̄  =0.3
 ν̄  =0.499999
 E = Ē/(1.0-ν̄^2)
  ν = ν̄/(1.0-ν̄)
@@ -45,30 +48,51 @@ set𝝭!(elements["Γᵗ"])
 
 
 
-eval(opsupmix)
-kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
-kₚᵤ = zeros(nₚ,2*nᵤ)
-kₚₚ = zeros(nₚ,nₚ)
-f = zeros(2*nᵤ)
-fp= zeros(nₚ)
-opsup[3](elements["Ω"],kᵤᵤ)
-opsup[4](elements["Ω"],elements["Ωᵖ"],kₚᵤ)
-opsup[5](elements["Ωᵖ"],kₚₚ)
-opsup[6](elements["Γᵗ"],f)
-αᵥ = 1e9
+# eval(opsupmix)
+# kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
+# kₚᵤ = zeros(nₚ,2*nᵤ)
+# kₚₚ = zeros(nₚ,nₚ)
+# f = zeros(2*nᵤ)
+# fp= zeros(nₚ)
+# opsup[3](elements["Ω"],kᵤᵤ)
+# opsup[4](elements["Ω"],elements["Ωᵖ"],kₚᵤ)
+# opsup[5](elements["Ωᵖ"],kₚₚ)
+# opsup[6](elements["Γᵗ"],f)
+# αᵥ = 1e9
 
-eval(opsPenalty)
-opsα[1](elements["Γᵍ"],kᵤᵤ,f)
-# opsα[2](elements["Γᵍ"],elements["Γᵍᵖ"],kᵤₚ,fp)
+# eval(opsPenalty)
+# opsα[1](elements["Γᵍ"],kᵤᵤ,f)
+# # opsα[2](elements["Γᵍ"],elements["Γᵍᵖ"],kᵤₚ,fp)
    
-k = [kᵤᵤ kₚᵤ';kₚᵤ kₚₚ]
-f = [f;fp]
-d = k\f
-d₁ = d[1:2:2*nᵤ]
-d₂ = d[2:2:2*nᵤ]
-q  = d[2*nᵤ+1:end]
-push!(nodes,:d₁=>d₁,:d₂=>d₂)
+# k = [kᵤᵤ kₚᵤ';kₚᵤ kₚₚ]
+# f = [f;fp]
+# d = k\f
+# d₁ = d[1:2:2*nᵤ]
+# d₂ = d[2:2:2*nᵤ]
+# q  = d[2*nᵤ+1:end]
+# push!(nodes,:d₁=>d₁,:d₂=>d₂)
 # push!(nodes_p,:q=>q)
+
+# # exact solution contour
+K=Ē/3/(1-2ν̄ )
+G=Ē/2/(1+ν̄ )
+p̄ = zeros(nₚ)
+i=0.0
+for p in nodes_p
+    i= p.𝐼
+    ξ¹ = p.x
+    ξ² = p.y
+    ∂ū₁∂x = -P/EI*(L-ξ¹)*ξ²
+    ∂ū₁∂y = -P/6/EI*((6*L-3*ξ¹)*ξ¹ + (2+ν )*(3*ξ²^2-D^2/4))
+    ∂ū₂∂x = P/6/EI*((6*L-3*ξ¹)*ξ¹ - 3*ν *ξ²^2 + (4+5*ν )*D^2/4)
+    ∂ū₂∂y = P/EI*(L-ξ¹)*ξ²*ν 
+    ε̄₁₁ = ∂ū₁∂x
+    ε̄₂₂ = ∂ū₂∂y
+    p̄[i]= K*(ε̄₁₁+ε̄₂₂)
+end
+push!(nodes_p,:q=>p̄)
+
+
 
 eval(VTK_mix_pressure)
 # eval(VTK_Q4P1_displacement_pressure)
@@ -129,16 +153,16 @@ eval(VTK_mix_pressure)
 # end
 # close(fo)
 
-a = elements["Ω"][end]
-ξs = collect(a.𝓖)
-𝝭 = ξs[3][:𝝭]
-u₂ = 0.0
-for (i,x) in enumerate(a.𝓒)
-    global u₂ += 𝝭[i]*x.d₂
-end
-h = nᵤ/nₚ
+# a = elements["Ω"][end]
+# ξs = collect(a.𝓖)
+# 𝝭 = ξs[3][:𝝭]
+# u₂ = 0.0
+# for (i,x) in enumerate(a.𝓒)
+#     global u₂ += 𝝭[i]*x.d₂
+# end
+# h = nᵤ/nₚ
 
-println(u₂)
+# println(u₂)
 # println(nₚ)
 # index = 10:30
 #     XLSX.openxlsx("./xlsx/cook.xlsx", mode="rw") do xf
