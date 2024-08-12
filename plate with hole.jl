@@ -4,11 +4,11 @@ using  ApproxOperator, LinearAlgebra, Printf, XLSX
 include("input.jl")
 
 # for i in 1637:1650
-    i=4558
-    ndiv= 24
+    i=284
+    ndiv= 16
     ndiv_p= 24
-    elements,nodes,nodes_p = import_fem_quad_plate_with_hole("./msh/plate_with_hole_quad_"*string(ndiv)*".msh","./msh/plate_with_hole_new_bubble_"*string(i)*".msh")
-    # elements,nodes,nodes_p =import_fem_tri3_plate_with_hole("./msh/plate_with_hole_"*string(ndiv)*".msh","./msh/plate_with_hole_new_bubble_"*string(i)*".msh")
+    # elements,nodes,nodes_p = import_fem_quad_plate_with_hole("./msh/plate_with_hole_"*string(ndiv)*".msh","./msh/plate_with_hole_new_bubble_"*string(i)*".msh")
+    elements,nodes,nodes_p =import_fem_tri3_plate_with_hole("./msh/plate_with_hole_"*string(ndiv)*".msh","./msh/plate_with_hole_new_bubble_"*string(i)*".msh")
 
     nᵤ = length(nodes)
     nₚ = length(nodes_p)

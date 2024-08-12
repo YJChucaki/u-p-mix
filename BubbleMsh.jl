@@ -8,7 +8,7 @@ path = "./msh/patchtest.msh"
 #  path = "./msh/square.msh"
 
  #square
-#  bubblemsh(path,[0.5,0.0,0.0],[0.48,0.48,0.0],4,0.18,0.01)
+ bubblemsh(path,[0.5,0.5,0.0],[0.4,0.4,0.0],225,0.05,0.01)
 
 
 #cantilever

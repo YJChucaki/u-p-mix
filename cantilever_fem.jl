@@ -1,4 +1,4 @@
-using  ApproxOperator, LinearAlgebra, Printf, TimerOutputs, XLSX
+using  ApproxOperator, LinearAlgebra, Printf, XLSX
 include("import_prescrible_ops.jl")
 include("import_cantilever.jl")
 
@@ -39,7 +39,7 @@ include("import_cantilever.jl")
         Operator{:∫vᵢgᵢds}(:α=>1e9*Ē),
         Operator{:Hₑ_PlaneStress}(:E=>E,:ν=>ν),
         Operator{:Hₑ_Incompressible}(:E=>Ē,:ν=>ν̄),
-        Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄),
+        Operator{:Hₑ_up_fem}(:E=>Ē,:ν=>ν̄),
     ]
 
     k = zeros(2*nᵤ,2*nᵤ)
@@ -54,30 +54,9 @@ include("import_cantilever.jl")
     d₁ = d[1:2:2*nᵤ]
     d₂ = d[2:2:2*nᵤ]
     push!(nodes,:d₁=>d₁,:d₂=>d₂)
-    p = zeros(nᵤ)
-    for ap in elements["Ω"]
-        𝓒 = ap.𝓒
-         𝓖 = ap.𝓖
-        ε₁₁ = 0.0
-        ε₂₂ = 0.0
-        ε₁₂ = 0.0
-        for (i,ξ) in enumerate(𝓖)
-                B₁ = ξ[:∂𝝭∂x]
-                B₂ = ξ[:∂𝝭∂y]
-                for (j,xⱼ) in enumerate(𝓒)
-                    I = xⱼ.𝐼
-                    ε₁₁ += B₁[j]*xⱼ.d₁
-                    ε₂₂ += B₂[j]*xⱼ.d₂
-                    ε₁₂ += B₁[j]*xⱼ.d₂ + B₂[j]*xⱼ.d₁
-                    p[I]=K*(ε₁₁+ε₂₂) 
-                end 
-        end
-        
-    end
-    push!(nodes,:q=>p)
 
-    # h1,l2 = ops[6](elements["Ωᵍ"])
-    h1,l2,h1_dil,h1_dev,l2_p = ops[7](elements["Ωᵍ"],elements["Ωᵍ"])
+    h1,l2 = ops[6](elements["Ωᵍ"])
+    # h1,l2,h1_dil,h1_dev,l2_p = ops[7](elements["Ωᵍ"])
     L2 = log10(l2)
     H1 = log10(h1)
     L2_p = log10(l2_p)

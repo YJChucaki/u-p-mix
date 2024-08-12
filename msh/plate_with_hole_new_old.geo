@@ -1,7 +1,7 @@
 
 a = 1.0;
 b = 5.0;
-n = 2;
+n = 32;
 
 Point(1) = {0.0, 0.0, 0.0};
 Point(2) = {  a, 0.0, 0.0};
@@ -41,4 +41,4 @@ Transfinite Surface{1};
 Mesh.Algorithm = 1;
 Mesh.MshFileVersion = 2;
 Mesh 2;
-RecombineMesh;
+// RecombineMesh;

@@ -60,7 +60,7 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_"*string(n
     opsup[4](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
     opsup[5](elements["Ωᵖ"],kₚₚ)
     opsup[6](elements["Γᵗ"],f)
-    αᵥ = 1e6
+    αᵥ = 1e9
 
     # eval(opsPenalty)
     # opsα[1](elements["Γᵍ"],kᵤᵤ,f)
@@ -94,7 +94,7 @@ elements, nodes ,nodes_p,Ω = import_cantilever_mix("./msh/cantilever_"*string(n
     # println(h1_dil,h1_dev)
     # h = log10(10.0/ndiv)
 
-    eval(VTK_mix_pressure)
+    # eval(VTK_mix_pressure)
     # eval(VTK_mix_displacement)
     # eval(VTK_Q4P1_displacement_pressure)
     # eval(VTK_T6P3_pressure)

@@ -163,6 +163,44 @@ function import_patchtest_mix_old(filename1::String, filename2::String)
     push!(elements["Ωᵍᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
     return elements, nodes, nodes_p , Ω
 end
+
+function import_patchtest_Q4P1(filename::String)
+    gmsh.initialize()
+    gmsh.open(filename)
+
+    entities = getPhysicalGroups()
+    nodes = get𝑿ᵢ()
+    x = nodes.x
+    y = nodes.y
+    z = nodes.z
+    integrationOrder_Ω = 10
+    integrationOrder_Γ = 10
+    integrationOrder_Ωᵍ =10
+    elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
+    elements["Ω"] = getElements(nodes, entities["Ω"],  integrationOrder_Ω)
+    elements["Ωᵍ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
+    elements["Ωᵍᵖ"] = getElements(nodes, entities["Ω"], integrationOrder_Ωᵍ)
+    elements["Γ¹ᵗ"] = getElements(nodes, entities["Γᵗ₁"],  integrationOrder_Γ, normal = true)
+    elements["Γ²ᵗ"] = getElements(nodes, entities["Γᵗ₂"],  integrationOrder_Γ, normal = true)
+    elements["Γ¹ᵍ"] = getElements(nodes, entities["Γᵍ₁"],  integrationOrder_Γ, normal = true)
+    elements["Γ²ᵍ"] = getElements(nodes, entities["Γᵍ₂"],  integrationOrder_Γ, normal = true)
+    elements["Γ³ᵍ"] = getElements(nodes, entities["Γᵍ₃"],  integrationOrder_Γ, normal = true)
+    # elements["Γᵖ"] = elements["Γ¹ᵖ"]∪elements["Γ²ᵖ"]∪elements["Γ³ᵖ"]∪elements["Γ⁴ᵖ"]
+    
+    push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+
+    push!(elements["Γ¹ᵗ"], :𝝭=>:𝑠)
+    push!(elements["Γ²ᵗ"], :𝝭=>:𝑠)
+    push!(elements["Γ¹ᵍ"], :𝝭=>:𝑠)
+    push!(elements["Γ²ᵍ"], :𝝭=>:𝑠)
+    push!(elements["Γ³ᵍ"], :𝝭=>:𝑠)
+    
+    # gmsh.finalize()
+    return elements, nodes
+end
+
 function import_patchtest_fem(filename::String)
     gmsh.initialize()
     gmsh.open(filename)
@@ -258,8 +296,8 @@ prescribeForFem = quote
     prescribe!(elements["Γ¹ᵗ"],:g=>(x,y,z)->T(x,y))
     prescribe!(elements["Γ²ᵗ"],:g=>(x,y,z)->T(x,y))
     prescribe!(elements["Ωᵍ"],:u=>(x,y,z)->T(x,y))
-    prescribe!(elements["Ωᵍᵖ"],:u=>(x,y,z)->P₁(x,y))
-    prescribe!(elements["Ωᵍᵖ"],:v=>(x,y,z)->P₂(x,y))
+    prescribe!(elements["Ωᵍ"],:p₁=>(x,y,z)->P₁(x,y))
+    prescribe!(elements["Ωᵍ"],:p₂=>(x,y,z)->P₂(x,y))
 
     prescribe!(elements["Γ¹ᵗ"],:t=>(x,y,z)->P₂(x,y))
     prescribe!(elements["Γ²ᵍ"],:t=>(x,y,z)->P₁(x,y))

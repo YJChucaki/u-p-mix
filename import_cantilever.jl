@@ -64,8 +64,8 @@ function import_cantilever_mix(filename1::String,filename2::String)
     x = nodes.x
     y = nodes.y
     z = nodes.z
-    integrationOrder_Ω = 9
-    integrationOrder_Γ = 9
+    integrationOrder_Ω = 4
+    integrationOrder_Γ = 4
     integrationOrder_Ωᵍ =10
     Ωᵘ = getElements(nodes, entities["Ω"])
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
@@ -88,9 +88,10 @@ function import_cantilever_mix(filename1::String,filename2::String)
     xᵖ = nodes_p.x
     yᵖ = nodes_p.y
     zᵖ = nodes_p.z
-    Ω = getElements(nodes_p, entities["Ω"])
+    print(entities)
+    Ω = getElements(nodes_p, entities[""])
     s, var𝐴 = cal_area_support(Ω)
-    s = 1.5*s*ones(length(nodes_p))
+    s = 2.5*s*ones(length(nodes_p))
     # s =1.8*12/ndiv_p*ones(length(nodes_p))
     # s = 1.3/10*ones(length(nodes_p))
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
@@ -110,7 +111,7 @@ function import_cantilever_mix(filename1::String,filename2::String)
     push!(elements["Ωᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
     push!(elements["Ωᵍᵖ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
     push!(elements["Ωᵍᵖ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
-    # gmsh.finalize()
+    gmsh.finalize()
     return elements, nodes, nodes_p,Ω,xᵖ,yᵖ,zᵖ, sp,type,Ωᵘ
 end
 function import_cantilever_reduce(filename1::String)
@@ -229,7 +230,7 @@ function import_cantilever_mix_bubble(filename1::String,filename2::String)
     xᵖ = nodes_p.x
     yᵖ = nodes_p.y
     zᵖ = nodes_p.z
-    Ω = getElements(nodes_p, entities["Ω"])
+    Ω = getElements(nodes_p, entities[""])
     s, var𝐴 = cal_area_support(Ω)
     s = 1.5*s*ones(length(nodes_p))
     # s = 2.5*s*ones(length(nodes_p))

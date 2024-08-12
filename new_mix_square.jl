@@ -1,10 +1,10 @@
- using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf, XLSX
+ using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf, XLSX, Alert
 # NP=[40,80,120,140]
 # for n=1:4
     # i=NP[n]
-ndiv= 5
-# ndiv_p= 46
-i= 50
+ndiv= 17
+# ndiv_p= 18
+i= 578
 # 40,60-3
 # 80-4
 # 100,120-5
@@ -12,11 +12,13 @@ i= 50
 include("import_prescrible_ops.jl")
 include("import_cantilever.jl")
 include("wirteVTK.jl")
-# elements, nodes ,nodes_p,Ω, xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
+elements, nodes ,nodes_p,Ω, xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_quad8_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p ,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/square_quad_"*string(ndiv)*".msh","./msh/square_"*string(ndiv_p)*".msh")
-elements, nodes ,nodes_p ,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/square_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p ,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./msh/square_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
 # elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_tri6_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(i)*".msh")
+# elements, nodes ,nodes_p ,xᵖ,yᵖ,zᵖ, sp,type= import_cantilever_mix("./msh/square_tri6_"*string(ndiv)*".msh","./msh/patchtest_tri6_"*string(ndiv)*".msh")
 # elements, nodes = import_cantilever_Q4P1("./msh/square_quad_"*string(ndiv)*".msh")
 # elements, nodes = import_cantilever_Q8P3("./msh/square_quad8_"*string(ndiv)*".msh")
 # elements, nodes ,nodes_p = import_cantilever_mix("./msh/square_tri6_"*string(ndiv)*".msh","./msh/square_"*string(ndiv)*".msh")
@@ -25,17 +27,17 @@ elements, nodes ,nodes_p ,Ω,xᵖ,yᵖ,zᵖ, sp,type = import_cantilever_mix("./
 nᵤ = length(nodes)
 nₚ = length(nodes_p)
 nₑ = length(elements["Ω"])
-nₑₚ = length(Ω)
+# nₑₚ = length(Ω)
     ##for Q4P1 
     # nₚ = length(elements["Ωᵖ"])
     ##for Q8P3 
     # nₚ = 3*length(elements["Ωᵖ"])
     nₘ=21
     P = 0
-    Ē = 3e6
-    # Ē = 1.0
-    ν̄ = 0.499
-    # ν̄ = 0.3
+    # Ē = 3e6
+    Ē = 1.0
+    # ν̄ = 0.499
+    ν̄ = 0.3
     E = Ē/(1.0-ν̄^2)
     ν = ν̄/(1.0-ν̄)
     L = 1
@@ -88,6 +90,7 @@ nₑₚ = length(Ω)
     vᵛ = eigvals(kᵛ)
     γ = eigvals(kᵛ,kᵈ)
     println(γ[2*nᵤ-nₚ+1])
+    alert()
 # # fo = open("./txt/inf_sup_value_"*string(ndiv)*"_1-1_tri3_"*string(ν̄ )*".txt","w") 
 #     fo = open("./txt/inf_sup_value_"*string(ndiv)*"_1-1_0.4999.txt","w") 
 #     for I in 1:2*nᵤ

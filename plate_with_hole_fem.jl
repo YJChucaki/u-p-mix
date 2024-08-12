@@ -4,12 +4,13 @@ include("import_plate_with_hole.jl")
 include("wirteVTK.jl")
 # for i=2:10
    
-ndiv = 8
+ndiv = 16
 # ndiv2 =4
 # nₚ =140
 # println(nₚ)
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
-elements,nodes= import_patchtest_fem("./msh/plate_with_hole_quad_"*string(ndiv)*".msh")
+# elements,nodes= import_patchtest_fem("./msh/plate_with_hole_quad_"*string(ndiv)*".msh")
+elements,nodes= import_patchtest_Q4P1("./msh/plate_with_hole_quad_"*string(ndiv)*".msh")
 # elements,nodes= import_patchtest_fem("./msh/plate_with_hole_new_quad_"*string(ndiv)*".msh")
 # elements,nodes= import_patchtest_fem("./msh/plate_with_hole.msh")
 nᵤ = length(nodes)
@@ -84,29 +85,29 @@ ops[2](elements["Γ¹ᵗ"],kᵅ,f)
 # ops[1](elements["Γ²ᵍ"],f)
 d = (k+kᵅ)\f #temperatures
 push!(nodes,:d=>d)
-p₁ = zeros(nᵤ)
-p₂ = zeros(nᵤ)
-for ap in elements["Ω"]
-       𝓒 = ap.𝓒
-       𝓖 = ap.𝓖
+# p₁ = zeros(nᵤ)
+# p₂ = zeros(nᵤ)
+# for ap in elements["Ω"]
+#        𝓒 = ap.𝓒
+#        𝓖 = ap.𝓖
        
-       for (i,ξ) in enumerate(𝓖)
-               B₁ = ξ[:∂𝝭∂x]
-               B₂ = ξ[:∂𝝭∂y]
-               for (j,xⱼ) in enumerate(𝓒)
-                   I = xⱼ.𝐼
-                   p₁[I] -= B₁[j]*xⱼ.d
-                   p₂[I] -= B₂[j]*xⱼ.d
-               end 
-       end
-   end
-   push!(nodes,:d₁=>p₁,:d₂=>p₂)
+#        for (i,ξ) in enumerate(𝓖)
+#                B₁ = ξ[:∂𝝭∂x]
+#                B₂ = ξ[:∂𝝭∂y]
+#                for (j,xⱼ) in enumerate(𝓒)
+#                    I = xⱼ.𝐼
+#                    p₁[I] -= B₁[j]*xⱼ.d
+#                    p₂[I] -= B₂[j]*xⱼ.d
+#                end 
+#        end
+#    end
+#    push!(nodes,:d₁=>p₁,:d₂=>p₂)
 
 
 set∇𝝭!(elements["Ωᵍ"])
 set∇𝝭!(elements["Ωᵍᵖ"])
 l2_u= ops[4](elements["Ωᵍ"])
-l2_p= ops[5](elements["Ωᵍᵖ"])
+l2_p= ops[5](elements["Ωᵍ"])
 
 L2_u = log10(l2_u)
 L2_p = log10(l2_p)

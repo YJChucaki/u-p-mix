@@ -1,8 +1,8 @@
-using ApproxOperator, JLD,LinearAlgebra, Printf ,Pardiso, Tensors
+using ApproxOperator, JLD,LinearAlgebra, Printf , Tensors
 
-ndiv= 3
+ndiv= 9
 # ndiv2= 24
-i= 5
+i= 162
 # ndiv_p=4
 include("import_prescrible_ops.jl")                       
 include("import_cantilever.jl")
@@ -121,14 +121,14 @@ k = [kᵤᵤ kₚᵤ' kₒᵤ';
      kₒᵤ kₚₒ' kₒₒ]
 # f = [fᵤ;fₚ;fₛ;fₒ]
 f = [fᵤ;fₚ;fₒ]
-    d = k\f
+    # d = k\f
  
 
-d₁ = d[1:2:2*nᵤ]
-d₂ = d[2:2:2*nᵤ]
-q  = d[2*nᵤ+1:2*nᵤ+nₚ]
-push!(nodes,:d₁=>d₁,:d₂=>d₂)
-push!(nodes_p,:q=>q)
+# d₁ = d[1:2:2*nᵤ]
+# d₂ = d[2:2:2*nᵤ]
+# q  = d[2*nᵤ+1:2*nᵤ+nₚ]
+# push!(nodes,:d₁=>d₁,:d₂=>d₂)
+# push!(nodes_p,:q=>q)
 # h1,l2,h1_dil,h1_dev,l2_p = ops[6](elements["Ωᵍ"],elements["Ωᵍᵖ"])
 # L2 = log10(l2)
 # H1 = log10(h1)

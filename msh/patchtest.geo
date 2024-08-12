@@ -1,6 +1,6 @@
 a = 1.0;
 b = 1.0;
-n = 40;
+n = 17;
 
 Point(1) = {0.0, 0.0, 0.0};
 Point(2) = {  a, 0.0, 0.0};
@@ -17,10 +17,11 @@ Plane Surface(1) = {1};
 
 
 Transfinite Curve{1,2,3,4} = n;
-
-Physical Curve("Γᵗ") = {2};
-Physical Curve("Γᵍ") = {4};
-Physical Curve("Γ") = {1,3};
+Transfinite Surface{1};
+Physical Curve("Γ₁") = {1};
+Physical Curve("Γ₂") = {2};
+Physical Curve("Γ₃") = {3};
+Physical Curve("Γ₄") = {4};
 //Physical Surface("Ω") = {1};
 
 //Transfinite Surface{1};
