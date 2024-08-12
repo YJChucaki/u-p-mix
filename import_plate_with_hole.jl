@@ -12,7 +12,7 @@ function import_patchtest_mix(filename1::String, filename2::String)
     zᵘ = nodes_u.z
     Ω = getElements(nodes_u, entities["Ω"])
     s, var𝐴 = cal_area_support(Ω)
-    s = 2.5*s*ones(length(nodes_u))
+    s = 1.5*s*ones(length(nodes_u))
     push!(nodes_u,:s₁=>s,:s₂=>s,:s₃=>s)
 
     integrationOrder_Ω = 6
@@ -315,14 +315,14 @@ prescribe = quote
     prescribe!(elements["Γ¹ᵗᵘ"],:g=>(x,y,z)->T(x,y))
     prescribe!(elements["Γ²ᵗᵘ"],:g=>(x,y,z)->T(x,y))
 
-    # prescribe!(elements["Γ¹ᵗᵘ"],:t=>(x,y,z)->P₁(x,y))
-    # prescribe!(elements["Γ²ᵗᵘ"],:g=>(x,y,z)->P₁(x,y))
-    # prescribe!(elements["Γ¹ᵗᵘ"],:t=>(x,y,z)->P₂(x,y))
-    # prescribe!(elements["Γ²ᵗᵘ"],:t₁=>(x,y,z)->P₁(x,y))
-    # prescribe!(elements["Γ²ᵗᵘ"],:t₂=>(x,y,z)->P₂(x,y))
+    prescribe!(elements["Γ¹ᵗᵘ"],:t=>(x,y,z)->P₁(x,y))
+    prescribe!(elements["Γ²ᵗᵘ"],:g=>(x,y,z)->P₁(x,y))
+    prescribe!(elements["Γ¹ᵗᵘ"],:t=>(x,y,z)->P₂(x,y))
+    prescribe!(elements["Γ²ᵗᵘ"],:t₁=>(x,y,z)->P₁(x,y))
+    prescribe!(elements["Γ²ᵗᵘ"],:t₂=>(x,y,z)->P₂(x,y))
     
-    # prescribe!(elements["Γ²ᵍᵘ"],:t=>(x,y,z)->P₁(x,y))
-    # prescribe!(elements["Γ²ᵍᵘ"],:t=>(x,y,z)->P₂(x,y))
+    prescribe!(elements["Γ²ᵍᵘ"],:t=>(x,y,z)->P₁(x,y))
+    prescribe!(elements["Γ²ᵍᵘ"],:t=>(x,y,z)->P₂(x,y))
     # prescribe!(elements["Γ¹ᵖ"],:n₁₁=>(x,y,z)->1.0)
     # prescribe!(elements["Γ¹ᵖ"],:n₁₂=>(x,y,z)->0.0)
     # prescribe!(elements["Γ¹ᵖ"],:n₂₂=>(x,y,z)->1.0)
@@ -340,8 +340,8 @@ prescribe = quote
     # prescribe!(elements["Γ⁴ᵖ"],:n₂₂=>(x,y,z)->1.0)
 
     prescribe!(elements["Ωᵍᵘ"],:u=>(x,y,z)->T(x,y))
-    prescribe!(elements["Ωᵍᵖ"],:u=>(x,y,z)->P₁(x,y))
-    prescribe!(elements["Ωᵍᵖ"],:v=>(x,y,z)->P₂(x,y))
+    prescribe!(elements["Ωᵍᵖ"],:p₁=>(x,y,z)->P₁(x,y))
+    prescribe!(elements["Ωᵍᵖ"],:p₂=>(x,y,z)->P₂(x,y))
 
 end
 

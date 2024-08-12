@@ -1,9 +1,12 @@
 using ApproxOperator,CairoMakie,Tensors, BenchmarkExample, Statistics
 import Gmsh: gmsh
-lwb = 1.5;lwm =1.;mso =10;msx =10;ppu = 2.5;α = 0.7;
-filename1 = "./msh/cantilever_4.msh"
-filename2 = "./msh/cantilever_bubble_147.msh"
-savename = "./png/cantilever_4_147.png"
+lwb = 1.5;lwm =0.1;mso =3;msx =2;ppu = 2.5;α = 0.7;
+# filename1 = "./msh/cantilever_32.msh"
+# filename2 = "./msh/cantilever_bubble_4165.msh"
+# savename = "./png/cantilever_32_4165.png"
+filename1 = "./msh/plate_with_hole_45.msh"
+filename2 = "./msh/plate_with_hole_2.msh"
+savename = "./png/plate_with_hole_2_45.png"
 
 gmsh.initialize()
 gmsh.open(filename1)
@@ -39,18 +42,18 @@ hidedecorations!(ax)
 L = 48.
 b = 12.
 
-for elm in elements["Ω"]
+for elm in elements["Ωᵖ"]
     id = [node.𝐼 for node in elm.𝓒]
-    lines!(x[id[index]],y[id[index]], linewidth = lwm, color = :grey)
+    lines!(xᵖ[id[index]],yᵖ[id[index]], linewidth = lwm, color = :grey)
 end
-lines!([0.0,L,L,0.0,0.0],[-b/2,-b/2,b/2,b/2,-b/2], linewidth = lwb, color = :black)
-scatter!(x,y,marker = :circle, markersize = mso, color = :black)
+# lines!([0.0,L,L,0.0,0.0],[-b/2,-b/2,b/2,b/2,-b/2], linewidth = lwb, color = :black)
+scatter!(xᵖ,yᵖ,marker = :circle, markersize = mso, color = :black)
 
 for elm in elements["Ωᵖ"]
     id = [node.𝐼 for node in elm.𝓒]
     # lines!(xᵖ[id[[1,2,3,1]]],yᵖ[id[[1,2,3,1]]], linewidth = lwm, color = :blue)
 end
-scatter!(xᵖ,yᵖ,marker = :xcross, markersize = msx, color = (:blue, α))
+scatter!(x,y,marker = :xcross, markersize = msx, color = (:blue, α))
 
 save(savename,f,px_per_unit = ppu)
 f
