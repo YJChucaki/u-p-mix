@@ -5,7 +5,7 @@ include("import_patchtest_bubble.jl")
 
 ndiv = 11
 nₚ = 100
-elements, nodes, nodes_p = import_mix_bubble("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
+elements, nodes, nodes_p = import_mix_bubble("./msh/patchtest_quad_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
 nᵤ = length(nodes)
 nₒ = length(elements["Ω"])
 nₛ = length(elements["Ω"])
@@ -19,8 +19,8 @@ set𝝭!(elements["Γᵖ"])
 set𝝭!(elements["Γˢ"])
 
 Ē = 1.0
-ν̄ = 0.4999999
-# ν̄ = 0.3
+# ν̄ = 0.4999999
+ν̄ = 0.3
 E = Ē/(1.0-ν̄^2)
 ν = ν̄/(1.0-ν̄)
 

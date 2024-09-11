@@ -298,6 +298,8 @@ prescribeForFem = quote
     prescribe!(elements["Ωᵍ"],:u=>(x,y,z)->T(x,y))
     prescribe!(elements["Ωᵍ"],:p₁=>(x,y,z)->P₁(x,y))
     prescribe!(elements["Ωᵍ"],:p₂=>(x,y,z)->P₂(x,y))
+    prescribe!(elements["Ωᵍ"],:u=>(x,y,z)->P₁(x,y))
+    prescribe!(elements["Ωᵍ"],:v=>(x,y,z)->P₂(x,y))
 
     prescribe!(elements["Γ¹ᵗ"],:t=>(x,y,z)->P₂(x,y))
     prescribe!(elements["Γ²ᵍ"],:t=>(x,y,z)->P₁(x,y))
@@ -342,6 +344,8 @@ prescribe = quote
     prescribe!(elements["Ωᵍᵘ"],:u=>(x,y,z)->T(x,y))
     prescribe!(elements["Ωᵍᵖ"],:p₁=>(x,y,z)->P₁(x,y))
     prescribe!(elements["Ωᵍᵖ"],:p₂=>(x,y,z)->P₂(x,y))
+    prescribe!(elements["Ωᵍᵖ"],:u=>(x,y,z)->P₁(x,y))
+    prescribe!(elements["Ωᵍᵖ"],:v=>(x,y,z)->P₂(x,y))
 
 end
 

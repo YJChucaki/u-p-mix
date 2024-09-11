@@ -323,12 +323,58 @@ function import_cook_membrane_fem(filename::String)
     return elements, nodes
 end
 
+function import_cook_membrane_MF(filename::String)
+    gmsh.initialize()
+    gmsh.open(filename)
+
+    entities = getPhysicalGroups()
+    nodes = get𝑿ᵢ()
+    x = nodes.x
+    y = nodes.y
+    z = nodes.z
+    integrationOrder_Ω = 4
+    integrationOrder_Γ = 4
+    integrationOrder_Ωᵍ =10
+    
+    Ω = getElements(nodes, entities["Ω"])
+    s, var𝐴 = cal_area_support(Ω)
+    s = 1.5*s*ones(length(nodes))
+    push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
+    # type = ReproducingKernel{:Quadratic2D,:□,:CubicSpline}
+    type = ReproducingKernel{:Linear2D,:□,:CubicSpline}
+    sp = RegularGrid(x,y,z,n = 3,γ = 5)
+    
+
+    elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
+    elements["Ω"] = getElements(nodes, entities["Ω"], type, integrationOrder_Ω, sp)
+    elements["Γᵍ"] = getElements(nodes, entities["Γᵍ"], type, integrationOrder_Γ, sp)
+    elements["Γᵗ"] = getElements(nodes, entities["Γᵗ"], type, integrationOrder_Γ, sp)
+    elements["Ωᵍ"] = getElements(nodes, entities["Ω"], type, integrationOrder_Ωᵍ, sp)
+    
+    nₘ=21
+    𝗠 = (0,zeros(nₘ))
+    ∂𝗠∂x = (0,zeros(nₘ))
+    ∂𝗠∂y = (0,zeros(nₘ))
+    push!(elements["Ω"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ω"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+    push!(elements["Ωᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Ωᵍ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+    push!(elements["Γᵗ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γᵗ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+    push!(elements["Γᵍ"], :𝝭=>:𝑠, :∂𝝭∂x=>:𝑠, :∂𝝭∂y=>:𝑠)
+    push!(elements["Γᵍ"], :𝗠=>𝗠, :∂𝗠∂x=>∂𝗠∂x, :∂𝗠∂y=>∂𝗠∂y)
+
+
+    return elements, nodes
+end
+
+
 
     
 
 prescribeForPenalty = quote
     prescribe!(elements["Γᵗ"],:t₁=>(x,y,z)->0.0)
-    prescribe!(elements["Γᵗ"],:t₂=>(x,y,z)->6.25)
+    # prescribe!(elements["Γᵗ"],:t₂=>(x,y,z)->6.25)
     prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->0.0)
     prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->0.0)
     # prescribe!(elements["Γᵍᵖ"],:n₁=>(x,y,z)->1.0)

@@ -2,16 +2,16 @@
 using BenchmarkExample
 import Gmsh: gmsh
 
-n = 6
+n = 17
 # filename = "heat_diffusion_patchtest_"
 # BenchmarkExample.PatchTest.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
 
 # filename = "plate_with_hole_quad_"
 # BenchmarkExample.Plate_with_hole.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true)
-# filename = "plate_with_hole_"
-# BenchmarkExample.Plate_with_hole.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
-filename = "plate_with_hole_tri6_"
-BenchmarkExample.Plate_with_hole.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, order = 2)
+filename = "plate_with_hole_"
+BenchmarkExample.Plate_with_hole.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n)
+# filename = "plate_with_hole_tri6_"
+# BenchmarkExample.Plate_with_hole.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, order = 2)
 # filename = "plate_with_hole_quad8_"
 # BenchmarkExample.Plate_with_hole.generateMsh("./msh/"*filename*string(n)*".msh", transfinite = n, quad = true, order = 2)
 # filename = "plate_with_hole_new_"

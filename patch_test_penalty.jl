@@ -9,7 +9,7 @@ ndiv= 11
 # elements, nodes = import_patchtest_fem("./msh/patchtest_tri6_"*string(ndiv)*".msh")
 # elements, nodes = import_patchtest_cross("./msh/patchtest_"*string(ndiv)*".msh")
 # elements, nodes = import_patchtest_stripe("./msh/patchtest_"*string(ndiv)*".msh")
-elements, nodes = import_patchtest_fem("./msh/patchtest_"*string(ndiv)*".msh")
+elements, nodes = import_patchtest_fem("./msh/patchtest_quad_"*string(ndiv)*".msh")
 
 nᵤ = length(nodes)
 nₑ = length(elements["Ω"])
@@ -36,7 +36,7 @@ E = 1.0
 # ∂²v∂x²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
 # ∂²v∂x∂y(x,y) = n*(n-1)*(x+y)^abs(n-2)
 # ∂²v∂y²(x,y)  = n*(n-1)*(x+y)^abs(n-2)
-n = 2
+n = 1
 u(x,y) = (1+2*x+3*y)^n
 v(x,y) = (4+5*x+6*y)^n
 ∂u∂x(x,y) = 2*n*(1+2*x+3*y)^abs(n-1)

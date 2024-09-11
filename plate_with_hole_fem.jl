@@ -4,13 +4,13 @@ include("import_plate_with_hole.jl")
 include("wirteVTK.jl")
 # for i=2:10
    
-ndiv = 16
+ndiv = 2
 # ndiv2 =4
 # nₚ =140
 # println(nₚ)
 # elements,nodes,nodes_p = import_patchtest_mix("./msh/patchtest_"*string(ndiv)*".msh","./msh/patchtest_bubble_"*string(nₚ)*".msh")
-# elements,nodes= import_patchtest_fem("./msh/plate_with_hole_quad_"*string(ndiv)*".msh")
-elements,nodes= import_patchtest_Q4P1("./msh/plate_with_hole_quad_"*string(ndiv)*".msh")
+elements,nodes= import_patchtest_fem("./msh/plate_with_hole_"*string(ndiv)*".msh")
+# elements,nodes= import_patchtest_Q4P1("./msh/plate_with_hole_quad_"*string(ndiv)*".msh")
 # elements,nodes= import_patchtest_fem("./msh/plate_with_hole_new_quad_"*string(ndiv)*".msh")
 # elements,nodes= import_patchtest_fem("./msh/plate_with_hole.msh")
 nᵤ = length(nodes)
@@ -107,13 +107,13 @@ push!(nodes,:d=>d)
 set∇𝝭!(elements["Ωᵍ"])
 set∇𝝭!(elements["Ωᵍᵖ"])
 l2_u= ops[4](elements["Ωᵍ"])
-l2_p= ops[5](elements["Ωᵍ"])
+# l2_p= ops[5](elements["Ωᵍ"])
 
 L2_u = log10(l2_u)
-L2_p = log10(l2_p)
+# L2_p = log10(l2_p)
      
 println(L2_u)
-println(L2_p)
+# println(L2_p)
            
 
 

@@ -1,37 +1,40 @@
 
-using  ApproxOperator, LinearAlgebra, Printf
-ndiv=5
+using ApproxOperator, Tensors, JLD,LinearAlgebra, GLMakie, CairoMakie, Printf
 include("input.jl")
-elements, nodes ,elms= import_gauss_quadratic("./msh/cook_membrance_"*string(ndiv)*".msh",:TriGI3)
+# for i in 2:10
+ndiv= 5
+
+
+
+include("import_prescrible_ops.jl")
+include("import_cook_membrane.jl")
+include("wirteVTK.jl")
+elements, nodes  = import_cook_membrane_fem("./msh/cook_membrane_"*string(ndiv)*".msh")
+# elements, nodes  = import_cook_membrane_MF("./msh/cook_membrane_"*string(ndiv)*".msh")
+# elements, nodes ,nodes_p,Ω = import_cook_membrane_mix("./msh/cook_membrane_quad_"*string(ndiv)*".msh","./msh/cook_membrane_"*string(i)*".msh")
+nᵤ = length(nodes)
+nₑ = length(elements["Ω"])
 
 κ = 400942
 μ = 80.1938
 E = 9*κ*μ/(3*κ+μ)
-# ν = (3*κ-2*μ)/2/(3*κ+μ)
-ν =0.499999999
+ν = (3*κ-2*μ)/2/(3*κ+μ)
+# ν =0.499999999
 # E = 70.0
 # ν = 0.3333
 Cᵢᵢᵢᵢ = E*(1-ν)/(1+ν)/(1-2*ν)
 Cᵢᵢⱼⱼ = E*ν/(1+ν)/(1-2*ν)
 Cᵢⱼᵢⱼ = E/(1+ν)/2
 
-nₚ = length(nodes)
-nₑ = length(elements["Ω"])
-s = 2.5*44/ndiv*ones(nₚ)
-push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
+eval(prescribeForPenalty)
 
-set𝝭!(elements["Ω"])
 set∇𝝭!(elements["Ω"])
-set𝝭!(elements["Γᵗ"])
+set∇𝝭!(elements["Ωᵍ"])
 set𝝭!(elements["Γᵍ"])
-set∇𝝭!(elements["Ωᶜ"])
+set𝝭!(elements["Γᵗ"])
 
-prescribe!(elements["Γᵗ"],:t₁=>(x,y,z)->0.0)
-prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->0.0)
-prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->0.0)
-prescribe!(elements["Γᵍ"],:n₁₁=>(x,y,z)->1.0)
-prescribe!(elements["Γᵍ"],:n₁₂=>(x,y,z)->0.0)
-prescribe!(elements["Γᵍ"],:n₂₂=>(x,y,z)->1.0)
+
+
 
 ops = [
     Operator{:Δ∫∫EᵢⱼSᵢⱼdxdy_NeoHookean}(:E=>E,:ν=>ν),
@@ -40,16 +43,16 @@ ops = [
     Operator{:∫vᵢuᵢds}(:α=>1e7*E),
 ]
 
-k = zeros(2*nₚ,2*nₚ)
-kα = zeros(2*nₚ,2*nₚ)
-f = zeros(2*nₚ)
-fα = zeros(2*nₚ)
-fint = zeros(2*nₚ)
-fext = zeros(2*nₚ)
-d = zeros(2*nₚ)
-Δd= zeros(2*nₚ)
-d₁ = zeros(nₚ)
-d₂ = zeros(nₚ)
+k = zeros(2*nᵤ,2*nᵤ)
+kα = zeros(2*nᵤ,2*nᵤ)
+f = zeros(2*nᵤ)
+fα = zeros(2*nᵤ)
+fint = zeros(2*nᵤ)
+fext = zeros(2*nᵤ)
+d = zeros(2*nᵤ)
+Δd= zeros(2*nᵤ)
+d₁ = zeros(nᵤ)
+d₂ = zeros(nᵤ)
 
 push!(nodes,:d₁=>d₁,:d₂=>d₂)
 
@@ -114,8 +117,8 @@ for (n,p) in enumerate(P)
         # d .+= λ*Δd 
 
         d .+= Δd 
-        d₁ .= d[1:2:2*nₚ]
-        d₂ .= d[2:2:2*nₚ]
+        d₁ .= d[1:2:2*nᵤ]
+        d₂ .= d[2:2:2*nᵤ]
 
         Δdnorm = LinearAlgebra.norm(Δd)
         # Δdnorm = LinearAlgebra.norm(λ*Δd)
@@ -134,59 +137,3 @@ end
 u=d₂[3]
 println(u)
 
-# fo = open("./vtk/cook_membrance_rkgsi_mix_"*string(ndiv_𝑢)*".vtk","w")
-# fo = open("./vtk/cook_membrance_rkgsi_"*string(ndiv_𝑢)*".vtk","w")
-fo = open("./vtk/cook_membrance_guass3_"*string(ndiv)*".vtk","w")
-@printf fo "# vtk DataFile Version 2.0\n"
-# @printf fo "cook_membrance_rkgsi_mix\n"
-@printf fo "cook_membrance_guass3\n"
-@printf fo "ASCII\n"
-@printf fo "DATASET POLYDATA\n"
-@printf fo "POINTS %i float\n" nₚ
-for p in nodes
-    @printf fo "%f %f %f\n" p.x p.y p.z
-end
-@printf fo "POLYGONS %i %i\n" nₑ 4*nₑ
-for ap in elms["Ω"]
-    𝓒 = ap.vertices
-    @printf fo "%i %i %i %i\n" 3 (x.i-1 for x in 𝓒)...
-end
-@printf fo "POINT_DATA %i\n" nₚ
-@printf fo "VECTORS U float\n"
-for p in elements["Ωᶜ"]
-    ξ = collect(p.𝓖)[1]
-    N = ξ[:𝝭]
-    u₁ = 0.0
-    u₂ = 0.0
-    for (i,x) in enumerate(p.𝓒)
-        u₁ += N[i]*x.d₁
-        u₂ += N[i]*x.d₂
-    end
-    @printf fo "%f %f %f\n" u₁ u₂ 0.0
-end
-
-@printf fo "TENSORS STRESS float\n"
-for p in elements["Ωᶜ"]
-    𝓒 = p.𝓒
-    𝓖 = p.𝓖
-    ε₁₁ = 0.0
-    ε₂₂ = 0.0
-    ε₁₂ = 0.0
-
-    for (i,ξ) in enumerate(𝓖)
-        B₁ = ξ[:∂𝝭∂x]
-        B₂ = ξ[:∂𝝭∂y]
-        for (j,xⱼ) in enumerate(𝓒)
-            ε₁₁ += B₁[j]*xⱼ.d₁
-            ε₂₂ += B₂[j]*xⱼ.d₂
-            ε₁₂ += B₁[j]*xⱼ.d₂ + B₂[j]*xⱼ.d₁
-        end
-    end
-    σ₁₁ = Cᵢᵢᵢᵢ*ε₁₁+Cᵢᵢⱼⱼ*ε₂₂
-    σ₂₂ = Cᵢᵢⱼⱼ*ε₁₁+Cᵢᵢᵢᵢ*ε₂₂
-    σ₁₂ = Cᵢⱼᵢⱼ*ε₁₂
-    @printf fo "%f %f %f\n" σ₁₁ σ₁₂ 0.0
-    @printf fo "%f %f %f\n" σ₁₂ σ₂₂ 0.0
-    @printf fo "%f %f %f\n" 0.0 0.0 0.0
-end
-close(fo)
